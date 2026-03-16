@@ -1,6 +1,6 @@
 # Instructions:<br>
 ## Step 1: Google Cloud Console<br>
-Go to https://console.cloud.google.com/<br>, create a project, and type in in order:<br>
+Go to https://console.cloud.google.com/, create a project, and type in in order:<br>
 ## Step 2: Clone in the Code
 ```
 git clone https://github.com/evanliaomusic/hongdousg.git

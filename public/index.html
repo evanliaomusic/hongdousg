@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>HongDou SG</title>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    <!-- This line connects to the FAN'S database -->
+    <script src="/__/firebase/init.js"></script>
+</head>
+<body>
+    <div id="loading">Updating App...</div>
+    <script>
+        // 1. Fetch YOUR latest code from GitHub
+        const GITHUB_URL = "https://raw.githubusercontent.com/evanliaomusic/hongdousg/refs/heads/main/public/index.html";
+
+        fetch(GITHUB_URL)
+            .then(res => res.text())
+            .then(html => {
+                // 2. We need to strip the <html> and <body> tags from your file 
+                // so we can inject it into this page.
+                document.open();
+                document.write(html);
+                document.close();
+            })
+            .catch(err => {
+                document.getElementById('loading').innerText = "Error loading app. Check internet.";
+            });
+    </script>
+</body>
+</html>

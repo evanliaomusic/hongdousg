@@ -1,2 +1,1 @@
-[[![Open in Cloud Shell](https://gstatic.com/cloudssh/images/open-btn.svg)](https://shell.cloud.google.com/cloudshell/editor?cloudshell_git_repo=https://github.com/evanliaomusic/hongdousg)
-](https://github.com/evanliaomusic/hongdousg.git)
+[![One-Click Deploy to Firebase](https://gstatic.com/cloudssh/images/open-btn.svg)](https://shell.cloud.google.com/cloudshell/editor?cloudshell_git_repo=https://github.com/evanliaomusic/hongdousg&cloudshell_tutorial=tutorial.md)

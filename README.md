@@ -2,4 +2,4 @@
 
 Click the button below to deploy this IDE to your own Firebase account instantly.
 
-[![Deploy to Firebase](https://deploy.cloud.run/button.svg)](https://deploy.cloud.run/?git_repo=https://github.com/evanliaomusic/hongdousg.git)
+[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/evanliaomusic/hongdousg)

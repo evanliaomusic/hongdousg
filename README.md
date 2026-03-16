@@ -1,8 +1,8 @@
 # Instructions:<br>
-###Step 1:<br>
+### Step 1:<br>
 Go to https://console.cloud.google.com/<br><br>
 Type in in order:
-Step 1:
+### Step 2:
 ```
 git clone https://github.com/evanliaomusic/hongdousg.git [newname]
 ```

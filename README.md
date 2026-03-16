@@ -1,4 +1,4 @@
-###Step 1:
+Step 1:
 Step 1: go to https://console.cloud.google.com/
 Type in in order:
 

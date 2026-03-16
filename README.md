@@ -1,5 +1,5 @@
-# Step 1:<br>
-Step 1: go to https://console.cloud.google.com/
+# Instructions:<br>
+Step 1:<br>Go to https://console.cloud.google.com/<br><br>
 Type in in order:
 Step 1:
 ```

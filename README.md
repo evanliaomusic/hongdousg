@@ -6,20 +6,13 @@ Go to https://console.cloud.google.com/ , create a new project (note the Project
 git clone https://github.com/evanliaomusic/hongdousg.git
 cd hongdousg
 ```
-Step 3: Authenticate the CLI
-
-Even in Cloud Shell, you must link the Firebase tool to your account:
-
-code
-Bash
-download
-content_copy
-expand_less
+## Step 3: Authenticate the CLI
+Link the Firebase tool to your account:
+```
 firebase login --no-localhost
-
+```
 Click the link provided, sign in, copy the authorization code, and paste it back into the terminal.
-
-Step 4: Enable Firebase Features
+## Step 4: Enable Firebase Features
 
 Google Cloud projects do not have Firebase enabled by default. Run this to "Firebase-ify" your GCP project:
 

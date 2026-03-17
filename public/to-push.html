@@ -2576,7 +2576,6 @@ This app runs in a sandbox. DO NOT use localStorage or initialize Firebase. Use 
 2. LOAD (Read Once): window.parent.postMessage({ action: 'LOAD_DATA', key: 'score', reqId: 'r1' }, '*');
 3. SUBSCRIBE (Realtime Listen): window.parent.postMessage({ action: 'SUBSCRIBE_DATA', key: 'score' }, '*');
 4. UNSUBSCRIBE: window.parent.postMessage({ action: 'UNSUBSCRIBE_DATA', key: 'score' }, '*');
-5. Whenever the user asks for an app that involves collaborative work, add in a rudimentary log-in system where users input their name, and ensure there is storage of individual user interaction in a hidden right side teacher control panel.
 
 LISTENER (Handle Responses):
 window.addEventListener('message', (e) => {
@@ -2791,7 +2790,6 @@ This app runs in a sandbox. DO NOT use localStorage or initialize Firebase. Use 
 2. LOAD (Read Once): window.parent.postMessage({ action: 'LOAD_DATA', key: 'score', reqId: 'r1' }, '*');
 3. SUBSCRIBE (Realtime Listen): window.parent.postMessage({ action: 'SUBSCRIBE_DATA', key: 'score' }, '*');
 4. UNSUBSCRIBE: window.parent.postMessage({ action: 'UNSUBSCRIBE_DATA', key: 'score' }, '*');
-5. Whenever the user asks for an app that involves collaborative work, add in a rudimentary log-in system where users input their name, and ensure there is storage of individual user interaction in a hidden right side teacher control panel
 
 LISTENER (Handle Responses):
 window.addEventListener('message', (e) => {

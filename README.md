@@ -1,15 +1,11 @@
 # Instructions<br>
 ## Step 1: Open Cloud Shell
-Go to console.cloud.google.com, create a new project (note the Project ID), and click the Activate Cloud Shell icon >_ in the top right header.
-
-Step 2: Clone the Code
-code
-Bash
-download
-content_copy
-expand_less
+Go to https://console.cloud.google.com/ , create a new project (note the Project ID), and click the Activate Cloud Shell icon >_ in the top right header.
+## Step 2: Clone the Code
+```
 git clone https://github.com/evanliaomusic/hongdousg.git
 cd hongdousg
+```
 Step 3: Authenticate the CLI
 
 Even in Cloud Shell, you must link the Firebase tool to your account:

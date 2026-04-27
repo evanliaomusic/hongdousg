@@ -2216,8 +2216,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const appTitle = document.getElementById('app-title-input').value.trim() || 'my-app';
         const htmlContent = codeEditor.value;
         const zip = new JSZip();
-        // By adding the folder path to the filename, JSZip creates the directory.
-        zip.file(appTitle + "/index.html", htmlContent);
+        // Place file at root of ZIP
+        zip.file("index.html", htmlContent);
         zip.generateAsync({type:"blob"}).then(function(content) {
             const a = document.createElement('a');
             a.href = URL.createObjectURL(content);
@@ -2245,7 +2245,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const htmlContent = codeEditor.value;
         const zip = new JSZip();
 
-        zip.file(appTitle + "/index.html", htmlContent);
+        zip.file("index.html", htmlContent);
         zip.generateAsync({type:"blob"}).then(function(content) {
             const a = document.createElement('a');
             a.href = URL.createObjectURL(content);

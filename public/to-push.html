@@ -2671,7 +2671,7 @@ JSON STRUCTURE:
 }
 
 DATA STORAGE BRIDGE (Realtime Database & Persistence):
-This app runs in a sandbox. DO NOT use localStorage or initialize Firebase. Use the built-in Parent Bridge for Realtime Sync:
+This app runs in a sandbox. Use localStorage indexDB until asked for collaborative app, then use the built-in Parent Bridge for Realtime Sync:
 1. SAVE (Write): window.parent.postMessage({ action: 'SAVE_DATA', key: 'score', value: 100 }, '*');
 2. LOAD (Read Once): window.parent.postMessage({ action: 'LOAD_DATA', key: 'score', reqId: 'r1' }, '*');
 3. SUBSCRIBE (Realtime Listen): window.parent.postMessage({ action: 'SUBSCRIBE_DATA', key: 'score' }, '*');
@@ -2898,7 +2898,7 @@ JSON STRUCTURE:
 }
 
 DATA STORAGE BRIDGE (Realtime Database & Persistence):
-This app runs in a sandbox. DO NOT use localStorage or initialize Firebase. Use the built-in Parent Bridge for Realtime Sync:
+This app runs in a sandbox. Use localStorage indexDB until asked for collaborative app, then use the built-in Parent Bridge for Realtime Sync:
 1. SAVE (Write): window.parent.postMessage({ action: 'SAVE_DATA', key: 'score', value: 100 }, '*');
 2. LOAD (Read Once): window.parent.postMessage({ action: 'LOAD_DATA', key: 'score', reqId: 'r1' }, '*');
 3. SUBSCRIBE (Realtime Listen): window.parent.postMessage({ action: 'SUBSCRIBE_DATA', key: 'score' }, '*');

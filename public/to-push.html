@@ -2670,14 +2670,17 @@ JSON STRUCTURE:
 ]
 }
 
-DATA STORAGE BRIDGE (Realtime Database & Persistence):
-This app runs in a sandbox. DO NOT use localStorage or initialize Firebase. Use the built-in Parent Bridge for Realtime Sync:
+DATA STORAGE:
+All apps should be purely offline by default, saving data in IndexedDB or localStorage.
+HOWEVER, if the user explicitly requests online collaborative work, you must enable the "Realtime Database Switch" (add a comment like "<!-- ONLINE COLLABORATION ENABLED -->" in the HTML) and use the built-in Parent Bridge for Realtime Sync INSTEAD of local storage.
+
+PARENT BRIDGE API (ONLY USE IF COLLABORATION IS REQUESTED):
 1. SAVE (Write): window.parent.postMessage({ action: 'SAVE_DATA', key: 'score', value: 100 }, '*');
 2. LOAD (Read Once): window.parent.postMessage({ action: 'LOAD_DATA', key: 'score', reqId: 'r1' }, '*');
 3. SUBSCRIBE (Realtime Listen): window.parent.postMessage({ action: 'SUBSCRIBE_DATA', key: 'score' }, '*');
 4. UNSUBSCRIBE: window.parent.postMessage({ action: 'UNSUBSCRIBE_DATA', key: 'score' }, '*');
 
-LISTENER (Handle Responses):
+LISTENER (Handle Responses - ONLY IF COLLABORATION ENABLED):
 window.addEventListener('message', (e) => {
    if(e.data.action === 'DATA_LOADED') console.log('Loaded:', e.data.value);
    if(e.data.action === 'DATA_UPDATED') {
@@ -2897,14 +2900,17 @@ JSON STRUCTURE:
 ]
 }
 
-DATA STORAGE BRIDGE (Realtime Database & Persistence):
-This app runs in a sandbox. DO NOT use localStorage or initialize Firebase. Use the built-in Parent Bridge for Realtime Sync:
+DATA STORAGE:
+All apps should be purely offline by default, saving data in IndexedDB or localStorage.
+HOWEVER, if the user explicitly requests online collaborative work, you must enable the "Realtime Database Switch" (add a comment like "<!-- ONLINE COLLABORATION ENABLED -->" in the HTML) and use the built-in Parent Bridge for Realtime Sync INSTEAD of local storage.
+
+PARENT BRIDGE API (ONLY USE IF COLLABORATION IS REQUESTED):
 1. SAVE (Write): window.parent.postMessage({ action: 'SAVE_DATA', key: 'score', value: 100 }, '*');
 2. LOAD (Read Once): window.parent.postMessage({ action: 'LOAD_DATA', key: 'score', reqId: 'r1' }, '*');
 3. SUBSCRIBE (Realtime Listen): window.parent.postMessage({ action: 'SUBSCRIBE_DATA', key: 'score' }, '*');
 4. UNSUBSCRIBE: window.parent.postMessage({ action: 'UNSUBSCRIBE_DATA', key: 'score' }, '*');
 
-LISTENER (Handle Responses):
+LISTENER (Handle Responses - ONLY IF COLLABORATION ENABLED):
 window.addEventListener('message', (e) => {
    if(e.data.action === 'DATA_LOADED') console.log('Loaded:', e.data.value);
    if(e.data.action === 'DATA_UPDATED') {

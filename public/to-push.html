@@ -1738,6 +1738,7 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             let destinationArray;
             let folderToOpen = activeFolderId;
+            const selectedItem = findItem(currentlySelectedVersionId);
 
             // Priority 1: Save into the folder currently being viewed
             const currentFolder = findItem(activeFolderId);
@@ -1746,7 +1747,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 destinationArray = currentFolder.children;
             } else {
                 // Priority 2: Fallback to the parent of the currently selected version
-                const selectedItem = findItem(currentlySelectedVersionId);
                 if (selectedItem) {
                     const parentOfSelected = findParent(currentlySelectedVersionId);
                     const siblings = parentOfSelected ? parentOfSelected.children : versionData;

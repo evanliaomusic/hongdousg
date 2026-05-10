@@ -1794,6 +1794,16 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         currentlySelectedVersionId = newVersion.id;
+        // Navigate the Assets panel to the folder containing the new version
+        const newVersionParent = findParent(newVersion.id);
+        if (newVersionParent) {
+            if (newVersionParent.type === 'folder') {
+                activeFolderId = newVersionParent.id;
+            } else if (newVersionParent.type === 'version') {
+                const grandParent = findParent(newVersionParent.id);
+                if (grandParent && grandParent.type === 'folder') activeFolderId = grandParent.id;
+            }
+        }
         saveVersionsToStorage();
         renderVersionsTree();
     }

@@ -1737,72 +1737,32 @@ document.addEventListener('DOMContentLoaded', function() {
             versionData.push(newFolder);
             activeFolderId = newFolder.id;
         } else {
-            let destinationArray;
-            let folderToOpen = activeFolderId;
-            const selectedItem = findItem(currentlySelectedVersionId);
-
-            // Priority 1: Save into the folder currently being viewed
+            let destinationArray = versionData;
+            
+            // Priority: Use the folder currently being viewed (even if empty)
             const currentFolder = findItem(activeFolderId);
             if (currentFolder && currentFolder.type === 'folder') {
                 if (!currentFolder.children) currentFolder.children = [];
                 destinationArray = currentFolder.children;
-            } else {
-                // Priority 2: Fallback to the parent of the currently selected version
-                if (selectedItem) {
-                    const parentOfSelected = findParent(currentlySelectedVersionId);
-                    const siblings = parentOfSelected ? parentOfSelected.children : versionData;
-                    const selectedIndex = siblings.findIndex(s => s.id === currentlySelectedVersionId);
-                    const isLatestInBranch = selectedIndex === siblings.length - 1 && (!selectedItem.children || selectedItem.children.length === 0);
-
-                    if (isLatestInBranch) {
-                        destinationArray = siblings;
-                    } else {
-                        if (!selectedItem.children) selectedItem.children = [];
-                        destinationArray = selectedItem.children;
-                    }
-                    folderToOpen = parentOfSelected ? (parentOfSelected.type === 'folder' ? parentOfSelected.id : findParent(parentOfSelected.id)?.id) : null;
-                } else {
-                    // Priority 3: Root of the database
-                    destinationArray = versionData;
-                    folderToOpen = null;
-                }
-            }
-
-            if (selectedItem) {
+            } else if (currentlySelectedVersionId) {
+                // Fallback: Use the siblings of the currently selected version
                 const parentOfSelected = findParent(currentlySelectedVersionId);
-                const siblings = parentOfSelected ? parentOfSelected.children : versionData;
-                
-                // Always add as a sibling to the currently selected version to keep them in the same context
-                destinationArray = siblings;
-
-                // Find the containing folder to keep the UI synced
-                let folderFinder = parentOfSelected;
-                while (folderFinder && folderFinder.type !== 'folder') {
-                    folderFinder = findParent(folderFinder.id);
-                }
-                folderToOpen = folderFinder ? folderFinder.id : null;
-            } else { // No version is selected, add to the last project folder
+                destinationArray = parentOfSelected ? parentOfSelected.children : versionData;
+            } else {
+                // Final Fallback: Last project folder
                 let lastRootFolder = [...versionData].reverse().find(item => item.type === 'folder');
                 if (!lastRootFolder) {
                     lastRootFolder = { id: `f-${Date.now()}`, type: 'folder', name: "Unsorted Edits", children: [] };
                     versionData.push(lastRootFolder);
                 }
-                if (!lastRootFolder.children) lastRootFolder.children = []; destinationArray = lastRootFolder.children;
-                folderToOpen = lastRootFolder.id;
+                if (!lastRootFolder.children) lastRootFolder.children = [];
+                destinationArray = lastRootFolder.children;
+                activeFolderId = lastRootFolder.id;
             }
             destinationArray.push(newVersion);
-            // Update context but don't force-jump if the user is already in a folder
-            if (!activeFolderId) activeFolderId = folderToOpen;
         }
 
         currentlySelectedVersionId = newVersion.id;
-        
-        // Force the Assets panel to show the folder containing the new version
-        let syncFolder = findParent(newVersion.id);
-        while (syncFolder && syncFolder.type !== 'folder') {
-            syncFolder = findParent(syncFolder.id);
-        }
-        if (syncFolder) activeFolderId = syncFolder.id;
 
         saveVersionsToStorage();
         renderVersionsTree();

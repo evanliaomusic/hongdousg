@@ -223,6 +223,9 @@
             color: var(--text-color); font-family: inherit; font-size: inherit;
             border-radius: 4px; padding: 2px 5px; width: calc(100% - 10px);
         }
+        .bulk-select-checkbox {
+            width: auto;
+        }
 
         /* Drag and Drop styles */
         .drag-over { border: 2px dashed var(--primary-color) !important; background-color: rgba(74, 125, 255, 0.2) !important; }
@@ -371,6 +374,8 @@
             <div class="panel-header">
                 <h3 data-translate-key="versionsHeader">Versions</h3>
                 <div class="panel-header-actions">
+                    <button id="bulk-select-button" class="action-button" style="padding: 6px 12px; font-size: 13px; background-color: #6c757d;" onclick="toggleBulkSelectionMode()">Select</button>
+                    <button id="bulk-delete-button" class="action-button" style="padding: 6px 12px; font-size: 13px; background-color: #dc3545; display: none;" onclick="executeBulkDelete()">Delete</button>
                     <button id="new-folder-button" class="action-button" style="padding: 6px 12px; font-size: 13px; background-color: var(--primary-color);" data-translate-key="newFolderButton">New Folder</button>
                 </div>
             </div>
@@ -1674,10 +1679,11 @@ document.addEventListener('DOMContentLoaded', function() {
         renderVersionsTree();
     }
 
-    function deleteItem(id) {
-        if (!confirm("Are you sure you want to delete this item and all its children?")) return;
+    function deleteItem(id, skipConfirmAndRender = false) {
+        if (!skipConfirmAndRender && !confirm("Are you sure you want to delete this item and all its children?")) return;
         const parent = findParent(id);
         const arrayToDeleteFrom = parent ? parent.children : versionData;
+        if (!arrayToDeleteFrom) return;
         const index = arrayToDeleteFrom.findIndex(item => item.id === id);
         if (index > -1) {
             arrayToDeleteFrom.splice(index, 1);
@@ -1686,9 +1692,46 @@ document.addEventListener('DOMContentLoaded', function() {
                 codeEditor.value = initialCode;
                 updatePreview();
             }
-            saveVersionsToStorage();
-            renderVersionsTree();
+            if (!skipConfirmAndRender) {
+                saveVersionsToStorage();
+                renderVersionsTree();
+            }
         }
+    }
+
+    let isBulkSelectionMode = false;
+
+    function toggleBulkSelectionMode() {
+        isBulkSelectionMode = !isBulkSelectionMode;
+        const btn = document.getElementById('bulk-select-button');
+        const delBtn = document.getElementById('bulk-delete-button');
+        if (isBulkSelectionMode) {
+            btn.textContent = "Cancel";
+            delBtn.style.display = "inline-block";
+        } else {
+            btn.textContent = "Select";
+            delBtn.style.display = "none";
+        }
+        renderVersionsTree();
+    }
+
+    function executeBulkDelete() {
+        const checkboxes = document.querySelectorAll('.bulk-select-checkbox:checked');
+        if (checkboxes.length === 0) {
+            alert("No items selected.");
+            return;
+        }
+        if (!confirm(`Are you sure you want to delete ${checkboxes.length} selected item(s) and all their children?`)) return;
+
+        checkboxes.forEach(cb => {
+            const id = cb.dataset.id;
+            deleteItem(id, true);
+        });
+        saveVersionsToStorage();
+        isBulkSelectionMode = false;
+        document.getElementById('bulk-select-button').textContent = "Select";
+        document.getElementById('bulk-delete-button').style.display = "none";
+        renderVersionsTree();
     }
 
     function renameItem(id, nameWrapper) {
@@ -1742,6 +1785,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 const nameWrapper = document.createElement('div');
                 nameWrapper.className = 'item-name-wrapper';
+                if (typeof isBulkSelectionMode !== 'undefined' && isBulkSelectionMode) {
+                    const cb = document.createElement('input');
+                    cb.type = 'checkbox';
+                    cb.className = 'bulk-select-checkbox';
+                    cb.dataset.id = item.id;
+                    cb.style.marginRight = '8px';
+                    cb.onclick = (e) => e.stopPropagation();
+                    nameWrapper.appendChild(cb);
+                }
                 const nameSpan = document.createElement('span');
                 nameSpan.className = 'item-name';
 
@@ -1777,11 +1829,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (item.type === 'folder') {
                     li.addEventListener('click', (e) => {
                         if (e.target.closest('.item-actions')) return;
+                        if (typeof isBulkSelectionMode !== 'undefined' && isBulkSelectionMode) {
+                            const cb = li.querySelector('.bulk-select-checkbox');
+                            if (cb) cb.checked = !cb.checked;
+                            return;
+                        }
                         activeFolderId = (activeFolderId === item.id) ? null : item.id;
                         renderVersionsTree();
                     });
                 } else { // type === 'version'
-                     li.addEventListener('click', () => {
+                     li.addEventListener('click', (e) => {
+                        if (e.target.closest('.item-actions')) return;
+                        if (typeof isBulkSelectionMode !== 'undefined' && isBulkSelectionMode) {
+                            const cb = li.querySelector('.bulk-select-checkbox');
+                            if (cb) cb.checked = !cb.checked;
+                            return;
+                        }
                         const version = findItem(item.id);
                         if (version) {
                             codeEditor.value = version.code;

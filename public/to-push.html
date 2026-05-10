@@ -2416,6 +2416,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const languageInstruction = `IMPORTANT: Your "explanation" text MUST be in ${languageNames[language] || 'English'}.`;
 
                 const contextPromptAdd = getGlobalProjectContextStr();
+                const kbData = await getKnowledgebaseContentParts(isDeepSeek);
 
                 if (appGoal === 'netlify-blob-backend') {
                     const goalInstruction = goalTemplates[appGoal];
@@ -2423,10 +2424,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     userPromptContent = `${historyContext}**User Request:** "${effectiveMessage}"${contextPromptAdd}\n\n**Original User HTML to Enhance:**\n\`\`\`html\n${originalCode}\n\`\`\`\nNow, generate the JSON response containing the four enhanced files.`;
                 } else if (isInitialCode) {
                     systemPrompt = `You are a "Builder" AI. Your ONLY function is to return a valid JSON object that builds a complete, functional HTML page from scratch. The JSON object MUST have three keys: "title" (a 3-5 word summary), "explanation" (a string explaining your work), and "htmlBodyContent" (a string with inner HTML for the body). Your response MUST be a single, raw JSON object without markdown fences. The "htmlBodyContent" must start with \`<div class="container">\` and use the provided "SpringGlass" CSS classes. If project assets are provided, incorporate them into the design using their local filenames (e.g. src="image.jpg"). ${languageInstruction}`;
-                    userPromptContent = `${historyContext}**User Request:** "${effectiveMessage}"${contextPromptAdd}\n\n**SpringGlass CSS Class Reference:**\n\`\`\`\n${springGlassCssReference}\n\`\`\`\nNow, generate the JSON response.`;
+                    userPromptContent = `${historyContext}**User Request:** "${effectiveMessage}"${contextPromptAdd}\n\n${kbData.extraText}\n\n**SpringGlass CSS Class Reference:**\n\`\`\`\n${springGlassCssReference}\n\`\`\`\nNow, generate the JSON response.`;
                 } else {
                     systemPrompt = `You are a "Patcher" AI. Your ONLY function is to return a valid JSON object that modifies existing HTML. The JSON object MUST have three keys: "title" (a 3-5 word summary), "explanation" (a string explaining changes), and "patches" (an array of {search, replace} objects). Your response MUST be a single, raw JSON object without markdown fences. "search" must be a verbatim match from the current HTML. All new HTML must use "SpringGlass" CSS classes. If assets are listed in the Project context, use their local filenames (e.g. src="image.jpg"). ${languageInstruction}`;
-                    userPromptContent = `${historyContext}**User Request:** "${effectiveMessage}"${contextPromptAdd}\n\n**Current HTML:** \`\`\`html\n${originalCode}\n\`\`\`\n\n**SpringGlass CSS Class Reference:**\n\`\`\`\n${springGlassCssReference}\n\`\`\`\nNow, generate the JSON response.`;
+                    userPromptContent = `${historyContext}**User Request:** "${effectiveMessage}"${contextPromptAdd}\n\n**Current HTML:** \`\`\`html\n${originalCode}\n\`\`\`\n\n${kbData.extraText}\n\n**SpringGlass CSS Class Reference:**\n\`\`\`\n${springGlassCssReference}\n\`\`\`\nNow, generate the JSON response.`;
                 }
 
                 // --- API Call Logic (remains the same) ---
@@ -2436,7 +2437,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     response = await fetch(`https://api.deepseek.com/chat/completions`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${deepseekApiKey}` }, body: JSON.stringify({ model: selectedModel, messages: messages, stream: true, response_format: { type: "json_object" } }), signal: currentRequestController.signal });
                 } else {
                     const textPrompt = `${systemPrompt}\n\n${userPromptContent}`;
-                    const contentParts = [{ "text": textPrompt }];
+                    const contentParts = [{ "text": textPrompt }, ...kbData.parts];
                     appSettings.materials.forEach(material => { if (material.base64Data) { contentParts.push({ "inlineData": { "mimeType": material.mimeType, "data": material.base64Data } }); } });
                     response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${selectedModel}:streamGenerateContent?key=${apiKey}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: contentParts }], generationConfig: { responseMimeType: "application/json" }, safetySettings: [ { "category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE" }, { "category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE" }, { "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE" }, { "category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE" } ] }), signal: currentRequestController.signal });
                 }

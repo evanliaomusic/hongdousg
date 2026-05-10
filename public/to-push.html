@@ -2252,7 +2252,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const arr = Array.isArray(items) ? items : Object.values(items);
             arr.forEach(item => {
                 if (item.name.toLowerCase() === 'knowledgebase') return;
-                if (item.type === 'asset' && item.data) assets.push(item);
+                if (item.type === 'asset') assets.push(item);
                 else if (item.type === 'folder') collectAssets(item.children);
             });
         }

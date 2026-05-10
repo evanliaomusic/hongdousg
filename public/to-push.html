@@ -1621,54 +1621,44 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!skipSave) saveVersionsToStorage();
     }
 
-    function getKnowledgebaseContentParts(isDeepSeek = false) {
+    async function getKnowledgebaseContentParts(isDeepSeek = false) {
         const parts = [];
         let extraText = "";
 
-        // Find the root folder of the current project context
-        let rootContext = null;
-        if (currentlySelectedVersionId) {
-            rootContext = getProjectRoot(currentlySelectedVersionId);
-        } else if (activeFolderId) {
-            rootContext = getProjectRoot(activeFolderId);
-        }
+        let rootContext = currentlySelectedVersionId ? getProjectRoot(currentlySelectedVersionId) : (activeFolderId ? getProjectRoot(activeFolderId) : null);
+        const itemsToScan = rootContext ? [rootContext] : versionData;
 
-        const collectFromKb = (items) => {
+        const collectFromKb = async (items) => {
             if (!items) return;
             const arr = Array.isArray(items) ? items : Object.values(items);
-            arr.forEach(item => {
+            for (const item of arr) {
                 if (item.type === 'folder' && item.name.toLowerCase() === 'knowledgebase') {
-                    (item.children || []).forEach(child => {
-                        if (child.type === 'asset' && child.data) {
+                    for (const child of (item.children || [])) {
+                        if (child.type === 'asset') {
+                            const data = await getAssetData(child.id);
+                            if (!data) continue;
+                            let base64Data = data.includes(',') ? data.split(',')[1] : data;
                             const mimeType = child.mimeType || 'text/plain';
-                            let base64Data = child.data;
-                            if (base64Data.includes(',')) base64Data = base64Data.split(',')[1];
-                            
-                            if (isDeepSeek) {
-                                if (mimeType.startsWith('text/') || mimeType === 'application/json' || mimeType.includes('xml') || child.name.endsWith('.txt') || child.name.endsWith('.js') || child.name.endsWith('.css') || child.name.endsWith('.html') || child.name.endsWith('.md')) {
-                                    try {
-                                        let textContent = decodeURIComponent(escape(atob(base64Data)));
-                                        extraText += `\n\n**Knowledgebase File (${child.name}):**\n\`\`\`\n${textContent}\n\`\`\``;
-                                    } catch(e) { console.error("Failed to decode kb file", e); }
-                                }
-                            } else {
+                            const isText = mimeType.startsWith('text/') || mimeType === 'application/json' || /\.(txt|js|css|html|md|json)$/i.test(child.name);
+
+                            if (isText) {
+                                try {
+                                    let textContent = decodeURIComponent(escape(atob(base64Data)));
+                                    extraText += `\n\n**KNOWLEDGEBASE FILE (${child.name}):**\n\`\`\`\n${textContent}\n\`\`\``;
+                                } catch(e) { console.error("Decode failed for " + child.name, e); }
+                            } else if (!isDeepSeek) {
                                 parts.push({ "inlineData": { "mimeType": mimeType, "data": base64Data } });
-                                extraText += `\n\n[Note: The file "${child.name}" from the knowledgebase has been attached as an inline data resource. Use its contents to inform your generation.]`;
+                                extraText += `\n\n[Note: Binary file "${child.name}" attached as inline resource.]`;
                             }
                         }
-                    });
+                    }
                 } else if (item.children) {
-                    collectFromKb(item.children);
+                    await collectFromKb(item.children);
                 }
-            });
+            }
         };
 
-        if (rootContext) {
-            collectFromKb([rootContext]);
-        } else {
-            // Fallback to global if no project root found, though usually unlikely
-            collectFromKb(versionData);
-        }
+        await collectFromKb(itemsToScan);
         return { parts, extraText };
     }
 

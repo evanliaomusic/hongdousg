@@ -2259,15 +2259,16 @@ document.addEventListener('DOMContentLoaded', function() {
         const rootItems = contextFolderId ? (findItem(contextFolderId)?.children || []) : versionData;
         collectAssets(rootItems);
 
-        assets.forEach(asset => {
-            const virtualUrl = getVirtualFileUrl(asset);
+        for (const asset of assets) {
+            const virtualUrl = await getVirtualFileUrlAsync(asset);
+            if (!virtualUrl) continue;
             const n = asset.name;
             processedHtml = processedHtml.split('"' + n + '"').join('"' + virtualUrl + '"')
                                          .split("'" + n + "'").join("'" + virtualUrl + "'")
                                          .split('"./' + n + '"').join('"' + virtualUrl + '"')
                                          .split("'./" + n + "'").join("'" + virtualUrl + "'")
                                          .split("(" + n + ")").join("(" + virtualUrl + ")");
-        });
+        }
         document.getElementById('live-preview').srcdoc = processedHtml;
     }
 

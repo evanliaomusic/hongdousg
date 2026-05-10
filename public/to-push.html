@@ -2138,6 +2138,26 @@ document.addEventListener('DOMContentLoaded', function() {
         calculateStorageUsage();
     }
 
+    const blobUrlCache = {};
+    function getVirtualFileUrl(asset) {
+        if (blobUrlCache[asset.id] && blobUrlCache[asset.id].data === asset.data) return blobUrlCache[asset.id].url;
+        try {
+            if (!asset.data || !asset.data.includes(',')) return asset.data;
+            const parts = asset.data.split(',');
+            const mime = parts[0].split(':')[1].split(';')[0];
+            const b64 = parts[1];
+            const bin = atob(b64);
+            const ab = new ArrayBuffer(bin.length);
+            const ua = new Uint8Array(ab);
+            for (let i = 0; i < bin.length; i++) ua[i] = bin.charCodeAt(i);
+            const blob = new Blob([ab], { type: mime });
+            const url = URL.createObjectURL(blob);
+            if (blobUrlCache[asset.id]) URL.revokeObjectURL(blobUrlCache[asset.id].url);
+            blobUrlCache[asset.id] = { data: asset.data, url: url };
+            return url;
+        } catch (e) { console.error("Blob creation failed for " + asset.name, e); return asset.data; }
+    }
+
     function updatePreview() {
         let processedHtml = codeEditor.value;
         let contextFolderId = activeFolderId;
@@ -2149,21 +2169,21 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!items) return;
             items.forEach(item => {
                 if (item.name.toLowerCase() === 'knowledgebase') return;
-                if (item.type === 'asset' && item.data) assets.push({ name: item.name, data: item.data });
+                if (item.type === 'asset' && item.data) assets.push(item);
                 else if (item.type === 'folder') collectAssets(item.children);
             });
         }
-        const rootItems = contextFolderId ? (findItem(contextFolderId)?.children ||[]) : versionData;
+        const rootItems = contextFolderId ? (findItem(contextFolderId)?.children || []) : versionData;
         collectAssets(rootItems);
 
         assets.forEach(asset => {
-            const d = asset.data;
+            const virtualUrl = getVirtualFileUrl(asset);
             const n = asset.name;
-            processedHtml = processedHtml.split('"' + n + '"').join('"' + d + '"')
-                                         .split("'" + n + "'").join("'" + d + "'")
-                                         .split('"./' + n + '"').join('"' + d + '"')
-                                         .split("'./" + n + "'").join("'" + d + "'")
-                                         .split("(" + n + ")").join("(" + d + ")");
+            processedHtml = processedHtml.split('"' + n + '"').join('"' + virtualUrl + '"')
+                                         .split("'" + n + "'").join("'" + virtualUrl + "'")
+                                         .split('"./' + n + '"').join('"' + virtualUrl + '"')
+                                         .split("'./" + n + "'").join("'" + virtualUrl + "'")
+                                         .split("(" + n + ")").join("(" + virtualUrl + ")");
         });
         document.getElementById('live-preview').srcdoc = processedHtml;
     }

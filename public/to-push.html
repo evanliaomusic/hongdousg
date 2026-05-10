@@ -1606,6 +1606,10 @@ document.addEventListener('DOMContentLoaded', function() {
         const parts = [];
         let extraText = "";
         
+        // Only scan the current project's root for knowledgebase files
+        const root = getProjectRoot(currentlySelectedVersionId || activeFolderId);
+        const scope = root ? [root] : versionData;
+
         const collectFromKb = (items) => {
             if (!items) return;
             items.forEach(item => {
@@ -1672,11 +1676,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // --- Version Control System ---
-    function saveVersionsToStorage() { localStorage.setItem('hongdouVersionData', JSON.stringify(versionData)); broadcastChange(50); }
+    function saveVersionsToStorage() { broadcastChange(50); }
     function loadVersionsFromStorage() {
-        const data = localStorage.getItem('hongdouVersionData');
-        versionData = data ? JSON.parse(data) : [];
-        renderVersionsTree();
+        // Versions are now primarily managed via Firebase to avoid LocalStorage quota limits.
+        if (versionData.length === 0) renderVersionsTree();
     }
     function findItem(id, items = versionData) {
         for (const item of items) {
@@ -1715,19 +1718,17 @@ document.addEventListener('DOMContentLoaded', function() {
             let destinationArray;
             let folderToOpen;
 
-            if (selectedItem) { // A version is actively selected
+            if (activeFolderId) { // Save to the folder currently opened in the UI
+                const folder = findItem(activeFolderId);
+                if (!folder.children) folder.children = [];
+                destinationArray = folder.children;
+                folderToOpen = activeFolderId;
+            } else if (selectedItem) {
                 const parentOfSelected = findParent(currentlySelectedVersionId);
                 const siblings = parentOfSelected ? parentOfSelected.children : versionData;
-                const selectedIndex = siblings.findIndex(s => s.id === currentlySelectedVersionId);
-                const isLatestInBranch = selectedIndex === siblings.length - 1 && (!selectedItem.children || selectedItem.children.length === 0);
-
-                if (isLatestInBranch) { // Add as a sibling when editing the "leaf" node
-                    destinationArray = siblings;
-                } else { // Branch by adding as a child when editing an "internal" node
-                    if (!selectedItem.children) selectedItem.children = []; destinationArray = selectedItem.children;
-                }
-                folderToOpen = parentOfSelected.type === 'folder' ? parentOfSelected.id : findParent(parentOfSelected.id)?.id;
-            } else { // No version is selected, add to the last project folder
+                destinationArray = siblings;
+                folderToOpen = parentOfSelected ? parentOfSelected.id : null;
+            } else { // Fallback
                 let lastRootFolder = [...versionData].reverse().find(item => item.type === 'folder');
                 if (!lastRootFolder) {
                     lastRootFolder = { id: `f-${Date.now()}`, type: 'folder', name: "Unsorted Edits", children: [] };
@@ -1816,8 +1817,22 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function calculateStorageUsage() {
         let total = 0;
-        // RTDB String overhead calculation
-        const countAssets = (items) => {
+        const dataString = JSON.stringify(versionData);
+        total = dataString.length;
+        const bar = document.getElementById('storage-bar');
+        const text = document.getElementById('storage-text');
+        if (bar && text) {
+            const limit = 1073741824; // 1GB RTDB limit
+            const mb = (total / (1024 * 1024)).toFixed(2);
+            const percent = Math.min(100, (total / limit) * 100);
+            bar.style.width = percent + '%';
+            bar.style.backgroundColor = percent > 90 ? '#dc3545' : (percent > 75 ? '#ffc107' : '#28a745');
+            text.textContent = `Cloud Storage: ${mb} MB / 1 GB`;
+        }
+        return total;
+    }
+
+    function countAssets_unused(items) {
             if (!items) return;
             items.forEach(item => {
                 if (item.type === 'asset' && item.data) {
@@ -2815,6 +2830,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const data = snapshot.val();
                 if (!data) return;
 
+                // Immediate UI Refresh on remote update
                 isReceivingUpdate = true;
 
                 // 1. Sync Versions (Always, unless we are the specific drag source, handled by UI updates)

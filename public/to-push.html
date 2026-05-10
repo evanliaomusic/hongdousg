@@ -646,6 +646,13 @@
         if (success) document.getElementById('app-sidebar').classList.remove('closed');
     } let language = 'en'; let chatHistoryLog = []; let currentRequestController = null; let progressSimulationTimeout = null; let countdownInterval = null;
     let versionData = []; let currentlySelectedVersionId = null; let draggedItemId = null; let activeFolderId = null; let html5QrCode = null;
+    const dbName = "HongDouAssetsDB";
+    const storeName = "assets";
+    function initDB() { return new Promise((resolve, reject) => { const request = indexedDB.open(dbName, 1); request.onupgradeneeded = (e) => { e.target.result.createObjectStore(storeName); }; request.onsuccess = () => resolve(request.result); request.onerror = () => reject(request.error); }); }
+    async function saveAssetData(id, data) { const db = await initDB(); return new Promise((resolve, reject) => { const tx = db.transaction(storeName, "readwrite"); tx.objectStore(storeName).put(data, id); tx.oncomplete = resolve; tx.onerror = reject; }); }
+    async function getAssetData(id) { const db = await initDB(); return new Promise((resolve, reject) => { const tx = db.transaction(storeName, "readonly"); const req = tx.objectStore(storeName).get(id); req.onsuccess = () => resolve(req.result); req.onerror = () => reject(req.error); }); }
+    async function deleteAssetData(id) { const db = await initDB(); return new Promise((resolve, reject) => { const tx = db.transaction(storeName, "readwrite"); tx.objectStore(storeName).delete(id); tx.oncomplete = resolve; tx.onerror = reject; }); }
+
     class ApiError extends Error {
         constructor(message, status) {
             super(message);
@@ -1665,7 +1672,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return { parts, extraText };
     }
 
-    function createZipWithAssets(htmlContent, appTitle) {
+    async function createZipWithAssets(htmlContent, appTitle) {
         const zip = new JSZip();
         zip.file("index.html", htmlContent);
         
@@ -1676,23 +1683,25 @@ document.addEventListener('DOMContentLoaded', function() {
             folderToExport = findItem(activeFolderId);
         }
         
-        const addAssetsToZip = (folderItems, currentPath) => {
-            folderItems.forEach(child => {
-                if (child.name.toLowerCase() === 'knowledgebase') return; // Skip knowledgebase in export
-                if (child.type === 'asset' && child.data) {
-                    let base64Data = child.data;
+        const addAssetsToZip = async (folderItems, currentPath) => {
+            for (const child of folderItems) {
+                if (child.name.toLowerCase() === 'knowledgebase') continue; // Skip knowledgebase in export
+                if (child.type === 'asset') {
+                    const data = await getAssetData(child.id);
+                    if (!data) continue;
+                    let base64Data = data;
                     if (base64Data.includes(',')) base64Data = base64Data.split(',')[1];
                     if (base64Data) zip.file(currentPath + child.name, base64Data, {base64: true});
                 } else if (child.type === 'folder') {
-                    addAssetsToZip(child.children ||[], currentPath + child.name + '/');
+                    await addAssetsToZip(child.children ||[], currentPath + child.name + '/');
                 }
-            });
+            }
         };
 
         if (folderToExport && folderToExport.type === 'folder' && folderToExport.name.toLowerCase() !== 'knowledgebase') {
-            addAssetsToZip(folderToExport.children ||[], '');
+            await addAssetsToZip(folderToExport.children ||[], '');
         } else {
-            addAssetsToZip(versionData, '');
+            await addAssetsToZip(versionData, '');
         }
         return zip;
     }
@@ -1801,6 +1810,12 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!arrayToDeleteFrom) return;
         const index = arrayToDeleteFrom.findIndex(item => item.id === id);
         if (index > -1) {
+            const itemToDelete = arrayToDeleteFrom[index];
+            const deleteAssetsRecursively = (item) => {
+                if (item.type === 'asset') deleteAssetData(item.id).catch(()=>console.warn("Failed to delete local asset"));
+                if (item.children) item.children.forEach(deleteAssetsRecursively);
+            };
+            deleteAssetsRecursively(itemToDelete);
             arrayToDeleteFrom.splice(index, 1);
             if (id === currentlySelectedVersionId) {
                 currentlySelectedVersionId = null;
@@ -1851,18 +1866,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function calculateStorageUsage() {
         let total = 0;
-        // RTDB String overhead calculation
-        const countAssets = (items) => {
+        // Estimate RTDB overhead (only code versions now)
+        const countUsage = (items) => {
             if (!items) return;
             const arr = Array.isArray(items) ? items : Object.values(items);
             arr.forEach(item => {
-                if (item.type === 'asset' && item.data) {
-                    total += item.data.length;
+                if (item.type === 'version' && item.code) {
+                    total += item.code.length;
                 }
-                if (item.children) countAssets(item.children);
+                if (item.children) countUsage(item.children);
             });
         };
-        countAssets(versionData);
+        countUsage(versionData);
         const bar = document.getElementById('storage-bar');
         const text = document.getElementById('storage-text');
         if (bar && text) {
@@ -1871,7 +1886,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const percent = Math.min(100, (total / limit) * 100);
             bar.style.width = percent + '%';
             bar.style.backgroundColor = percent > 90 ? '#dc3545' : (percent > 75 ? '#ffc107' : '#28a745');
-            text.textContent = `Storage: ${mb} MB / 1 GB`;
+            text.textContent = `Storage: ${mb} MB / 1 GB (Local Assets not counted)`;
         }
         return total;
     }
@@ -1898,31 +1913,29 @@ document.addEventListener('DOMContentLoaded', function() {
                 const reader = new FileReader();
                 reader.onload = (evt) => {
                     const base64Data = evt.target.result;
-                    if (calculateStorageUsage() + base64Data.length > 1073741824) {
-                        alert(`Cannot add ${file.name}: 1GB Database limit exceeded.`);
-                    } else {
-                        let baseName = file.name;
-                        let newName = baseName;
-                        let counter = 1;
-                        while (destArray.some(item => item.name === newName)) {
-                            const dotIndex = baseName.lastIndexOf('.');
-                            if (dotIndex !== -1) {
-                                newName = `${baseName.substring(0, dotIndex)} (${counter})${baseName.substring(dotIndex)}`;
-                            } else {
-                                newName = `${baseName} (${counter})`;
-                            }
-                            counter++;
+                    let baseName = file.name;
+                    let newName = baseName;
+                    let counter = 1;
+                    while (destArray.some(item => item.name === newName)) {
+                        const dotIndex = baseName.lastIndexOf('.');
+                        if (dotIndex !== -1) {
+                            newName = `${baseName.substring(0, dotIndex)} (${counter})${baseName.substring(dotIndex)}`;
+                        } else {
+                            newName = `${baseName} (${counter})`;
                         }
+                        counter++;
+                    }
+                    const newAssetId = `asset-${Date.now()}-${Math.random()}`;
+                    saveAssetData(newAssetId, base64Data).then(() => {
                         destArray.push({
-                            id: `asset-${Date.now()}-${Math.random()}`,
+                            id: newAssetId,
                             type: 'asset',
                             name: newName,
                             mimeType: file.type,
-                            data: base64Data,
                             timestamp: Date.now()
                         });
-                    }
-                    resolve();
+                        resolve();
+                    });
                 };
                 reader.onerror = () => resolve();
                 reader.readAsDataURL(file);
@@ -2083,7 +2096,7 @@ document.addEventListener('DOMContentLoaded', function() {
             } else if (item.type === 'asset') {
                 if (item.mimeType && item.mimeType.startsWith('image/')) {
                     const img = document.createElement('img');
-                    img.src = item.data;
+                    getAssetData(item.id).then(data => { if(data) img.src = data; });
                     img.style.width = '32px';
                     img.style.height = '32px';
                     img.style.objectFit = 'cover';
@@ -2138,8 +2151,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     renderVersionsTree();
                     broadcastChange();
                 } else if (item.type === 'asset') {
-                    navigator.clipboard.writeText(item.data).then(() => {
-                        alert(`Asset Data URI copied to clipboard!`);
+                    getAssetData(item.id).then(data => {
+                        if (data) {
+                            navigator.clipboard.writeText(data).then(() => {
+                                alert(`Asset Data URI copied to clipboard!`);
+                            });
+                        } else {
+                            alert("Asset data not found locally. It may have been uploaded on another device.");
+                        }
                     });
                 }
             });
@@ -2201,11 +2220,13 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     const blobUrlCache = {};
-    function getVirtualFileUrl(asset) {
-        if (blobUrlCache[asset.id] && blobUrlCache[asset.id].data === asset.data) return blobUrlCache[asset.id].url;
+    async function getVirtualFileUrlAsync(asset) {
+        if (blobUrlCache[asset.id]) return blobUrlCache[asset.id].url;
         try {
-            if (!asset.data || !asset.data.includes(',')) return asset.data;
-            const parts = asset.data.split(',');
+            const data = await getAssetData(asset.id);
+            if (!data) return null;
+            if (!data.includes(',')) return data;
+            const parts = data.split(',');
             const mime = parts[0].split(':')[1].split(';')[0];
             const b64 = parts[1];
             const bin = atob(b64);
@@ -2214,13 +2235,12 @@ document.addEventListener('DOMContentLoaded', function() {
             for (let i = 0; i < bin.length; i++) ua[i] = bin.charCodeAt(i);
             const blob = new Blob([ab], { type: mime });
             const url = URL.createObjectURL(blob);
-            if (blobUrlCache[asset.id]) URL.revokeObjectURL(blobUrlCache[asset.id].url);
-            blobUrlCache[asset.id] = { data: asset.data, url: url };
+            blobUrlCache[asset.id] = { url: url };
             return url;
-        } catch (e) { console.error("Blob creation failed for " + asset.name, e); return asset.data; }
+        } catch (e) { console.error("Blob creation failed for " + asset.name, e); return null; }
     }
 
-    function updatePreview() {
+    async function updatePreview() {
         let processedHtml = codeEditor.value;
         let contextFolderId = activeFolderId;
         if (!contextFolderId && currentlySelectedVersionId) { const p = findParent(currentlySelectedVersionId); if (p) contextFolderId = p.id; }
@@ -2660,13 +2680,13 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('send-button').addEventListener('click', handleSendClick);
     document.getElementById('chat-input').addEventListener('keypress', e => e.key === 'Enter' && handleSendClick());
     document.getElementById('new-folder-button').addEventListener('click', () => createNewFolder());
-    function downloadAppAsZip() {
+    async function downloadAppAsZip() {
         if (typeof JSZip === 'undefined') {
             alert('JSZip library not loaded. Please check your internet connection.');
             return;
         }
         const appTitle = document.getElementById('app-title-input').value.trim() || 'my-app';
-        const zip = createZipWithAssets(codeEditor.value, appTitle);
+        const zip = await createZipWithAssets(codeEditor.value, appTitle);
         zip.generateAsync({type:"blob"}).then(function(content) {
             const a = document.createElement('a');
             a.href = URL.createObjectURL(content);
@@ -2678,7 +2698,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }).catch(err => console.error("Error creating zip file:", err));
     }
 
-    function deployToNetlify() {
+    async function deployToNetlify() {
         if (typeof JSZip === 'undefined') {
             alert('JSZip library not loaded. Please check your internet connection.');
             return;
@@ -2691,7 +2711,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         const appTitle = document.getElementById('app-title-input').value.trim() || 'my-app';
-        const zip = createZipWithAssets(codeEditor.value, appTitle);
+        const zip = await createZipWithAssets(codeEditor.value, appTitle);
 
         zip.generateAsync({type:"blob"}).then(function(content) {
             const a = document.createElement('a');
@@ -3190,7 +3210,7 @@ ${document.getElementById('manual-input').value.trim()}
 
 ${getGlobalProjectContextStr()}
 
-${getKnowledgebaseContentParts(true).extraText}
+${(await getKnowledgebaseContentParts(true)).extraText}
 `;
         try {
             await navigator.clipboard.writeText(promptText);
@@ -3427,7 +3447,7 @@ ${getGlobalProjectContextStr()}
 `;
 
         try {
-            const kbData = getKnowledgebaseContentParts(false);
+            const kbData = await getKnowledgebaseContentParts(false);
             const finalPromptText = promptText + kbData.extraText;
             const contentParts =[{ text: finalPromptText }, ...kbData.parts];
             let response;

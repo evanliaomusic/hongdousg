@@ -1605,7 +1605,15 @@ document.addEventListener('DOMContentLoaded', function() {
     function getKnowledgebaseContentParts(isDeepSeek = false) {
         const parts = [];
         let extraText = "";
-        
+
+        // Find the root folder of the current project context
+        let rootContext = null;
+        if (currentlySelectedVersionId) {
+            rootContext = getProjectRoot(currentlySelectedVersionId);
+        } else if (activeFolderId) {
+            rootContext = getProjectRoot(activeFolderId);
+        }
+
         const collectFromKb = (items) => {
             if (!items) return;
             items.forEach(item => {
@@ -1635,7 +1643,12 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         };
 
-        collectFromKb(versionData);
+        if (rootContext) {
+            collectFromKb([rootContext]);
+        } else {
+            // Fallback to global if no project root found, though usually unlikely
+            collectFromKb(versionData);
+        }
         return { parts, extraText };
     }
 
@@ -1672,7 +1685,19 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // --- Version Control System ---
-    function saveVersionsToStorage() { localStorage.setItem('hongdouVersionData', JSON.stringify(versionData)); broadcastChange(50); }
+    function saveVersionsToStorage() {
+        // Primary save to Firebase to bypass localStorage 5MB limit
+        if (syncReference) {
+            syncReference.child('versions').set(versionData);
+        }
+        // Attempt localStorage only for smaller metadata or fallback
+        try {
+            localStorage.setItem('hongdouVersionData', JSON.stringify(versionData));
+        } catch (e) {
+            console.warn("LocalStorage full, relying on Firebase.");
+        }
+        broadcastChange(50);
+    }
     function loadVersionsFromStorage() {
         const data = localStorage.getItem('hongdouVersionData');
         versionData = data ? JSON.parse(data) : [];
@@ -1711,9 +1736,36 @@ document.addEventListener('DOMContentLoaded', function() {
             versionData.push(newFolder);
             activeFolderId = newFolder.id;
         } else {
-            const selectedItem = findItem(currentlySelectedVersionId);
             let destinationArray;
-            let folderToOpen;
+            let folderToOpen = activeFolderId;
+
+            // Priority 1: Save into the folder currently being viewed
+            const currentFolder = findItem(activeFolderId);
+            if (currentFolder && currentFolder.type === 'folder') {
+                if (!currentFolder.children) currentFolder.children = [];
+                destinationArray = currentFolder.children;
+            } else {
+                // Priority 2: Fallback to the parent of the currently selected version
+                const selectedItem = findItem(currentlySelectedVersionId);
+                if (selectedItem) {
+                    const parentOfSelected = findParent(currentlySelectedVersionId);
+                    const siblings = parentOfSelected ? parentOfSelected.children : versionData;
+                    const selectedIndex = siblings.findIndex(s => s.id === currentlySelectedVersionId);
+                    const isLatestInBranch = selectedIndex === siblings.length - 1 && (!selectedItem.children || selectedItem.children.length === 0);
+
+                    if (isLatestInBranch) {
+                        destinationArray = siblings;
+                    } else {
+                        if (!selectedItem.children) selectedItem.children = [];
+                        destinationArray = selectedItem.children;
+                    }
+                    folderToOpen = parentOfSelected ? (parentOfSelected.type === 'folder' ? parentOfSelected.id : findParent(parentOfSelected.id)?.id) : null;
+                } else {
+                    // Priority 3: Root of the database
+                    destinationArray = versionData;
+                    folderToOpen = null;
+                }
+            }
 
             if (selectedItem) { // A version is actively selected
                 const parentOfSelected = findParent(currentlySelectedVersionId);
@@ -1737,7 +1789,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 folderToOpen = lastRootFolder.id;
             }
             destinationArray.push(newVersion);
-            activeFolderId = folderToOpen;
+            // Update context but don't force-jump if the user is already in a folder
+            if (!activeFolderId) activeFolderId = folderToOpen;
         }
 
         currentlySelectedVersionId = newVersion.id;
@@ -1754,9 +1807,21 @@ document.addEventListener('DOMContentLoaded', function() {
             name: folderName,
             children: []
         };
-        versionData.push(newFolder);
+        
+        // If we are inside a folder, add as child, otherwise add to root
+        if (activeFolderId) {
+            const targetFolder = findItem(activeFolderId);
+            if (targetFolder && targetFolder.children) {
+                targetFolder.children.push(newFolder);
+            } else {
+                versionData.push(newFolder);
+            }
+        } else {
+            versionData.push(newFolder);
+        }
+
         saveVersionsToStorage();
-        renderVersionsTree();
+        renderVersionsTree(); // Immediate UI update
     }
 
     function deleteItem(id, skipConfirmAndRender = false) {
@@ -1841,6 +1906,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     async function handleAssetUpload(event) {
+        // Immediate UI feedback
+        const btn = document.getElementById('upload-asset-button');
+        const oldText = btn.textContent;
+        btn.textContent = "Uploading...";
         const files = event.target.files;
         if (!files.length) return;
         
@@ -1877,6 +1946,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     saveVersionsToStorage();
                     renderVersionsTree();
                     broadcastChange(100);
+                    btn.textContent = oldText;
                 }
             };
             reader.readAsDataURL(file);

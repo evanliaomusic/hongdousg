@@ -253,18 +253,19 @@
 3. Copy AI Response JSON.
 4. Click 'Upgrade'."></textarea>
             <div style="display: flex; gap: 8px; width: 100%;">
-                <button id="download-context-btn" class="action-button" style="flex: 1; padding: 8px 5px; font-size: 11px; background-color: var(--spotlight-1); text-align: center; white-space: nowrap;">Get AI Context</button>
-                <button id="manual-undo-btn" class="action-button" style="flex: 0.5; padding: 8px 0; font-size: 11px; background-color: #e67e22; text-align: center; margin: 0 4px; display: inline-block;" title="Undo last upgrade">Undo</button>
+                <button id="btn-open-kb" class="action-button" style="flex: 1.2; padding: 8px 5px; font-size: 11px; background-color: #f39c12; text-align: center; display: flex; align-items: center; justify-content: center;" onclick="openKnowledgebase()">Knowledgebase</button>
+                <button id="manual-undo-btn" class="action-button" style="flex: 0.6; padding: 8px 0; font-size: 11px; background-color: #e67e22; text-align: center; display: inline-block;" title="Undo last upgrade">Undo</button>
                 <button id="manual-upgrade-btn" class="action-button" style="flex: 1; padding: 8px 5px; font-size: 11px; background-color: var(--primary-color); text-align: center;">Upgrade</button>
             </div>
 
-            <div style="display: flex; align-items: center; gap: 5px; margin-top: 5px; min-height: 24px;">
-                <button id="ai-tool-btn" class="action-button" style="flex-grow: 1; padding: 8px 5px; font-size: 11px; background-color: #10a37f; text-align: center;" onclick="openAiTool()">Open ChatGPT</button>
-                <button id="btn-open-kb" class="action-button" style="flex-grow: 1; padding: 4px 8px; font-size: 11px; background-color: #f39c12; text-align: center; height: 24px; display: flex; align-items: center; justify-content: center;" onclick="openKnowledgebase()">Knowledgebase</button>
-                <button id="btn-mini-gemini-keys" style="display:none; flex-grow: 1; padding: 4px 8px; font-size: 11px; background: linear-gradient(135deg, #7b61ff, #00d2ff); border: none; border-radius: 4px; color: white; height: 24px; box-sizing: border-box; cursor: pointer; white-space: nowrap;">Manage API Keys</button>
-                <input type="password" id="mini-api-key" placeholder="Paste Gemini Key" style="display:none; flex-grow: 1; padding: 4px 8px; font-size: 11px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 4px; color: white; height: 24px; box-sizing: border-box;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-top: 5px; min-height: 32px;">
+                <button id="ai-tool-btn" class="action-button" style="flex: 1; padding: 8px 5px; font-size: 11px; background-color: #10a37f; text-align: center;" onclick="openAiTool()">Open ChatGPT</button>
+                <button id="download-context-btn" class="action-button" style="flex: 1; padding: 8px 5px; font-size: 11px; background-color: var(--spotlight-1); text-align: center; white-space: nowrap;">Get AI Context</button>
+                
+                <button id="btn-mini-gemini-keys" style="display:none; flex: 1; padding: 4px 8px; font-size: 11px; background: linear-gradient(135deg, #7b61ff, #00d2ff); border: none; border-radius: 4px; color: white; height: 32px; box-sizing: border-box; cursor: pointer; white-space: nowrap;">Manage API Keys</button>
+                <input type="password" id="mini-api-key" placeholder="Paste Gemini Key" style="display:none; flex: 1; padding: 4px 8px; font-size: 11px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 4px; color: white; height: 32px; box-sizing: border-box;">
 
-                <select id="ai-tool-select" onchange="updateAiLink()" style="width: 22px; height: 22px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.3); background-color: rgba(0,0,0,0.3); color: transparent; cursor: pointer; -webkit-appearance: none; appearance: none; padding: 0; background-image: url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22white%22%3e%3cpath d=%22M7 10l5 5 5-5z%22/%3e%3c/svg%3e'); background-repeat: no-repeat; background-position: center; background-size: 16px;">
+                <select id="ai-tool-select" onchange="updateAiLink()" style="width: 24px; height: 24px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.3); background-color: rgba(0,0,0,0.3); color: transparent; cursor: pointer; -webkit-appearance: none; appearance: none; padding: 0; background-image: url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22white%22%3e%3cpath d=%22M7 10l5 5 5-5z%22/%3e%3c/svg%3e'); background-repeat: no-repeat; background-position: center; background-size: 16px;">
                     <option value="chatgpt">ChatGPT</option>
                     <option value="gemini">Gemini</option>
                     <option value="aistudio">AI Studio</option>
@@ -284,14 +285,7 @@
                 <div id="gemini-usage-dropdown" style="display: none; flex-direction: column; background: #000;">
                 </div>
             </div>
-            <div style="margin-top: 10px; width: 100%; border: 1px solid var(--border-color); border-radius: 6px; overflow: hidden; background: rgba(0,0,0,0.2); box-sizing: border-box;">
-                <div style="padding: 4px; display: flex; align-items: center; justify-content: space-between; font-size: 10px; color: var(--text-color); opacity: 0.8;">
-                    <span id="storage-text">Storage: 0 B / 1 GB</span>
-                </div>
-                <div style="width: 100%; height: 4px; background: rgba(255,255,255,0.1);">
-                    <div id="storage-bar" style="width: 0%; height: 100%; background-color: #28a745; transition: width 0.3s;"></div>
-                </div>
-            </div>
+
         </div>
     </div>
     <hr style="width: 100%; border: none; border-top: 1px solid var(--border-color); opacity: 0.5;">

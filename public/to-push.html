@@ -278,6 +278,7 @@
 
             <div style="display: flex; align-items: center; gap: 5px; margin-top: 5px; min-height: 24px;">
                 <button id="ai-tool-btn" class="action-button" style="flex-grow: 1; padding: 8px 5px; font-size: 11px; background-color: #10a37f; text-align: center;" onclick="openAiTool()">Open ChatGPT</button>
+                <button id="btn-mini-gemini-keys" style="display:none; flex-grow: 1; padding: 4px 8px; font-size: 11px; background: linear-gradient(135deg, #7b61ff, #00d2ff); border: none; border-radius: 4px; color: white; height: 24px; box-sizing: border-box; cursor: pointer; white-space: nowrap;">Manage API Keys</button>
                 <input type="password" id="mini-api-key" placeholder="Paste Gemini Key" style="display:none; flex-grow: 1; padding: 4px 8px; font-size: 11px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 4px; color: white; height: 24px; box-sizing: border-box;">
 
                 <select id="ai-tool-select" onchange="updateAiLink()" style="width: 22px; height: 22px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.3); background-color: rgba(0,0,0,0.3); color: transparent; cursor: pointer; -webkit-appearance: none; appearance: none; padding: 0; background-image: url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22white%22%3e%3cpath d=%22M7 10l5 5 5-5z%22/%3e%3c/svg%3e'); background-repeat: no-repeat; background-position: center; background-size: 16px;">
@@ -383,7 +384,8 @@
                 <label for="api-key" style="margin: 0;" data-translate-key="geminiKeyLabel">Gemini API Key:</label>
                 <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer" style="color: var(--primary-color); font-size: 12px; text-decoration: none;" data-translate-key="getApiKeyLink">Get API Key</a>
             </div>
-            <input type="password" id="api-key">
+            <button id="btn-gemini-keys" class="action-button" style="width: 100%; background: linear-gradient(135deg, #7b61ff, #00d2ff); text-align: center; padding: 10px 5px; font-size: 12px; border: none; border-radius: 5px; color: white; cursor: pointer;">Manage Gemini API Keys</button>
+            <input type="password" id="api-key" style="display: none;">
         </div>
         <div class="settings-item" id="deepseek-key-container" style="display: none;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
@@ -448,6 +450,24 @@
             <p style="font-family: 'Noto Serif SC', serif;" data-translate-key="creditsP1Zh">本应用程序由新加坡国立教育学院(NIE)音乐专业研究生教育文凭学生<strong>廖晟旸(Evan)</strong>与中文专业研究生教育文凭学生<strong>彭嘉仪</strong>合作开发。</p>
             <p style="font-family: 'Noto Serif SC', serif;" data-translate-key="creditsP2Zh">我们热衷于利用技术来促进教育发展，并积极寻求志同道合的伙伴。如果您是教育工作者、开发者或设计师，并对构建创新的学习工具感兴趣，我们非常期待与您交流。</p>
             <p style="text-align: center; margin-top: 25px;" data-translate-key="creditsContact">Contact: <a href="mailto:Liao_Sheng_Yang@moe.edu.sg" style="color: var(--primary-color); text-decoration: none;">Liao_Sheng_Yang@moe.edu.sg</a></p>
+        </div>
+    </div>
+</div>
+
+<div id="gemini-keys-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10,10,20,0.95); backdrop-filter: blur(10px); z-index: 10000; justify-content: center; align-items: center;">
+    <div class="panel" style="padding: 30px; width: 90%; max-width: 500px; display: flex; flex-direction: column; gap: 15px;">
+        <h3 style="margin: 0;">Gemini API Carousel</h3>
+        <p style="font-size: 12px; color: #a0a0a0; margin: 0;">Manage your Gemini API keys. The app will cycle through them automatically on rate limits.</p>
+        <div id="gemini-keys-container" style="max-height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px;"></div>
+        <div style="display:flex; gap:10px; margin-bottom: 10px;">
+            <button id="gemini-keys-add" class="action-button" style="flex: 1; background: #555;">+ Add Key</button>
+            <button id="gemini-keys-import" class="action-button" style="flex: 1; background: #17a2b8;">📤 Import</button>
+            <button id="gemini-keys-export" class="action-button" style="flex: 1; background: #28a745;">📥 Export</button>
+            <input type="file" id="gemini-keys-file" accept=".json" style="display: none;">
+        </div>
+        <div style="display:flex; gap:10px;">
+            <button id="gemini-keys-cancel" class="action-button" style="flex: 1; background: #444;">Cancel</button>
+            <button id="gemini-keys-save" class="action-button" style="flex: 1; background: var(--primary-color);">Save</button>
         </div>
     </div>
 </div>
@@ -1925,8 +1945,8 @@ document.addEventListener('DOMContentLoaded', function() {
             document.querySelector('.tab-button[onclick*="settings"]').click();
             return;
         }
-        if (!isDeepSeek && !apiKey) {
-            alert('Please enter your Gemini API Key in the Settings tab.');
+        if (!isDeepSeek && (typeof getCurrentGeminiKey === 'function' ? !getCurrentGeminiKey() : !apiKey)) {
+            alert('Please add a Gemini API Key in the API Carousel.');
             document.querySelector('.tab-button[onclick*="settings"]').click();
             return;
         }
@@ -2671,7 +2691,7 @@ JSON STRUCTURE:
 }
 
 DATA STORAGE BRIDGE (Realtime Database & Persistence):
-This app runs in a sandbox. Use localStorage indexDB until asked for collaborative app, then use the built-in Parent Bridge for Realtime Sync:
+This app runs in a sandbox. DO NOT use localStorage or initialize Firebase. Use the built-in Parent Bridge for Realtime Sync:
 1. SAVE (Write): window.parent.postMessage({ action: 'SAVE_DATA', key: 'score', value: 100 }, '*');
 2. LOAD (Read Once): window.parent.postMessage({ action: 'LOAD_DATA', key: 'score', reqId: 'r1' }, '*');
 3. SUBSCRIBE (Realtime Listen): window.parent.postMessage({ action: 'SUBSCRIBE_DATA', key: 'score' }, '*');
@@ -2753,7 +2773,8 @@ ${document.getElementById('manual-input').value.trim()}
             contextBtn.onclick = () => window.open('https://aistudio.google.com/app/apikey', '_blank');
 
             externalBtn.style.display = 'none';
-            apiKeyInput.style.display = 'block';
+            apiKeyInput.style.display = 'none';
+            document.getElementById('btn-mini-gemini-keys').style.display = 'block';
 
             // Hide select, show camera
             select.style.display = 'none';
@@ -2776,6 +2797,7 @@ ${document.getElementById('manual-input').value.trim()}
 
             externalBtn.style.display = 'inline-block';
             apiKeyInput.style.display = 'none';
+            document.getElementById('btn-mini-gemini-keys').style.display = 'none';
 
             // Show select, hide camera
             select.style.display = 'block';
@@ -2819,8 +2841,13 @@ ${document.getElementById('manual-input').value.trim()}
             apiKey = decodedText;
             document.getElementById('api-key').value = decodedText;
 
+            if (typeof geminiKeys !== 'undefined') {
+                geminiKeys.push({ nickname: 'Scanned Key', key: decodedText });
+                localStorage.setItem('geminiKeys', JSON.stringify(geminiKeys));
+            }
+
             closeQrScanner();
-            alert("API Key scanned successfully!");
+            alert("API Key scanned successfully and added to Carousel!");
         } else {
             console.warn("Scanned code rejected: " + decodedText);
             // Optional: visual feedback for rejection, but prompt said "reject", implies silence or error
@@ -2834,14 +2861,11 @@ ${document.getElementById('manual-input').value.trim()}
     }
 
     async function runMiniAiUpgrade() {
-        const apiKeyVal = document.getElementById('mini-api-key').value.trim();
         const instruction = document.getElementById('manual-input').value.trim();
         const currentCode = codeEditor.value;
+        let activeKey = typeof getCurrentGeminiKey === 'function' ? getCurrentGeminiKey() : apiKey;
 
-        if (!apiKeyVal) { alert("Please enter a Gemini API Key."); return; }
-        localStorage.setItem('geminiApiKey', apiKeyVal);
-        apiKey = apiKeyVal;
-        document.getElementById('api-key').value = apiKeyVal;
+        if (!activeKey) { alert("Please add a Gemini API Key in the API Carousel."); return; }
         if (!instruction) { alert("Please enter an instruction."); return; }
 
         const usage = getUsage(selectedGeminiModel);
@@ -2898,7 +2922,7 @@ JSON STRUCTURE:
 }
 
 DATA STORAGE BRIDGE (Realtime Database & Persistence):
-This app runs in a sandbox. Use localStorage indexDB until asked for collaborative app, then use the built-in Parent Bridge for Realtime Sync:
+This app runs in a sandbox. DO NOT use localStorage or initialize Firebase. Use the built-in Parent Bridge for Realtime Sync:
 1. SAVE (Write): window.parent.postMessage({ action: 'SAVE_DATA', key: 'score', value: 100 }, '*');
 2. LOAD (Read Once): window.parent.postMessage({ action: 'LOAD_DATA', key: 'score', reqId: 'r1' }, '*');
 3. SUBSCRIBE (Realtime Listen): window.parent.postMessage({ action: 'SUBSCRIBE_DATA', key: 'score' }, '*');
@@ -2927,14 +2951,21 @@ ${instruction}
 `;
 
         try {
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${selectedGeminiModel}:generateContent?key=${apiKeyVal}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: [{ parts: [{ text: promptText }] }]
-                })
-            });
-
+            let response;
+            let maxAttempts = (typeof geminiKeys !== 'undefined' && geminiKeys.length > 0) ? geminiKeys.length : 1;
+            for (let attempt = 0; attempt < maxAttempts; attempt++) {
+                response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${selectedGeminiModel}:generateContent?key=${activeKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: promptText }] }]
+                    })
+                });
+                if (!response.ok && (response.status === 429 || response.status === 403 || response.status === 400) && maxAttempts > 1) {
+                    if (typeof rotateGeminiKey === 'function') { rotateGeminiKey(); activeKey = getCurrentGeminiKey(); continue; }
+                }
+                break;
+            }
             if (!response.ok) throw new Error("API Error: " + response.status);
             incrementUsage(selectedGeminiModel);
             const data = await response.json();
@@ -2977,6 +3008,121 @@ ${instruction}
     // document.getElementById('download-context-btn').addEventListener('click', downloadAiContext);
     // We handle the click inside the toggle function now.
     toggleUpgraderMode();
+
+    // --- Gemini API Carousel Logic ---
+    let geminiKeys = JSON.parse(localStorage.getItem('geminiKeys') || '[]');
+    let currentKeyIndex = parseInt(localStorage.getItem('geminiKeyIndex') || '0');
+
+    if (geminiKeys.length === 0 && localStorage.getItem('geminiApiKey')) {
+        geminiKeys.push({ nickname: 'Default Key', key: localStorage.getItem('geminiApiKey') });
+        localStorage.setItem('geminiKeys', JSON.stringify(geminiKeys));
+    }
+
+    function renderKeys() {
+        const container = document.getElementById('gemini-keys-container');
+        if (!container) return;
+        container.innerHTML = '';
+        geminiKeys.forEach(item => {
+            addKeyRow(item.nickname || 'Key', item.key || item);
+        });
+    }
+
+    function addKeyRow(nickname = '', key = '') {
+        const row = document.createElement('div');
+        row.style.display = 'flex';
+        row.style.gap = '5px';
+        row.innerHTML = `<input type="text" class="key-nick" placeholder="Nickname" value="${nickname}" style="flex: 1; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: white; padding: 8px; border-radius: 4px; box-sizing: border-box;">
+                         <input type="password" class="key-val" placeholder="AIza..." value="${key}" style="flex: 2; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: white; padding: 8px; border-radius: 4px; box-sizing: border-box;">
+                         <button class="action-button" style="background: #dc3545; padding: 8px 12px; border: none; color: white; border-radius: 4px; cursor: pointer;" onclick="this.parentElement.remove()">X</button>`;
+        document.getElementById('gemini-keys-container').appendChild(row);
+    }
+
+    document.getElementById('btn-gemini-keys')?.addEventListener('click', () => {
+        renderKeys();
+        document.getElementById('gemini-keys-modal').style.display = 'flex';
+    });
+
+    document.getElementById('btn-mini-gemini-keys')?.addEventListener('click', () => {
+        renderKeys();
+        document.getElementById('gemini-keys-modal').style.display = 'flex';
+    });
+
+    document.getElementById('gemini-keys-add')?.addEventListener('click', () => addKeyRow());
+
+    document.getElementById('gemini-keys-cancel')?.addEventListener('click', () => {
+        document.getElementById('gemini-keys-modal').style.display = 'none';
+    });
+
+    document.getElementById('gemini-keys-save')?.addEventListener('click', () => {
+        const rows = document.getElementById('gemini-keys-container').querySelectorAll('div');
+        geminiKeys =[];
+        rows.forEach(row => {
+            const nick = row.querySelector('.key-nick').value.trim();
+            const val = row.querySelector('.key-val').value.trim();
+            if (val) {
+                geminiKeys.push({ nickname: nick || 'Key', key: val });
+            }
+        });
+        localStorage.setItem('geminiKeys', JSON.stringify(geminiKeys));
+        localStorage.setItem('geminiKeyIndex', '0');
+        currentKeyIndex = 0;
+        if(geminiKeys.length > 0) {
+            apiKey = geminiKeys[0].key;
+            localStorage.setItem('geminiApiKey', apiKey);
+            const mainKeyEl = document.getElementById('api-key');
+            if(mainKeyEl) mainKeyEl.value = apiKey;
+        }
+        document.getElementById('gemini-keys-modal').style.display = 'none';
+    });
+
+    document.getElementById('gemini-keys-export')?.addEventListener('click', () => {
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(geminiKeys, null, 2));
+        const downloadAnchorNode = document.createElement('a');
+        downloadAnchorNode.setAttribute("href", dataStr);
+        downloadAnchorNode.setAttribute("download", "gemini_keys_carousel.json");
+        document.body.appendChild(downloadAnchorNode);
+        downloadAnchorNode.click();
+        downloadAnchorNode.remove();
+    });
+
+    document.getElementById('gemini-keys-import')?.addEventListener('click', () => {
+        document.getElementById('gemini-keys-file').click();
+    });
+
+    document.getElementById('gemini-keys-file')?.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+            try {
+                const importedKeys = JSON.parse(evt.target.result);
+                if (Array.isArray(importedKeys)) {
+                    importedKeys.forEach(k => {
+                        if (typeof k === 'string') addKeyRow('Imported Key', k);
+                        else if (k.key) addKeyRow(k.nickname || 'Imported Key', k.key);
+                    });
+                }
+            } catch(err) {
+                alert("Invalid JSON file.");
+            }
+        };
+        reader.readAsText(file);
+        e.target.value = ''; // Reset
+    });
+
+    function getCurrentGeminiKey() {
+        if (geminiKeys.length === 0) return apiKey;
+        if (currentKeyIndex >= geminiKeys.length) currentKeyIndex = 0;
+        return geminiKeys[currentKeyIndex].key || geminiKeys[currentKeyIndex];
+    }
+
+    function rotateGeminiKey() {
+        if (geminiKeys.length > 1) {
+            currentKeyIndex = (currentKeyIndex + 1) % geminiKeys.length;
+            localStorage.setItem('geminiKeyIndex', currentKeyIndex);
+            console.log("Rotated to key index: " + currentKeyIndex);
+        }
+    }
 </script>
 </body>
 </html>

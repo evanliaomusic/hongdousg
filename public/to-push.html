@@ -1862,8 +1862,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const btn = document.getElementById('upload-asset-button');
         const oldText = btn.textContent;
         btn.textContent = "Uploading...";
-        const files = event.target.files;
-        if (!files.length) return;
+        const files = Array.from(event.target.files);
+        if (!files.length) {
+            btn.textContent = oldText;
+            return;
+        }
         
         let destArray = getChildrenOf(activeFolderId);
         let filesProcessed = 0;

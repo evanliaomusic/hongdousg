@@ -1686,18 +1686,14 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // --- Version Control System ---
-    function saveVersionsToStorage() {
-        // Primary save to Firebase to bypass localStorage 5MB limit
-        if (syncReference) {
-            syncReference.child('versions').set(versionData);
-        }
-        // Attempt localStorage only for smaller metadata or fallback
+    function saveVersionsToStorage(customDelay = 50) {
         try {
             localStorage.setItem('hongdouVersionData', JSON.stringify(versionData));
         } catch (e) {
             console.warn("LocalStorage full, relying on Firebase.");
         }
-        broadcastChange(50);
+        // Unified broadcast prevents race conditions where versions update before active selection state
+        broadcastChange(customDelay);
     }
     function loadVersionsFromStorage() {
         const data = localStorage.getItem('hongdouVersionData');
@@ -1726,47 +1722,30 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function createNewVersion(newCode, title, isInitial) {
-        const newVersion = {
-            id: `v-${Date.now()}`, type: 'version', name: title, code: newCode,
-            timestamp: Date.now(), children: []
-        };
-
+        const newVersion = { id: `v-${Date.now()}`, type: 'version', name: title, code: newCode, timestamp: Date.now(), children: [] };
         if (isInitial) {
             const folderName = document.getElementById('app-title-input').value.trim() || title || `New App ${new Date().toLocaleDateString()}`;
             const newFolder = { id: `f-${Date.now()}`, type: 'folder', name: folderName, children: [newVersion] };
             versionData.push(newFolder);
             activeFolderId = newFolder.id;
         } else {
-            let destinationArray = versionData;
-            
-            // Priority: Use the folder currently being viewed (even if empty)
-            const currentFolder = findItem(activeFolderId);
-            if (currentFolder && currentFolder.type === 'folder') {
-                if (!currentFolder.children) currentFolder.children = [];
-                destinationArray = currentFolder.children;
-            } else if (currentlySelectedVersionId) {
-                // Fallback: Use the siblings of the currently selected version
-                const parentOfSelected = findParent(currentlySelectedVersionId);
-                destinationArray = parentOfSelected ? parentOfSelected.children : versionData;
-            } else {
-                // Final Fallback: Last project folder
-                let lastRootFolder = [...versionData].reverse().find(item => item.type === 'folder');
-                if (!lastRootFolder) {
-                    lastRootFolder = { id: `f-${Date.now()}`, type: 'folder', name: "Unsorted Edits", children: [] };
-                    versionData.push(lastRootFolder);
-                }
-                if (!lastRootFolder.children) lastRootFolder.children = [];
-                destinationArray = lastRootFolder.children;
-                activeFolderId = lastRootFolder.id;
+            let targetFolder = findItem(activeFolderId);
+            if (!targetFolder || targetFolder.type !== 'folder') {
+                const parent = currentlySelectedVersionId ? findParent(currentlySelectedVersionId) : null;
+                targetFolder = (parent && parent.type === 'folder') ? parent : [...versionData].reverse().find(i => i.type === 'folder');
             }
-            destinationArray.push(newVersion);
+            if (targetFolder) {
+                if (!targetFolder.children) targetFolder.children = [];
+                targetFolder.children.push(newVersion);
+                activeFolderId = targetFolder.id;
+            } else {
+                versionData.push(newVersion);
+                activeFolderId = null;
+            }
         }
-
         currentlySelectedVersionId = newVersion.id;
-
-        saveVersionsToStorage();
+        saveVersionsToStorage(10);
         renderVersionsTree();
-        // Ensure the preview updates to the new code
         codeEditor.value = newVersion.code;
         updatePreview();
     }

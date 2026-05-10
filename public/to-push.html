@@ -353,6 +353,8 @@
                 <div class="panel-header-actions">
                     <button id="bulk-select-button" class="action-button" style="padding: 6px 12px; font-size: 13px; background-color: #6c757d;" onclick="toggleBulkSelectionMode()">Select</button>
                     <button id="bulk-delete-button" class="action-button" style="padding: 6px 12px; font-size: 13px; background-color: #dc3545; display: none;" onclick="executeBulkDelete()">Delete</button>
+                    <button id="upload-asset-button" class="action-button" style="padding: 6px 12px; font-size: 13px; background-color: #28a745;" onclick="document.getElementById('asset-file-input').click()">Upload</button>
+                    <input type="file" id="asset-file-input" style="display: none;" multiple onchange="handleAssetUpload(event)">
                     <button id="new-folder-button" class="action-button" style="padding: 6px 12px; font-size: 13px; background-color: var(--primary-color);" data-translate-key="newFolderButton">New Folder</button>
                 </div>
             </div>
@@ -1814,6 +1816,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function calculateStorageUsage() {
         let total = 0;
+        // RTDB String overhead calculation
         const countAssets = (items) => {
             if (!items) return;
             items.forEach(item => {
@@ -1827,7 +1830,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const bar = document.getElementById('storage-bar');
         const text = document.getElementById('storage-text');
         if (bar && text) {
-            const limit = 1073741824; // 1GB
+            const limit = 1073741824; // 1GB Firebase RTDB limit
             const mb = (total / (1024 * 1024)).toFixed(2);
             const percent = Math.min(100, (total / limit) * 100);
             bar.style.width = percent + '%';
@@ -1835,6 +1838,50 @@ document.addEventListener('DOMContentLoaded', function() {
             text.textContent = `Storage: ${mb} MB / 1 GB`;
         }
         return total;
+    }
+
+    async function handleAssetUpload(event) {
+        const files = event.target.files;
+        if (!files.length) return;
+        
+        let destArray = getChildrenOf(activeFolderId);
+        let filesProcessed = 0;
+        
+        for (const file of files) {
+            const reader = new FileReader();
+            reader.onload = (evt) => {
+                const base64Data = evt.target.result;
+                if (calculateStorageUsage() + base64Data.length > 1073741824) {
+                    alert(`Cannot add ${file.name}: 1GB Database limit exceeded.`);
+                } else {
+                    let newName = file.name;
+                    let counter = 1;
+                    while (destArray.some(item => item.name === newName)) {
+                        const dotIndex = file.name.lastIndexOf('.');
+                        newName = dotIndex !== -1 
+                            ? `${file.name.substring(0, dotIndex)} (${counter})${file.name.substring(dotIndex)}` 
+                            : `${file.name} (${counter})`;
+                        counter++;
+                    }
+                    destArray.push({
+                        id: `asset-${Date.now()}-${Math.random()}`,
+                        type: 'asset',
+                        name: newName,
+                        mimeType: file.type,
+                        data: base64Data,
+                        timestamp: Date.now()
+                    });
+                }
+                filesProcessed++;
+                if (filesProcessed === files.length) {
+                    saveVersionsToStorage();
+                    renderVersionsTree();
+                    broadcastChange(100);
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+        event.target.value = ''; // Reset input
     }
 
     function getChildrenOf(folderId) {
@@ -2230,7 +2277,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     });
                     return str;
                 }
-                let folderStructureStr = "Project Folder Structure:\n";
+                let folderStructureStr = "Project Folder Structure (The user can reference these files by their NAME in the code, but you MUST replace src/href/url attributes with the corresponding [ASSET] Data URI provided below):\n";
                 if (contextFolderId) {
                     const f = findItem(contextFolderId);
                     folderStructureStr += `${f?.name || 'Root'}/\n` + getFolderStructureString(contextFolderId, '  ');

@@ -1863,10 +1863,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const oldText = btn.textContent;
         btn.textContent = "Uploading...";
         const files = Array.from(event.target.files);
-        if (!files.length) {
-            btn.textContent = oldText;
-            return;
-        }
+        if (!files.length) return;
         
         let destArray = getChildrenOf(activeFolderId);
         let filesProcessed = 0;

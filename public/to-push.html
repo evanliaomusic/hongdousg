@@ -1586,7 +1586,8 @@ document.addEventListener('DOMContentLoaded', function() {
     function ensureKnowledgebaseFolder(skipSave = false) {
         const recursiveEnsure = (items) => {
             if (!items) return;
-            items.forEach(item => {
+            const arr = Array.isArray(items) ? items : Object.values(items);
+            arr.forEach(item => {
                 if (item.type === 'folder') {
                     if (!item.children) item.children = [];
                     const isKb = item.name.toLowerCase() === 'knowledgebase';
@@ -1617,7 +1618,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const collectFromKb = (items) => {
             if (!items) return;
-            items.forEach(item => {
+            const arr = Array.isArray(items) ? items : Object.values(items);
+            arr.forEach(item => {
                 if (item.type === 'folder' && item.name.toLowerCase() === 'knowledgebase') {
                     (item.children || []).forEach(child => {
                         if (child.type === 'asset' && child.data) {
@@ -1701,20 +1703,26 @@ document.addEventListener('DOMContentLoaded', function() {
         renderVersionsTree();
     }
     function findItem(id, items = versionData) {
-        for (const item of items) {
+        const arr = Array.isArray(items) ? items : Object.values(items || {});
+        for (const item of arr) {
             if (item.id === id) return item;
-            if (item.children && item.children.length > 0) {
-                const found = findItem(id, item.children);
-                if (found) return found;
+            if (item.children) {
+                const childrenArr = Array.isArray(item.children) ? item.children : Object.values(item.children);
+                if (childrenArr.length > 0) {
+                    const found = findItem(id, childrenArr);
+                    if (found) return found;
+                }
             }
         }
         return null;
     }
     function findParent(childId, items = versionData, parent = null) {
-        for (const item of items) {
+        const arr = Array.isArray(items) ? items : Object.values(items || {});
+        for (const item of arr) {
             if (item.id === childId) return parent;
             if (item.children) {
-                const foundParent = findParent(childId, item.children, item);
+                const childrenArr = Array.isArray(item.children) ? item.children : Object.values(item.children);
+                const foundParent = findParent(childId, childrenArr, item);
                 if (foundParent) return foundParent;
             }
         }
@@ -1836,7 +1844,8 @@ document.addEventListener('DOMContentLoaded', function() {
         // RTDB String overhead calculation
         const countAssets = (items) => {
             if (!items) return;
-            items.forEach(item => {
+            const arr = Array.isArray(items) ? items : Object.values(items);
+            arr.forEach(item => {
                 if (item.type === 'asset' && item.data) {
                     total += item.data.length;
                 }
@@ -1907,13 +1916,15 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function getChildrenOf(folderId) {
-        if (!folderId) return versionData;
-        const folder = findItem(folderId);
+        let currentRoot = Array.isArray(versionData) ? versionData : Object.values(versionData || {});
+        if (!folderId) return currentRoot;
+        const folder = findItem(folderId, currentRoot);
         if (folder && folder.type === 'folder') {
-            if (!folder.children) folder.children =[];
+            if (!folder.children) folder.children = [];
+            if (!Array.isArray(folder.children)) folder.children = Object.values(folder.children);
             return folder.children;
         }
-        return versionData;
+        return currentRoot;
     }
 
     function renameItem(id, thumbElement) {
@@ -2167,7 +2178,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const assets = [];
         function collectAssets(items) {
             if (!items) return;
-            items.forEach(item => {
+            const arr = Array.isArray(items) ? items : Object.values(items);
+            arr.forEach(item => {
                 if (item.name.toLowerCase() === 'knowledgebase') return;
                 if (item.type === 'asset' && item.data) assets.push(item);
                 else if (item.type === 'folder') collectAssets(item.children);
@@ -2866,8 +2878,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 // 1. Sync Versions (Always, unless we are the specific drag source, handled by UI updates)
                 if (data.versions) {
-                     if (JSON.stringify(versionData) !== JSON.stringify(data.versions) || currentlySelectedVersionId !== data.activeVersion) {
-                         versionData = data.versions;
+                     const normalize = (arr) => {
+                        if (!arr) return [];
+                        const items = Array.isArray(arr) ? arr : Object.values(arr);
+                        return items.map(item => {
+                            if (item && item.children) item.children = normalize(item.children);
+                            return item;
+                        }).filter(Boolean);
+                     };
+                     const normalizedVersions = normalize(data.versions);
+                     if (JSON.stringify(versionData) !== JSON.stringify(normalizedVersions) || currentlySelectedVersionId !== data.activeVersion) {
+                         versionData = normalizedVersions;
                          ensureKnowledgebaseFolder(true);
                          currentlySelectedVersionId = data.activeVersion;
                          renderVersionsTree();
@@ -3025,7 +3046,8 @@ document.addEventListener('DOMContentLoaded', function() {
         while (contextFolderId) { const p = findParent(contextFolderId); if (!p) break; contextFolderId = p.id; }
         
         function getFolderStructureString(folderId, indent = '') {
-            const items = folderId ? (findItem(folderId)?.children ||[]) : versionData;
+            const rawItems = folderId ? (findItem(folderId)?.children ||[]) : versionData;
+            const items = Array.isArray(rawItems) ? rawItems : Object.values(rawItems);
             let str = '';
             items.forEach(item => {
                 if (item.name.toLowerCase() === 'knowledgebase') return;

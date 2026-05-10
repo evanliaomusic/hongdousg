@@ -171,47 +171,16 @@
         .timer-display { font-size: 12px; font-family: 'SF Mono', 'Courier New', monospace; white-space: nowrap; color: var(--text-color); opacity: 0.85; align-self: flex-end; }
 
         #versions-panel, #manual-panel { flex: 0 0 25%; }
-        #versions-list-container { flex-grow: 1; overflow-y: auto; padding: 15px; }
-        #versions-list-container ul { list-style: none; padding-left: 20px; margin: 0; }
-        #versions-list-container ul:first-child { padding-left: 0; }
-        #versions-list-container li {
-            padding: 8px 12px; margin-bottom: 5px; border-radius: 6px; background-color: rgba(255, 255, 255, 0.05);
-            display: flex; align-items: center; justify-content: space-between; cursor: pointer;
-            transition: background-color 0.2s; user-select: none;
-        }
-        #versions-list-container li:hover { background-color: rgba(255, 255, 255, 0.1); }
-        #versions-list-container li.active { background-color: var(--primary-color); color: white; }
-        #versions-list-container li .item-name { flex-grow: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        #versions-list-container li .item-name::before {
-            font-family: 'SF Mono', 'Courier New', monospace; margin-right: 10px;
-        }
-        #versions-list-container li.type-folder > .item-name-wrapper > .item-name::before { content: ''; } /* Use toggle instead */
-        #versions-list-container li.type-version > .item-name-wrapper > .item-name::before { content: '📄'; }
-
-        .item-name-wrapper { display: flex; align-items: center; min-width: 0; flex-grow: 1; }
-        #versions-list-container li.type-folder {
-            background-color: rgba(255, 255, 255, 0.08);
-            font-weight: 600;
-        }
-        #versions-list-container li.type-folder.active-folder {
-            border-left: 3px solid var(--primary-color);
-            padding-left: 9px;
-        }
-        #versions-list-container li.type-folder:hover {
-            background-color: rgba(255, 255, 255, 0.15);
-        }
-        .folder-toggle {
-            margin-right: 8px;
-            transition: transform 0.2s ease-in-out;
-            display: inline-block;
-            width: 12px;
-            text-align: center;
-        }
-        #versions-list-container li.type-folder.collapsed .folder-toggle {
-            transform: rotate(-90deg);
-        }
-        .item-actions { display: none; }
-        #versions-list-container li:hover .item-actions { display: flex; align-items: center; }
+        #versions-list-container { flex-grow: 1; overflow-y: auto; padding: 15px; display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 15px; align-content: start; position: relative; }
+        .drag-over-container { background-color: rgba(74, 125, 255, 0.1); border: 2px dashed var(--primary-color); border-radius: 10px; }
+        .asset-thumbnail { display: flex; flex-direction: column; align-items: center; padding: 10px; border-radius: 8px; background-color: rgba(255, 255, 255, 0.05); cursor: pointer; transition: all 0.2s; position: relative; user-select: none; text-align: center; border: 1px solid transparent; box-sizing: border-box; }
+        .asset-thumbnail:hover { background-color: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.2); }
+        .asset-thumbnail.active { background-color: rgba(74, 125, 255, 0.2); border-color: var(--primary-color); }
+        .asset-thumbnail .icon { font-size: 32px; margin-bottom: 8px; pointer-events: none; }
+        .asset-thumbnail .name { font-size: 12px; color: var(--text-color); width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; pointer-events: none; }
+        .item-actions { display: none; position: absolute; top: -5px; right: -5px; background: var(--panel-bg); border-radius: 10px; padding: 2px; box-shadow: 0 2px 5px rgba(0,0,0,0.5); z-index: 10; border: 1px solid var(--border-color); }
+        .asset-thumbnail:hover .item-actions { display: flex; align-items: center; }
+        .asset-thumbnail.up-button { background-color: rgba(0,0,0,0.2); }
         .action-icon-btn {
             background: none; border: none; color: var(--text-color); cursor: pointer; opacity: 0.6;
             font-size: 16px; padding: 0 5px; transition: opacity 0.2s;
@@ -299,9 +268,17 @@
             <div id="gemini-usage-tracker" style="display: none; margin-top: 10px; width: 100%; border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; font-size: 11px; font-weight: 500; cursor: pointer; user-select: none; box-sizing: border-box; background: rgba(0,0,0,0.2);">
                 <div id="gemini-usage-selected" style="padding: 8px 6px; background: #000; text-align: center; position: relative;" onclick="toggleGeminiDropdown()">
                     <div id="gemini-usage-selected-bg" style="position: absolute; top: 0; left: 0; height: 100%; width: 100%; background: #369b18; z-index: 0; opacity: 0.9; transition: width 0.3s, background-color 0.3s;"></div>
-                    <span id="gemini-usage-selected-text" style="position: relative; z-index: 1; color: white; text-shadow: 1px 1px 2px #000;">Gemini 3.0 Flash [20/20 Left]</span>
+                    <span id="gemini-usage-selected-text" style="position: relative; z-index: 1; color: white; text-shadow: 1px 1px 2px #000;">Gemini 3.0 Flash[20/20 Left]</span>
                 </div>
                 <div id="gemini-usage-dropdown" style="display: none; flex-direction: column; background: #000;">
+                </div>
+            </div>
+            <div style="margin-top: 10px; width: 100%; border: 1px solid var(--border-color); border-radius: 6px; overflow: hidden; background: rgba(0,0,0,0.2); box-sizing: border-box;">
+                <div style="padding: 4px; display: flex; align-items: center; justify-content: space-between; font-size: 10px; color: var(--text-color); opacity: 0.8;">
+                    <span id="storage-text">Storage: 0 B / 1 GB</span>
+                </div>
+                <div style="width: 100%; height: 4px; background: rgba(255,255,255,0.1);">
+                    <div id="storage-bar" style="width: 0%; height: 100%; background-color: #28a745; transition: width 0.3s;"></div>
                 </div>
             </div>
         </div>
@@ -312,7 +289,7 @@
         <button class="toggle-button" id="toggle-code" onclick="togglePanel('middle-panel')" data-translate-key="codeToggle">Code</button>
 
         <button id="toggle-manual" style="display: none;"></button>
-        <button class="toggle-button" id="toggle-versions" onclick="togglePanel('versions-panel')" data-translate-key="versionsToggle">Versions</button>
+        <button class="toggle-button" id="toggle-versions" onclick="togglePanel('versions-panel')">Assets</button>
         <button class="toggle-button" id="toggle-credits" onclick="togglePanel('credits-panel')" data-translate-key="creditsTab">Credits</button>
     </div>
     <hr style="width: 100%; border: none; border-top: 1px solid var(--border-color); opacity: 0.5; margin: 15px 0;">
@@ -372,7 +349,7 @@
         <div id="versions-panel" class="panel hidden">
             <button class="icon-button" onclick="togglePanel('versions-panel')" style="position: absolute; top: 15px; right: 15px; color: #ff5555; font-weight: bold; z-index: 10;">✕</button>
             <div class="panel-header">
-                <h3 data-translate-key="versionsHeader">Versions</h3>
+                <h3>Assets</h3>
                 <div class="panel-header-actions">
                     <button id="bulk-select-button" class="action-button" style="padding: 6px 12px; font-size: 13px; background-color: #6c757d;" onclick="toggleBulkSelectionMode()">Select</button>
                     <button id="bulk-delete-button" class="action-button" style="padding: 6px 12px; font-size: 13px; background-color: #dc3545; display: none;" onclick="executeBulkDelete()">Delete</button>
@@ -1591,6 +1568,107 @@ document.addEventListener('DOMContentLoaded', function() {
         alert('Settings saved!'); document.querySelector('.tab-button[onclick*="coder"]').click();
     }
 
+    // --- Knowledgebase & Export Utilities ---
+    function getProjectRoot(id) {
+        if (!id) return null;
+        let current = findItem(id);
+        let parent = findParent(id);
+        while (parent) {
+            current = parent;
+            parent = findParent(current.id);
+        }
+        return (current && current.type === 'folder') ? current : null;
+    }
+
+    function ensureKnowledgebaseFolder(skipSave = false) {
+        const recursiveEnsure = (items) => {
+            if (!items) return;
+            items.forEach(item => {
+                if (item.type === 'folder') {
+                    if (!item.children) item.children = [];
+                    const isKb = item.name.toLowerCase() === 'knowledgebase';
+                    let kbFolder = item.children.find(child => child.type === 'folder' && child.name.toLowerCase() === 'knowledgebase');
+                    if (!kbFolder && !isKb) {
+                        kbFolder = { id: `f-kb-${Date.now()}-${Math.random()}`, type: 'folder', name: 'knowledgebase', children: [] };
+                        item.children.unshift(kbFolder);
+                    }
+                    recursiveEnsure(item.children);
+                }
+            });
+        };
+        recursiveEnsure(versionData);
+        if (!skipSave) saveVersionsToStorage();
+    }
+
+    function getKnowledgebaseContentParts(isDeepSeek = false) {
+        const parts = [];
+        let extraText = "";
+        
+        const collectFromKb = (items) => {
+            if (!items) return;
+            items.forEach(item => {
+                if (item.type === 'folder' && item.name.toLowerCase() === 'knowledgebase') {
+                    (item.children || []).forEach(child => {
+                        if (child.type === 'asset' && child.data) {
+                            const mimeType = child.mimeType || 'text/plain';
+                            let base64Data = child.data;
+                            if (base64Data.includes(',')) base64Data = base64Data.split(',')[1];
+                            
+                            if (isDeepSeek) {
+                                if (mimeType.startsWith('text/') || mimeType === 'application/json' || mimeType.includes('xml') || child.name.endsWith('.txt') || child.name.endsWith('.js') || child.name.endsWith('.css') || child.name.endsWith('.html') || child.name.endsWith('.md')) {
+                                    try {
+                                        let textContent = decodeURIComponent(escape(atob(base64Data)));
+                                        extraText += `\n\n**Knowledgebase File (${child.name}):**\n\`\`\`\n${textContent}\n\`\`\``;
+                                    } catch(e) { console.error("Failed to decode kb file", e); }
+                                }
+                            } else {
+                                parts.push({ "inlineData": { "mimeType": mimeType, "data": base64Data } });
+                                extraText += `\n\n[Note: The file "${child.name}" from the knowledgebase has been attached as an inline data resource. Use its contents to inform your generation.]`;
+                            }
+                        }
+                    });
+                } else if (item.children) {
+                    collectFromKb(item.children);
+                }
+            });
+        };
+
+        collectFromKb(versionData);
+        return { parts, extraText };
+    }
+
+    function createZipWithAssets(htmlContent, appTitle) {
+        const zip = new JSZip();
+        zip.file("index.html", htmlContent);
+        
+        let folderToExport = null;
+        if (currentlySelectedVersionId) {
+            folderToExport = findParent(currentlySelectedVersionId);
+        } else if (activeFolderId) {
+            folderToExport = findItem(activeFolderId);
+        }
+        
+        const addAssetsToZip = (folderItems, currentPath) => {
+            folderItems.forEach(child => {
+                if (child.name.toLowerCase() === 'knowledgebase') return; // Skip knowledgebase in export
+                if (child.type === 'asset' && child.data) {
+                    let base64Data = child.data;
+                    if (base64Data.includes(',')) base64Data = base64Data.split(',')[1];
+                    if (base64Data) zip.file(currentPath + child.name, base64Data, {base64: true});
+                } else if (child.type === 'folder') {
+                    addAssetsToZip(child.children ||[], currentPath + child.name + '/');
+                }
+            });
+        };
+
+        if (folderToExport && folderToExport.type === 'folder' && folderToExport.name.toLowerCase() !== 'knowledgebase') {
+            addAssetsToZip(folderToExport.children ||[], '');
+        } else {
+            addAssetsToZip(versionData, '');
+        }
+        return zip;
+    }
+
     // --- Version Control System ---
     function saveVersionsToStorage() { localStorage.setItem('hongdouVersionData', JSON.stringify(versionData)); broadcastChange(50); }
     function loadVersionsFromStorage() {
@@ -1734,9 +1812,45 @@ document.addEventListener('DOMContentLoaded', function() {
         renderVersionsTree();
     }
 
-    function renameItem(id, nameWrapper) {
-        const nameSpan = nameWrapper.querySelector('.item-name');
-        const currentName = nameSpan.textContent;
+    function calculateStorageUsage() {
+        let total = 0;
+        const countAssets = (items) => {
+            if (!items) return;
+            items.forEach(item => {
+                if (item.type === 'asset' && item.data) {
+                    total += item.data.length;
+                }
+                if (item.children) countAssets(item.children);
+            });
+        };
+        countAssets(versionData);
+        const bar = document.getElementById('storage-bar');
+        const text = document.getElementById('storage-text');
+        if (bar && text) {
+            const limit = 1073741824; // 1GB
+            const mb = (total / (1024 * 1024)).toFixed(2);
+            const percent = Math.min(100, (total / limit) * 100);
+            bar.style.width = percent + '%';
+            bar.style.backgroundColor = percent > 90 ? '#dc3545' : (percent > 75 ? '#ffc107' : '#28a745');
+            text.textContent = `Storage: ${mb} MB / 1 GB`;
+        }
+        return total;
+    }
+
+    function getChildrenOf(folderId) {
+        if (!folderId) return versionData;
+        const folder = findItem(folderId);
+        if (folder && folder.type === 'folder') {
+            if (!folder.children) folder.children =[];
+            return folder.children;
+        }
+        return versionData;
+    }
+
+    function renameItem(id, thumbElement) {
+        const nameDiv = thumbElement.querySelector('.name');
+        if (!nameDiv) return;
+        const currentName = nameDiv.textContent;
         const input = document.createElement('input');
         input.type = 'text';
         input.value = currentName;
@@ -1751,7 +1865,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     saveVersionsToStorage();
                 }
             }
-            renderVersionsTree(); // Rerender to restore original state
+            renderVersionsTree();
         };
 
         input.addEventListener('blur', finishEditing);
@@ -1764,144 +1878,195 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        nameWrapper.innerHTML = ''; // Clear the span
-        nameWrapper.appendChild(input);
+        nameDiv.replaceWith(input);
         input.focus();
         input.select();
     }
 
     function renderVersionsTree() {
+        ensureKnowledgebaseFolder(true);
         const container = document.getElementById('versions-list-container');
         container.innerHTML = '';
-        const rootUl = document.createElement('ul');
-
-        const buildTree = (items, parentElement) => {
-            items.forEach(item => {
-                const li = document.createElement('li');
-                li.dataset.id = item.id;
-                li.draggable = true;
-                li.className = `type-${item.type}`;
-                if (item.id === currentlySelectedVersionId) li.classList.add('active');
-
-                const nameWrapper = document.createElement('div');
-                nameWrapper.className = 'item-name-wrapper';
-                if (typeof isBulkSelectionMode !== 'undefined' && isBulkSelectionMode) {
-                    const cb = document.createElement('input');
-                    cb.type = 'checkbox';
-                    cb.className = 'bulk-select-checkbox';
-                    cb.dataset.id = item.id;
-                    cb.style.marginRight = '8px';
-                    cb.onclick = (e) => e.stopPropagation();
-                    nameWrapper.appendChild(cb);
-                }
-                const nameSpan = document.createElement('span');
-                nameSpan.className = 'item-name';
-
-                if (item.type === 'folder') {
-                    li.classList.add(item.id === activeFolderId ? 'expanded' : 'collapsed');
-                    if (item.id === activeFolderId) li.classList.add('active-folder');
-                    nameSpan.innerHTML = `<span class="folder-toggle">&#9660;</span> ${item.name}`; // Down arrow
-                } else {
-                    nameSpan.textContent = item.name;
-                }
-                nameWrapper.appendChild(nameSpan);
-
-                const actionsWrapper = document.createElement('div');
-                actionsWrapper.className = 'item-actions';
-                const renameBtn = document.createElement('button');
-                renameBtn.className = 'action-icon-btn';
-                renameBtn.innerHTML = '&#9998;';
-                renameBtn.title = 'Rename';
-                renameBtn.onclick = (e) => { e.stopPropagation(); renameItem(item.id, nameWrapper); };
-
-                const deleteBtn = document.createElement('button');
-                deleteBtn.className = 'action-icon-btn';
-                deleteBtn.innerHTML = '&times;';
-                deleteBtn.title = 'Delete';
-                deleteBtn.onclick = (e) => { e.stopPropagation(); deleteItem(item.id); };
-
-                actionsWrapper.appendChild(renameBtn);
-                actionsWrapper.appendChild(deleteBtn);
-                li.appendChild(nameWrapper);
-                li.appendChild(actionsWrapper);
-
-                // CLICK HANDLERS
-                if (item.type === 'folder') {
-                    li.addEventListener('click', (e) => {
-                        if (e.target.closest('.item-actions')) return;
-                        if (typeof isBulkSelectionMode !== 'undefined' && isBulkSelectionMode) {
-                            const cb = li.querySelector('.bulk-select-checkbox');
-                            if (cb) cb.checked = !cb.checked;
-                            return;
-                        }
-                        activeFolderId = (activeFolderId === item.id) ? null : item.id;
-                        renderVersionsTree();
-                    });
-                } else { // type === 'version'
-                     li.addEventListener('click', (e) => {
-                        if (e.target.closest('.item-actions')) return;
-                        if (typeof isBulkSelectionMode !== 'undefined' && isBulkSelectionMode) {
-                            const cb = li.querySelector('.bulk-select-checkbox');
-                            if (cb) cb.checked = !cb.checked;
-                            return;
-                        }
-                        const version = findItem(item.id);
-                        if (version) {
-                            codeEditor.value = version.code;
-                            updatePreview();
-                            currentlySelectedVersionId = item.id;
-                            renderVersionsTree();
-                            broadcastChange();
-                        }
-                    });
-                }
-
-                // DRAG AND DROP (omitted for brevity, remains the same as before)
-                li.addEventListener('dragstart', (e) => { e.stopPropagation(); draggedItemId = item.id; e.dataTransfer.setData('text/plain', item.id); setTimeout(() => li.classList.add('dragging'), 0); });
-                li.addEventListener('dragend', (e) => { e.stopPropagation(); li.classList.remove('dragging'); draggedItemId = null; });
-                li.addEventListener('dragover', (e) => { e.preventDefault(); e.stopPropagation(); if (item.id === draggedItemId) return; li.classList.add('drag-over'); });
-                li.addEventListener('dragleave', (e) => { e.stopPropagation(); li.classList.remove('drag-over'); });
-                li.addEventListener('drop', (e) => {
-                    e.preventDefault(); e.stopPropagation(); li.classList.remove('drag-over');
-                    const droppedOnId = item.id; if (droppedOnId === draggedItemId) return;
-                    const draggedItem = findItem(draggedItemId); const droppedOnItem = findItem(droppedOnId);
-                    if (!draggedItem || !droppedOnItem) return;
-                    let temp = droppedOnItem; while(temp) { if (temp.id === draggedItemId) return; temp = findParent(temp.id); }
-                    const sourceParent = findParent(draggedItemId);
-                    const sourceArray = sourceParent ? sourceParent.children : versionData;
-                    const sourceIndex = sourceArray.findIndex(i => i.id === draggedItemId);
-                    if (sourceIndex > -1) {
-                        sourceArray.splice(sourceIndex, 1);
-                        if (droppedOnItem.type === 'folder') {
-                            if (!droppedOnItem.children) droppedOnItem.children = [];
-                            droppedOnItem.children.push(draggedItem);
-                            activeFolderId = droppedOnItem.id;
-                        } else {
-                            const destParent = findParent(droppedOnId);
+        
+        let currentItems = getChildrenOf(activeFolderId);
+        
+        if (activeFolderId) {
+            const upBtn = document.createElement('div');
+            upBtn.className = 'asset-thumbnail up-button';
+            upBtn.innerHTML = '<div class="icon">&#128193;</div><div class="name">.. (Up)</div>';
+            upBtn.onclick = () => {
+                const parent = findParent(activeFolderId);
+                activeFolderId = parent ? parent.id : null;
+                renderVersionsTree();
+            };
+            upBtn.addEventListener('dragover', (e) => { e.preventDefault(); upBtn.classList.add('drag-over'); });
+            upBtn.addEventListener('dragleave', () => upBtn.classList.remove('drag-over'));
+            upBtn.addEventListener('drop', (e) => {
+                e.preventDefault(); upBtn.classList.remove('drag-over');
+                if (draggedItemId) {
+                    const draggedItem = findItem(draggedItemId);
+                    if (draggedItem) {
+                        const sourceParent = findParent(draggedItemId);
+                        const sourceArray = sourceParent ? sourceParent.children : versionData;
+                        const sourceIndex = sourceArray.findIndex(i => i.id === draggedItemId);
+                        if (sourceIndex > -1) {
+                            sourceArray.splice(sourceIndex, 1);
+                            const destParent = findParent(activeFolderId);
                             const destArray = destParent ? destParent.children : versionData;
-                            let destIndex = destArray.findIndex(i => i.id === droppedOnId);
-                            if (destIndex === -1) destIndex = destArray.length;
-                            destArray.splice(destIndex, 0, draggedItem);
+                            destArray.push(draggedItem);
+                            saveVersionsToStorage();
+                            renderVersionsTree();
                         }
-                    }
-                    saveVersionsToStorage(); renderVersionsTree();
-                });
-
-                parentElement.appendChild(li);
-
-                // Conditional rendering of children
-                if (item.children && item.children.length > 0) {
-                    const shouldRenderChildren = (item.type === 'version') || (item.type === 'folder' && item.id === activeFolderId);
-                    if (shouldRenderChildren) {
-                        const childUl = document.createElement('ul');
-                        parentElement.appendChild(childUl);
-                        buildTree(item.children, childUl);
                     }
                 }
             });
-        };
-        buildTree(versionData, rootUl);
-        container.appendChild(rootUl);
+            container.appendChild(upBtn);
+        }
+
+        currentItems.forEach(item => {
+            const thumb = document.createElement('div');
+            thumb.className = 'asset-thumbnail';
+            thumb.dataset.id = item.id;
+            thumb.draggable = true;
+            if (item.id === currentlySelectedVersionId) thumb.classList.add('active');
+
+            if (typeof isBulkSelectionMode !== 'undefined' && isBulkSelectionMode) {
+                const cb = document.createElement('input');
+                cb.type = 'checkbox';
+                cb.className = 'bulk-select-checkbox';
+                cb.dataset.id = item.id;
+                cb.style.position = 'absolute';
+                cb.style.top = '5px';
+                cb.style.left = '5px';
+                cb.style.zIndex = '5';
+                cb.onclick = (e) => e.stopPropagation();
+                thumb.appendChild(cb);
+            }
+
+            const iconDiv = document.createElement('div');
+            iconDiv.className = 'icon';
+            if (item.type === 'folder') {
+                iconDiv.innerHTML = '&#128193;';
+            } else if (item.type === 'version') {
+                iconDiv.innerHTML = '&#128196;';
+            } else if (item.type === 'asset') {
+                if (item.mimeType && item.mimeType.startsWith('image/')) {
+                    const img = document.createElement('img');
+                    img.src = item.data;
+                    img.style.width = '32px';
+                    img.style.height = '32px';
+                    img.style.objectFit = 'cover';
+                    img.style.borderRadius = '4px';
+                    iconDiv.appendChild(img);
+                } else {
+                    iconDiv.innerHTML = '&#128444;&#65039;';
+                }
+            }
+            
+            const nameDiv = document.createElement('div');
+            nameDiv.className = 'name';
+            nameDiv.textContent = item.name;
+            nameDiv.title = item.name;
+
+            const actionsDiv = document.createElement('div');
+            actionsDiv.className = 'item-actions';
+            
+            const renameBtn = document.createElement('button');
+            renameBtn.className = 'action-icon-btn';
+            renameBtn.innerHTML = '&#9998;';
+            renameBtn.onclick = (e) => { e.stopPropagation(); renameItem(item.id, thumb); };
+            
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'action-icon-btn';
+            deleteBtn.innerHTML = '&times;';
+            deleteBtn.onclick = (e) => { e.stopPropagation(); deleteItem(item.id); };
+
+            actionsDiv.appendChild(renameBtn);
+            actionsDiv.appendChild(deleteBtn);
+
+            thumb.appendChild(iconDiv);
+            thumb.appendChild(nameDiv);
+            thumb.appendChild(actionsDiv);
+
+            thumb.addEventListener('click', (e) => {
+                if (e.target.closest('.item-actions') || e.target.closest('.bulk-select-checkbox') || e.target.closest('.rename-input')) return;
+                
+                if (typeof isBulkSelectionMode !== 'undefined' && isBulkSelectionMode) {
+                    const cb = thumb.querySelector('.bulk-select-checkbox');
+                    if (cb) cb.checked = !cb.checked;
+                    return;
+                }
+
+                if (item.type === 'folder') {
+                    activeFolderId = item.id;
+                    renderVersionsTree();
+                } else if (item.type === 'version') {
+                    codeEditor.value = item.code;
+                    updatePreview();
+                    currentlySelectedVersionId = item.id;
+                    renderVersionsTree();
+                    broadcastChange();
+                } else if (item.type === 'asset') {
+                    navigator.clipboard.writeText(item.data).then(() => {
+                        alert(`Asset Data URI copied to clipboard!`);
+                    });
+                }
+            });
+
+            thumb.addEventListener('dragstart', (e) => { 
+                e.stopPropagation(); 
+                draggedItemId = item.id; 
+                e.dataTransfer.setData('text/plain', item.id); 
+                setTimeout(() => thumb.classList.add('dragging'), 0); 
+            });
+            thumb.addEventListener('dragend', (e) => { 
+                e.stopPropagation(); 
+                thumb.classList.remove('dragging'); 
+                draggedItemId = null; 
+            });
+            
+            if (item.type === 'folder') {
+                thumb.addEventListener('dragover', (e) => { 
+                    e.preventDefault(); e.stopPropagation(); 
+                    if (item.id === draggedItemId) return; 
+                    thumb.classList.add('drag-over'); 
+                });
+                thumb.addEventListener('dragleave', (e) => { 
+                    e.stopPropagation(); 
+                    thumb.classList.remove('drag-over'); 
+                });
+                thumb.addEventListener('drop', (e) => {
+                    e.preventDefault(); e.stopPropagation(); 
+                    thumb.classList.remove('drag-over');
+                    if (draggedItemId && draggedItemId !== item.id) {
+                        const draggedItem = findItem(draggedItemId);
+                        if (!draggedItem) return;
+                        
+                        let temp = item; 
+                        while(temp) { 
+                            if (temp.id === draggedItemId) return; 
+                            temp = findParent(temp.id); 
+                        }
+                        
+                        const sourceParent = findParent(draggedItemId);
+                        const sourceArray = sourceParent ? sourceParent.children : versionData;
+                        const sourceIndex = sourceArray.findIndex(i => i.id === draggedItemId);
+                        
+                        if (sourceIndex > -1) {
+                            sourceArray.splice(sourceIndex, 1);
+                            if (!item.children) item.children =[];
+                            item.children.push(draggedItem);
+                            saveVersionsToStorage(); 
+                            renderVersionsTree();
+                        }
+                    }
+                });
+            }
+
+            container.appendChild(thumb);
+        });
+        
+        calculateStorageUsage();
     }
 
     function updatePreview() { document.getElementById('live-preview').srcdoc = codeEditor.value; }
@@ -2049,16 +2214,41 @@ document.addEventListener('DOMContentLoaded', function() {
                 const languageNames = { en: 'English', zh: 'Chinese', ms: 'Malay', ta: 'Tamil' };
                 const languageInstruction = `IMPORTANT: Your "explanation" text MUST be in ${languageNames[language] || 'English'}.`;
 
+                let contextFolderId = activeFolderId;
+                if (!contextFolderId && currentlySelectedVersionId) { const p = findParent(currentlySelectedVersionId); if (p) contextFolderId = p.id; }
+                while (contextFolderId) { const p = findParent(contextFolderId); if (!p) break; contextFolderId = p.id; }
+                function getFolderStructureString(folderId, indent = '') {
+                    const items = folderId ? (findItem(folderId)?.children ||[]) : versionData;
+                    let str = '';
+                    items.forEach(item => {
+                        if (item.type === 'asset') {
+                            str += `${indent}- [ASSET] ${item.name} (Use exactly this string as src/href: ${item.data})\n`;
+                        } else {
+                            str += `${indent}- ${item.name}${item.type === 'folder' ? '/' : ''}\n`;
+                            if (item.type === 'folder') str += getFolderStructureString(item.id, indent + '  ');
+                        }
+                    });
+                    return str;
+                }
+                let folderStructureStr = "Project Folder Structure:\n";
+                if (contextFolderId) {
+                    const f = findItem(contextFolderId);
+                    folderStructureStr += `${f?.name || 'Root'}/\n` + getFolderStructureString(contextFolderId, '  ');
+                } else {
+                    folderStructureStr += getFolderStructureString(null, '  ');
+                }
+                const contextPromptAdd = `\n\n**${folderStructureStr}**\n\nNote: Treat 'index.html' as the current active file.\n`;
+
                 if (appGoal === 'netlify-blob-backend') {
                     const goalInstruction = goalTemplates[appGoal];
                     systemPrompt = `${goalInstruction} ${languageInstruction}`;
-                    userPromptContent = `${historyContext}**User Request:** "${effectiveMessage}"\n\n**Original User HTML to Enhance:**\n\`\`\`html\n${originalCode}\n\`\`\`\nNow, generate the JSON response containing the four enhanced files.`;
+                    userPromptContent = `${historyContext}**User Request:** "${effectiveMessage}"${contextPromptAdd}\n\n**Original User HTML to Enhance:**\n\`\`\`html\n${originalCode}\n\`\`\`\nNow, generate the JSON response containing the four enhanced files.`;
                 } else if (isInitialCode) {
                     systemPrompt = `You are a "Builder" AI. Your ONLY function is to return a valid JSON object that builds a complete, functional HTML page from scratch. The JSON object MUST have three keys: "title" (a 3-5 word summary), "explanation" (a string explaining your work), and "htmlBodyContent" (a string with inner HTML for the body). Your response MUST be a single, raw JSON object without markdown fences. The "htmlBodyContent" must start with \`<div class="container">\` and use the provided "SpringGlass" CSS classes. ${languageInstruction}`;
-                    userPromptContent = `${historyContext}**User Request:** "${effectiveMessage}"\n\n**SpringGlass CSS Class Reference:**\n\`\`\`\n${springGlassCssReference}\n\`\`\`\nNow, generate the JSON response.`;
+                    userPromptContent = `${historyContext}**User Request:** "${effectiveMessage}"${contextPromptAdd}\n\n**SpringGlass CSS Class Reference:**\n\`\`\`\n${springGlassCssReference}\n\`\`\`\nNow, generate the JSON response.`;
                 } else {
                     systemPrompt = `You are a "Patcher" AI. Your ONLY function is to return a valid JSON object that modifies existing HTML. The JSON object MUST have three keys: "title" (a 3-5 word summary), "explanation" (a string explaining changes), and "patches" (an array of {search, replace} objects). Your response MUST be a single, raw JSON object without markdown fences. "search" must be a verbatim match from the current HTML. All new HTML must use "SpringGlass" CSS classes. ${languageInstruction}`;
-                    userPromptContent = `${historyContext}**User Request:** "${effectiveMessage}"\n\n**Current HTML:** \`\`\`html\n${originalCode}\n\`\`\`\n\n**SpringGlass CSS Class Reference:**\n\`\`\`\n${springGlassCssReference}\n\`\`\`\nNow, generate the JSON response.`;
+                    userPromptContent = `${historyContext}**User Request:** "${effectiveMessage}"${contextPromptAdd}\n\n**Current HTML:** \`\`\`html\n${originalCode}\n\`\`\`\n\n**SpringGlass CSS Class Reference:**\n\`\`\`\n${springGlassCssReference}\n\`\`\`\nNow, generate the JSON response.`;
                 }
 
                 // --- API Call Logic (remains the same) ---
@@ -2213,6 +2403,49 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     document.addEventListener('DOMContentLoaded', () => {
+        const versionsPanel = document.getElementById('versions-panel');
+        versionsPanel.addEventListener('dragover', (e) => { if (e.dataTransfer.types.includes('Files')) { e.preventDefault(); e.stopPropagation(); versionsPanel.classList.add('drag-over-container'); } }, true);
+        versionsPanel.addEventListener('dragleave', (e) => { if (e.dataTransfer.types.includes('Files')) { versionsPanel.classList.remove('drag-over-container'); } }, true);
+        versionsPanel.addEventListener('drop', (e) => {
+            if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                e.preventDefault(); e.stopPropagation(); versionsPanel.classList.remove('drag-over-container');
+                let destArray = getChildrenOf(activeFolderId);
+                const closestThumb = e.target.closest('.asset-thumbnail');
+                if (closestThumb) {
+                    const item = findItem(closestThumb.dataset.id);
+                    if (item && item.type === 'folder') destArray = item.children || (item.children = []);
+                    else if (item) { const parent = findParent(item.id); destArray = parent ? parent.children : versionData; }
+                }
+                let filesProcessed = 0;
+                const totalFiles = e.dataTransfer.files.length;
+                Array.from(e.dataTransfer.files).forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = (evt) => {
+                        const base64Data = evt.target.result;
+                        if (calculateStorageUsage() + base64Data.length > 1073741824) {
+                            alert(`Cannot add ${file.name}: 1GB Limit exceeded.`);
+                        } else {
+                            let baseName = file.name;
+                            let newName = baseName;
+                            let counter = 1;
+                            while (destArray.some(item => item.name === newName)) {
+                                const dotIndex = baseName.lastIndexOf('.');
+                                if (dotIndex !== -1) {
+                                    newName = `${baseName.substring(0, dotIndex)} (${counter})${baseName.substring(dotIndex)}`;
+                                } else {
+                                    newName = `${baseName} (${counter})`;
+                                }
+                                counter++;
+                            }
+                            destArray.push({ id: `asset-${Date.now()}-${Math.random()}`, type: 'asset', name: newName, mimeType: file.type, data: base64Data, timestamp: Date.now() });
+                        }
+                        filesProcessed++;
+                        if (filesProcessed === totalFiles) { saveVersionsToStorage(); renderVersionsTree(); }
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
+        }, true);
         initGeminiUsage();
         loadSettings();
         startRealtimeSync(); // Auto-start if config exists
@@ -2297,10 +2530,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         const appTitle = document.getElementById('app-title-input').value.trim() || 'my-app';
-        const htmlContent = codeEditor.value;
-        const zip = new JSZip();
-        // Place file at root of ZIP
-        zip.file("index.html", htmlContent);
+        const zip = createZipWithAssets(codeEditor.value, appTitle);
         zip.generateAsync({type:"blob"}).then(function(content) {
             const a = document.createElement('a');
             a.href = URL.createObjectURL(content);
@@ -2325,10 +2555,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         const appTitle = document.getElementById('app-title-input').value.trim() || 'my-app';
-        const htmlContent = codeEditor.value;
-        const zip = new JSZip();
+        const zip = createZipWithAssets(codeEditor.value, appTitle);
 
-        zip.file("index.html", htmlContent);
         zip.generateAsync({type:"blob"}).then(function(content) {
             const a = document.createElement('a');
             a.href = URL.createObjectURL(content);
@@ -2337,7 +2565,6 @@ document.addEventListener('DOMContentLoaded', function() {
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(a.href);
-            // Use a timeout to ensure the user sees the new tab before the alert.
             setTimeout(() => {
                 alert(`Your app file "${appTitle}.zip" is now downloading.\n\nPlease drag and drop this file into the Netlify tab that just opened to deploy your site!`);
             }, 500);
@@ -2547,6 +2774,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (data.versions) {
                      if (JSON.stringify(versionData) !== JSON.stringify(data.versions) || currentlySelectedVersionId !== data.activeVersion) {
                          versionData = data.versions;
+                         ensureKnowledgebaseFolder(true);
                          currentlySelectedVersionId = data.activeVersion;
                          renderVersionsTree();
                      }
@@ -2780,6 +3008,8 @@ ${currentCode}
 
 MY REQUEST:
 ${document.getElementById('manual-input').value.trim()}
+
+${getKnowledgebaseContentParts(true).extraText}
 `;
         try {
             await navigator.clipboard.writeText(promptText);
@@ -3014,6 +3244,9 @@ ${instruction}
 `;
 
         try {
+            const kbData = getKnowledgebaseContentParts(false);
+            const finalPromptText = promptText + kbData.extraText;
+            const contentParts =[{ text: finalPromptText }, ...kbData.parts];
             let response;
             let maxAttempts = (typeof geminiKeys !== 'undefined' && geminiKeys.length > 0) ? geminiKeys.length : 1;
             for (let attempt = 0; attempt < maxAttempts; attempt++) {
@@ -3021,7 +3254,7 @@ ${instruction}
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        contents: [{ parts: [{ text: promptText }] }]
+                        contents:[{ parts: contentParts }]
                     })
                 });
                 if (!response.ok && (response.status === 429 || response.status === 403 || response.status === 400) && maxAttempts > 1) {

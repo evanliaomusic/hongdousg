@@ -2138,7 +2138,35 @@ document.addEventListener('DOMContentLoaded', function() {
         calculateStorageUsage();
     }
 
-    function updatePreview() { document.getElementById('live-preview').srcdoc = codeEditor.value; }
+    function updatePreview() {
+        let processedHtml = codeEditor.value;
+        let contextFolderId = activeFolderId;
+        if (!contextFolderId && currentlySelectedVersionId) { const p = findParent(currentlySelectedVersionId); if (p) contextFolderId = p.id; }
+        while (contextFolderId) { const p = findParent(contextFolderId); if (!p) break; contextFolderId = p.id; }
+
+        const assets = [];
+        function collectAssets(items) {
+            if (!items) return;
+            items.forEach(item => {
+                if (item.name.toLowerCase() === 'knowledgebase') return;
+                if (item.type === 'asset' && item.data) assets.push({ name: item.name, data: item.data });
+                else if (item.type === 'folder') collectAssets(item.children);
+            });
+        }
+        const rootItems = contextFolderId ? (findItem(contextFolderId)?.children ||[]) : versionData;
+        collectAssets(rootItems);
+
+        assets.forEach(asset => {
+            const d = asset.data;
+            const n = asset.name;
+            processedHtml = processedHtml.split('"' + n + '"').join('"' + d + '"')
+                                         .split("'" + n + "'").join("'" + d + "'")
+                                         .split('"./' + n + '"').join('"' + d + '"')
+                                         .split("'./" + n + "'").join("'" + d + "'")
+                                         .split("(" + n + ")").join("(" + d + ")");
+        });
+        document.getElementById('live-preview').srcdoc = processedHtml;
+    }
 
     function stopProgressSimulation() {
         if (progressSimulationTimeout) {
@@ -2283,40 +2311,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 const languageNames = { en: 'English', zh: 'Chinese', ms: 'Malay', ta: 'Tamil' };
                 const languageInstruction = `IMPORTANT: Your "explanation" text MUST be in ${languageNames[language] || 'English'}.`;
 
-                let contextFolderId = activeFolderId;
-                if (!contextFolderId && currentlySelectedVersionId) { const p = findParent(currentlySelectedVersionId); if (p) contextFolderId = p.id; }
-                while (contextFolderId) { const p = findParent(contextFolderId); if (!p) break; contextFolderId = p.id; }
-                function getFolderStructureString(folderId, indent = '') {
-                    const items = folderId ? (findItem(folderId)?.children ||[]) : versionData;
-                    let str = '';
-                    items.forEach(item => {
-                        if (item.type === 'asset') {
-                            str += `${indent}- [ASSET] ${item.name} (Use exactly this string as src/href: ${item.data})\n`;
-                        } else {
-                            str += `${indent}- ${item.name}${item.type === 'folder' ? '/' : ''}\n`;
-                            if (item.type === 'folder') str += getFolderStructureString(item.id, indent + '  ');
-                        }
-                    });
-                    return str;
-                }
-                let folderStructureStr = "Project Assets & Files (IMPORTANT: Use the [ASSET] Data URIs provided below for any images, media, or linked files. If the user mentions a filename like 'a.jpeg', look for its [ASSET] entry and use that exact string in your HTML src/href/url):\n";
-                if (contextFolderId) {
-                    const f = findItem(contextFolderId);
-                    folderStructureStr += `${f?.name || 'Root'}/\n` + getFolderStructureString(contextFolderId, '  ');
-                } else {
-                    folderStructureStr += getFolderStructureString(null, '  ');
-                }
-                const contextPromptAdd = `\n\n**PROJECT ASSETS CONTEXT:**\n${folderStructureStr}\n\nNote: You MUST use the provided Data URIs for assets to ensure they display correctly. Do not use local filenames.\n`;
+                const contextPromptAdd = getGlobalProjectContextStr();
 
                 if (appGoal === 'netlify-blob-backend') {
                     const goalInstruction = goalTemplates[appGoal];
                     systemPrompt = `${goalInstruction} ${languageInstruction}`;
                     userPromptContent = `${historyContext}**User Request:** "${effectiveMessage}"${contextPromptAdd}\n\n**Original User HTML to Enhance:**\n\`\`\`html\n${originalCode}\n\`\`\`\nNow, generate the JSON response containing the four enhanced files.`;
                 } else if (isInitialCode) {
-                    systemPrompt = `You are a "Builder" AI. Your ONLY function is to return a valid JSON object that builds a complete, functional HTML page from scratch. The JSON object MUST have three keys: "title" (a 3-5 word summary), "explanation" (a string explaining your work), and "htmlBodyContent" (a string with inner HTML for the body). Your response MUST be a single, raw JSON object without markdown fences. The "htmlBodyContent" must start with \`<div class="container">\` and use the provided "SpringGlass" CSS classes. If project assets are provided, incorporate them into the design using their full Data URIs. ${languageInstruction}`;
+                    systemPrompt = `You are a "Builder" AI. Your ONLY function is to return a valid JSON object that builds a complete, functional HTML page from scratch. The JSON object MUST have three keys: "title" (a 3-5 word summary), "explanation" (a string explaining your work), and "htmlBodyContent" (a string with inner HTML for the body). Your response MUST be a single, raw JSON object without markdown fences. The "htmlBodyContent" must start with \`<div class="container">\` and use the provided "SpringGlass" CSS classes. If project assets are provided, incorporate them into the design using their local filenames (e.g. src="image.jpg"). ${languageInstruction}`;
                     userPromptContent = `${historyContext}**User Request:** "${effectiveMessage}"${contextPromptAdd}\n\n**SpringGlass CSS Class Reference:**\n\`\`\`\n${springGlassCssReference}\n\`\`\`\nNow, generate the JSON response.`;
                 } else {
-                    systemPrompt = `You are a "Patcher" AI. Your ONLY function is to return a valid JSON object that modifies existing HTML. The JSON object MUST have three keys: "title" (a 3-5 word summary), "explanation" (a string explaining changes), and "patches" (an array of {search, replace} objects). Your response MUST be a single, raw JSON object without markdown fences. "search" must be a verbatim match from the current HTML. All new HTML must use "SpringGlass" CSS classes. If assets are listed in the Project context, use their Data URIs instead of local filenames. ${languageInstruction}`;
+                    systemPrompt = `You are a "Patcher" AI. Your ONLY function is to return a valid JSON object that modifies existing HTML. The JSON object MUST have three keys: "title" (a 3-5 word summary), "explanation" (a string explaining changes), and "patches" (an array of {search, replace} objects). Your response MUST be a single, raw JSON object without markdown fences. "search" must be a verbatim match from the current HTML. All new HTML must use "SpringGlass" CSS classes. If assets are listed in the Project context, use their local filenames (e.g. src="image.jpg"). ${languageInstruction}`;
                     userPromptContent = `${historyContext}**User Request:** "${effectiveMessage}"${contextPromptAdd}\n\n**Current HTML:** \`\`\`html\n${originalCode}\n\`\`\`\n\n**SpringGlass CSS Class Reference:**\n\`\`\`\n${springGlassCssReference}\n\`\`\`\nNow, generate the JSON response.`;
                 }
 
@@ -2994,6 +2999,39 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    function getGlobalProjectContextStr() {
+        let contextFolderId = activeFolderId;
+        if (!contextFolderId && currentlySelectedVersionId) { const p = findParent(currentlySelectedVersionId); if (p) contextFolderId = p.id; }
+        while (contextFolderId) { const p = findParent(contextFolderId); if (!p) break; contextFolderId = p.id; }
+        
+        function getFolderStructureString(folderId, indent = '') {
+            const items = folderId ? (findItem(folderId)?.children ||[]) : versionData;
+            let str = '';
+            items.forEach(item => {
+                if (item.name.toLowerCase() === 'knowledgebase') return;
+                if (item.type === 'version' && item.id !== currentlySelectedVersionId) return;
+                if (item.type === 'asset') {
+                    str += `${indent}- ${item.name}\n`;
+                } else if (item.type === 'version') {
+                    str += `${indent}- index.html (Active Document)\n`;
+                } else {
+                    str += `${indent}- ${item.name}${item.type === 'folder' ? '/' : ''}\n`;
+                    if (item.type === 'folder') str += getFolderStructureString(item.id, indent + '  ');
+                }
+            });
+            return str;
+        }
+        
+        let folderStructureStr = "Project File Structure:\n";
+        if (contextFolderId) {
+            const f = findItem(contextFolderId);
+            folderStructureStr += `${f?.name || 'Root'}/\n` + getFolderStructureString(contextFolderId, '  ');
+        } else {
+            folderStructureStr += getFolderStructureString(null, '  ');
+        }
+        return `\n\n**PROJECT ASSETS CONTEXT:**\n${folderStructureStr}\n\nNote: You can use the asset filenames directly in your HTML (e.g. <img src="image.jpg"> or href="style.css"). The preview engine and ZIP exporter will automatically resolve them. DO NOT use Data URIs for these files in the code.\n`;
+    }
+
     function undoManualUpgrade() {
         // 1. Try memory buffer
         if (previousManualCodeState !== null) {
@@ -3077,6 +3115,8 @@ ${currentCode}
 
 MY REQUEST:
 ${document.getElementById('manual-input').value.trim()}
+
+${getGlobalProjectContextStr()}
 
 ${getKnowledgebaseContentParts(true).extraText}
 `;
@@ -3310,6 +3350,8 @@ ${currentCode}
 
 MY REQUEST:
 ${instruction}
+
+${getGlobalProjectContextStr()}
 `;
 
         try {

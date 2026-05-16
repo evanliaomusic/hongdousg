@@ -1656,9 +1656,10 @@ document.addEventListener('DOMContentLoaded', function() {
         return { parts, extraText };
     }
 
-    async function createZipWithAssets(htmlContent, appTitle) {
+    async function createZipWithAssets(htmlContent, appTitle, wrapInFolder = false) {
         const zip = new JSZip();
-        zip.file("index.html", htmlContent);
+        const rootFolder = wrapInFolder ? zip.folder(appTitle.replace(/[^a-z0-9]/gi, '-').toLowerCase() || 'my-app') : zip;
+        rootFolder.file("index.html", htmlContent);
         
         let folderToExport = null;
         if (currentlySelectedVersionId) {
@@ -1675,7 +1676,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (!data) continue;
                     let base64Data = data;
                     if (base64Data.includes(',')) base64Data = base64Data.split(',')[1];
-                    if (base64Data) zip.file(currentPath + child.name, base64Data, {base64: true});
+                    if (base64Data) rootFolder.file(currentPath + child.name, base64Data, {base64: true});
                 } else if (child.type === 'folder') {
                     await addAssetsToZip(child.children ||[], currentPath + child.name + '/');
                 }
@@ -2661,6 +2662,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     document.getElementById('mini-api-key').addEventListener('input', function(e) { const val = e.target.value.trim(); localStorage.setItem('geminiApiKey', val); apiKey = val; document.getElementById('api-key').value = val; broadcastChange(); });
     document.getElementById('manual-input').addEventListener('input', broadcastChange);
+    document.getElementById('manual-input').addEventListener('keydown', function(e) {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+            e.preventDefault();
+            document.getElementById('manual-upgrade-btn').click();
+        }
+    });
     document.getElementById('ai-model').addEventListener('change', updateApiKeyVisibility);
     document.getElementById('save-settings').addEventListener('click', saveSettings);
     document.getElementById('send-button').addEventListener('click', handleSendClick);
@@ -2672,7 +2679,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         const appTitle = document.getElementById('app-title-input').value.trim() || 'my-app';
-        const zip = await createZipWithAssets(codeEditor.value, appTitle);
+        const zip = await createZipWithAssets(codeEditor.value, appTitle, true);
         zip.generateAsync({type:"blob"}).then(function(content) {
             const a = document.createElement('a');
             a.href = URL.createObjectURL(content);
@@ -2697,7 +2704,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         const appTitle = document.getElementById('app-title-input').value.trim() || 'my-app';
-        const zip = await createZipWithAssets(codeEditor.value, appTitle);
+        const zip = await createZipWithAssets(codeEditor.value, appTitle, true);
 
         zip.generateAsync({type:"blob"}).then(function(content) {
             const a = document.createElement('a');
@@ -3107,7 +3114,7 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             folderStructureStr += getFolderStructureString(null, '  ');
         }
-        return `\n\n**PROJECT ASSETS CONTEXT:**\n${folderStructureStr}\n\nNote: You can use the asset filenames directly in your HTML (e.g. <img src="image.jpg"> or href="style.css"). The preview engine and ZIP exporter will automatically resolve them. DO NOT use Data URIs for these files in the code.\n`;
+        return `\n\n**PROJECT ASSETS CONTEXT:**\n${folderStructureStr}\n\nNote: You MUST use the asset filenames exactly as listed, WITHOUT any folder paths (e.g. use <img src="image.jpg">, NEVER <img src="folder/image.jpg">). The preview engine and ZIP exporter will automatically resolve them at the root level. DO NOT use Data URIs for these files in the code.\n`;
     }
 
     function undoManualUpgrade() {

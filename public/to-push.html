@@ -386,6 +386,7 @@
 
         <div class="settings-item"><label for="ai-model" data-translate-key="aiModelLabel">AI Model:</label>
             <select id="ai-model">
+                <option value="gemini-flash-latest" selected>Gemini 3.5 Flash</option>
                 <option value="gemini-3-flash-preview">Gemini 3 Flash</option>
                 <option value="gemini-3-flash-preview">Gemini 3 Flash</option>
                 <option value="gemini-3-flash-preview">Latest Version of Gemini Flash 3</option>
@@ -466,16 +467,17 @@
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 <script>
-    let apiKey = ''; let deepseekApiKey = ''; let model = 'gemini-3-flash-preview';
+    let apiKey = ''; let deepseekApiKey = ''; let model = 'gemini-flash-latest';
 
     let pinState = { mode: 'check', input: '', temp: '' }; let remotePin = null;
 
     const geminiModels =[
+        { id: 'gemini-flash-latest', name: 'Gemini 3.5 Flash', limit: 20 },
         { id: 'gemini-3-flash-preview', name: 'Gemini 3.0 Flash', limit: 20 },
         { id: 'gemini-3.1-flash-lite-preview', name: 'Gemini 3.1 Flash Lite', limit: 500 },
         { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash', limit: 20 }
     ];
-    let selectedGeminiModel = 'gemini-3-flash-preview';
+    let selectedGeminiModel = 'gemini-flash-latest';
 
     function initGeminiUsage() {
         const today = new Date().toDateString();
@@ -1556,7 +1558,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function loadSettings() { const savedTitle = localStorage.getItem('hongdouAppTitle'); if(savedTitle) document.getElementById('app-title-input').value = savedTitle;
         apiKey = localStorage.getItem('geminiApiKey') || '';
         deepseekApiKey = localStorage.getItem('deepseekApiKey') || '';
-        model = localStorage.getItem('geminiModel') || 'gemini-3-flash-preview';
+        model = localStorage.getItem('geminiModel') || 'gemini-flash-latest';
         language = localStorage.getItem('appLanguage') || 'en';
 
         document.getElementById('api-key').value = apiKey;

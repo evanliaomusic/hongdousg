@@ -2254,8 +2254,8 @@ document.addEventListener('DOMContentLoaded', function() {
     function syncBridgeToggleFromCode() {
         const toggle = document.getElementById('firebase-bridge-toggle');
         if (toggle) {
-            const marker = '<meta name="firebase-bridge" content="enabled">';
-            toggle.checked = codeEditor.value.includes(marker);
+            const regex = /<meta\s+name=["']firebase-bridge["']\s+content=["']enabled["']\s*\/?>/i;
+            toggle.checked = regex.test(codeEditor.value);
         }
     }
 
@@ -2265,19 +2265,24 @@ document.addEventListener('DOMContentLoaded', function() {
         const isChecked = toggle.checked;
         let code = codeEditor.value;
         const marker = '<meta name="firebase-bridge" content="enabled">';
+        const checkRegex = /<meta\s+name=["']firebase-bridge["']\s+content=["']enabled["']\s*\/?>/i;
         
-        if (isChecked && !code.includes(marker)) {
-            if (code.includes('</head>')) {
-                codeEditor.value = code.replace('</head>', '    ' + marker + '\n</head>');
+        if (isChecked && !checkRegex.test(code)) {
+            if (/<\/head>/i.test(code)) {
+                code = code.replace(/<\/head>/i, '    ' + marker + '\n</head>');
+            } else if (/<head.*?>/i.test(code)) {
+                code = code.replace(/(<head.*?>)/i, '$1\n    ' + marker);
+            } else if (/<html.*?>/i.test(code)) {
+                code = code.replace(/(<html.*?>)/i, '$1\n<head>\n    ' + marker + '\n</head>');
             } else {
-                codeEditor.value = marker + '\n' + code;
+                code = marker + '\n' + code;
             }
+            codeEditor.value = code;
             updatePreview();
             broadcastChange();
-        } else if (!isChecked && code.includes(marker)) {
-            code = code.replace('    ' + marker + '\n', '');
-            code = code.replace(marker + '\n', '');
-            code = code.replace(marker, '');
+        } else if (!isChecked && checkRegex.test(code)) {
+            const removeRegex = /[ \t]*<meta\s+name=["']firebase-bridge["']\s+content=["']enabled["']\s*\/?>\r?\n?/gi;
+            code = code.replace(removeRegex, '');
             codeEditor.value = code;
             updatePreview();
             broadcastChange();

@@ -259,22 +259,28 @@
             </div>
 
             <div style="display: flex; align-items: center; gap: 8px; margin-top: 5px; min-height: 32px;">
-                <button id="ai-tool-btn" class="action-button" style="flex: 1; padding: 8px 5px; font-size: 11px; background-color: #10a37f; text-align: center;" onclick="openAiTool()">Open ChatGPT</button>
                 <button id="download-context-btn" class="action-button" style="flex: 1; padding: 8px 5px; font-size: 11px; background-color: var(--spotlight-1); text-align: center; white-space: nowrap;">Get AI Context</button>
                 
-                <button id="btn-mini-gemini-keys" style="display:none; flex: 1; padding: 4px 8px; font-size: 11px; background: linear-gradient(135deg, #7b61ff, #00d2ff); border: none; border-radius: 4px; color: white; height: 32px; box-sizing: border-box; cursor: pointer; white-space: nowrap;">Manage API Keys</button>
-                <input type="password" id="mini-api-key" placeholder="Paste Gemini Key" style="display:none; flex: 1; padding: 4px 8px; font-size: 11px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 4px; color: white; height: 32px; box-sizing: border-box;">
+                <div id="ai-tool-group" style="display: flex; flex: 1; border-radius: 5px; overflow: hidden; border: 1px solid var(--border-color);">
+                    <button id="ai-tool-btn" class="action-button" style="flex: 1; padding: 8px 5px; font-size: 11px; background-color: #10a37f; text-align: center; border-radius: 0; border: none; margin: 0; box-shadow: none;" onclick="openAiTool()">Open ChatGPT</button>
+                    <select id="ai-tool-select" onchange="updateAiLink()" style="width: 24px; background-color: #0d8a6a; border: none; border-left: 1px solid rgba(255,255,255,0.2); color: transparent; cursor: pointer; -webkit-appearance: none; appearance: none; padding: 0; background-image: url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22white%22%3e%3cpath d=%22M7 10l5 5 5-5z%22/%3e%3c/svg%3e'); background-repeat: no-repeat; background-position: center; background-size: 16px; border-radius: 0; margin: 0;">
+                        <option value="chatgpt">ChatGPT</option>
+                        <option value="gemini">Gemini</option>
+                        <option value="aistudio">AI Studio</option>
+                        <option value="claude">Claude</option>
+                        <option value="deepseek">DeepSeek</option>
+                    </select>
+                </div>
 
-                <select id="ai-tool-select" onchange="updateAiLink()" style="width: 24px; height: 24px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.3); background-color: rgba(0,0,0,0.3); color: transparent; cursor: pointer; -webkit-appearance: none; appearance: none; padding: 0; background-image: url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22white%22%3e%3cpath d=%22M7 10l5 5 5-5z%22/%3e%3c/svg%3e'); background-repeat: no-repeat; background-position: center; background-size: 16px;">
-                    <option value="chatgpt">ChatGPT</option>
-                    <option value="gemini">Gemini</option>
-                    <option value="aistudio">AI Studio</option>
-                    <option value="claude">Claude</option>
-                    <option value="deepseek">DeepSeek</option>
-                </select>
-                <button id="camera-btn" onclick="openQrScanner()" title="Scan Gemini API Key QR Code">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-                </button>
+                <button id="btn-mini-gemini-keys" class="action-button" style="display:none; flex: 1; padding: 8px 5px; font-size: 11px; background: linear-gradient(135deg, #7b61ff, #00d2ff); border: none; border-radius: 5px; color: white; box-sizing: border-box; cursor: pointer; white-space: nowrap; text-align: center;">Manage Keys</button>
+                <input type="password" id="mini-api-key" placeholder="Paste Gemini Key" style="display:none; flex: 1; padding: 8px 5px; font-size: 11px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 5px; color: white; box-sizing: border-box;">
+                <div id="bridge-toggle-container" style="display: none; flex-direction: column; align-items: center; justify-content: center; gap: 4px; border: 1px solid var(--border-color); padding: 4px 6px; border-radius: 5px; background: rgba(0,0,0,0.3); box-sizing: border-box;" title="Enable Firebase Bridge Prompt">
+                    <span style="font-size: 9px; font-weight: bold; color: #ccc; line-height: 1; white-space: nowrap;">Database</span>
+                    <label class="toggle-switch" style="margin-left: 0;">
+                        <input type="checkbox" id="firebase-bridge-toggle" onchange="handleBridgeToggleChange()">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
                 <div id="mini-loader" class="mini-loader"></div>
             </div>
             <div id="gemini-usage-tracker" style="display: none; margin-top: 10px; width: 100%; border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; font-size: 11px; font-weight: 500; cursor: pointer; user-select: none; box-sizing: border-box; background: rgba(0,0,0,0.2);">
@@ -308,6 +314,7 @@
             <button id="reset-code-button-preview" class="action-button" style="width: 100%; background-color: var(--danger-color); text-align: center; padding: 10px 5px; font-size: 12px;" data-translate-key="resetButton">Reset</button>
         </div>
         <button id="reset-pin-btn" class="action-button" style="width: 100%; background-color: #555; text-align: center; padding: 10px 5px; font-size: 12px; margin-top: 5px;" onclick="resetPin()">Set New Password</button>
+        <button id="logout-btn" class="action-button" style="width: 100%; background-color: #dc3545; text-align: center; padding: 10px 5px; font-size: 12px; margin-top: 5px;" onclick="logout()">Logout</button>
     </div>
 </div>
 
@@ -386,7 +393,7 @@
 
         <div class="settings-item"><label for="ai-model" data-translate-key="aiModelLabel">AI Model:</label>
             <select id="ai-model">
-                <option value="gemini-flash-latest" selected>Gemini 3.5 Flash</option>
+                <option value="gemini-3.5-flash" selected>Gemini 3.5 Flash</option>
                 <option value="gemini-3-flash-preview">Gemini 3 Flash</option>
                 <option value="gemini-3-flash-preview">Gemini 3 Flash</option>
                 <option value="gemini-3-flash-preview">Latest Version of Gemini Flash 3</option>
@@ -467,17 +474,17 @@
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 <script>
-    let apiKey = ''; let deepseekApiKey = ''; let model = 'gemini-flash-latest';
+    let apiKey = ''; let deepseekApiKey = ''; let model = 'gemini-3.5-flash';
 
     let pinState = { mode: 'check', input: '', temp: '' }; let remotePin = null;
 
     const geminiModels =[
-        { id: 'gemini-flash-latest', name: 'Gemini 3.5 Flash', limit: 20 },
+        { id: 'gemini-3.5-flash', name: 'Gemini 3.5 Flash', limit: 20 },
         { id: 'gemini-3-flash-preview', name: 'Gemini 3.0 Flash', limit: 20 },
         { id: 'gemini-3.1-flash-lite-preview', name: 'Gemini 3.1 Flash Lite', limit: 500 },
         { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash', limit: 20 }
     ];
-    let selectedGeminiModel = 'gemini-flash-latest';
+    let selectedGeminiModel = 'gemini-3.5-flash';
 
     function initGeminiUsage() {
         const today = new Date().toDateString();
@@ -519,14 +526,18 @@
         const dd = document.getElementById('gemini-usage-dropdown');
         if (dd) dd.innerHTML = '';
 
+        const localKeys = JSON.parse(localStorage.getItem('geminiKeys') || '[]');
+        const keyMultiplier = Math.max(1, localKeys.length);
+
         geminiModels.forEach(model => {
+            const effectiveLimit = model.limit * keyMultiplier;
             const usage = getUsage(model.id);
-            const left = Math.max(0, model.limit - usage);
-            const percentage = left / model.limit;
+            const left = Math.max(0, effectiveLimit - usage);
+            const percentage = left / effectiveLimit;
             const color = percentage > 0.25 ? '#369b18' : '#ff3b3b'; 
             const widthPct = Math.max(0, percentage * 100) + '%';
             
-            const text = model.name + ' [' + left + '/' + model.limit + ' Left]';
+            const text = model.name + ' [' + left + '/' + effectiveLimit + ' Left]';
 
             if (model.id === selectedGeminiModel) {
                 document.getElementById('gemini-usage-selected-bg').style.width = widthPct;
@@ -567,6 +578,11 @@
         const sidebar = document.getElementById('app-sidebar');
         if (!sidebar.classList.contains('closed')) {
             sidebar.classList.add('closed');
+            return;
+        }
+        const savedPin = localStorage.getItem('savedAdminPin');
+        if (savedPin && (savedPin === remotePin || savedPin === '872185')) {
+            sidebar.classList.remove('closed');
             return;
         }
         pinState.input = '';
@@ -619,10 +635,13 @@
                 if (syncReference) {
                     syncReference.update({ adminPin: pinState.input });
                     remotePin = pinState.input;
+                    localStorage.setItem('savedAdminPin', pinState.input);
                     alert("Global PIN Saved to Database!");
                     closePinPad(true);
                 } else {
-                    remotePin = pinState.input; alert("Offline Mode: PIN set for this session.");
+                    remotePin = pinState.input; 
+                    localStorage.setItem('savedAdminPin', pinState.input);
+                    alert("Offline Mode: PIN set for this session.");
                     closePinPad(true);
                 }
             } else {
@@ -631,13 +650,18 @@
                 title.textContent = "Set Global PIN (DB)";
             }
         } else if (pinState.mode === 'unlock') {
-            if (pinState.input === remotePin || pinState.input === '872185') { closePinPad(true); }
+            if (pinState.input === remotePin || pinState.input === '872185') { 
+                localStorage.setItem('savedAdminPin', pinState.input);
+                closePinPad(true); 
+            }
             else { alert("Incorrect PIN."); pinState.input = ''; }
         }
         updatePinDisplay();
     }
 
-    function resetPin() { if(confirm("Reset Global Admin Password? This will allow anyone to set a new password.")) { if(syncReference) { syncReference.child('adminPin').remove(); remotePin = null; alert("Password reset in Database. Please set a new one."); toggleSidebar(); } else { alert("Database not connected."); } } } function closePinPad(success) {
+    function resetPin() { if(confirm("Reset Global Admin Password? This will allow anyone to set a new password.")) { if(syncReference) { syncReference.child('adminPin').remove(); remotePin = null; localStorage.removeItem('savedAdminPin'); alert("Password reset in Database. Please set a new one."); toggleSidebar(); } else { alert("Database not connected."); } } }
+    function logout() { localStorage.removeItem('savedAdminPin'); document.getElementById('app-sidebar').classList.add('closed'); alert("Logged out successfully."); }
+    function closePinPad(success) {
         document.getElementById('pin-overlay').style.display = 'none';
         if (success) document.getElementById('app-sidebar').classList.remove('closed');
     } let language = 'en'; let chatHistoryLog = []; let currentRequestController = null; let progressSimulationTimeout = null; let countdownInterval = null;
@@ -1558,7 +1582,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function loadSettings() { const savedTitle = localStorage.getItem('hongdouAppTitle'); if(savedTitle) document.getElementById('app-title-input').value = savedTitle;
         apiKey = localStorage.getItem('geminiApiKey') || '';
         deepseekApiKey = localStorage.getItem('deepseekApiKey') || '';
-        model = localStorage.getItem('geminiModel') || 'gemini-flash-latest';
+        model = localStorage.getItem('geminiModel') || 'gemini-3.5-flash';
         language = localStorage.getItem('appLanguage') || 'en';
 
         document.getElementById('api-key').value = apiKey;
@@ -2227,7 +2251,41 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch (e) { console.error("Blob creation failed for " + asset.name, e); return null; }
     }
 
+    function syncBridgeToggleFromCode() {
+        const toggle = document.getElementById('firebase-bridge-toggle');
+        if (toggle) {
+            const marker = '<meta name="firebase-bridge" content="enabled">';
+            toggle.checked = codeEditor.value.includes(marker);
+        }
+    }
+
+    function handleBridgeToggleChange() {
+        const toggle = document.getElementById('firebase-bridge-toggle');
+        if (!toggle) return;
+        const isChecked = toggle.checked;
+        let code = codeEditor.value;
+        const marker = '<meta name="firebase-bridge" content="enabled">';
+        
+        if (isChecked && !code.includes(marker)) {
+            if (code.includes('</head>')) {
+                codeEditor.value = code.replace('</head>', '    ' + marker + '\n</head>');
+            } else {
+                codeEditor.value = marker + '\n' + code;
+            }
+            updatePreview();
+            broadcastChange();
+        } else if (!isChecked && code.includes(marker)) {
+            code = code.replace('    ' + marker + '\n', '');
+            code = code.replace(marker + '\n', '');
+            code = code.replace(marker, '');
+            codeEditor.value = code;
+            updatePreview();
+            broadcastChange();
+        }
+    }
+
     async function updatePreview() {
+        syncBridgeToggleFromCode();
         let processedHtml = codeEditor.value;
         let contextFolderId = activeFolderId;
         if (!contextFolderId && currentlySelectedVersionId) { const p = findParent(currentlySelectedVersionId); if (p) contextFolderId = p.id; }
@@ -3175,7 +3233,10 @@ JSON STRUCTURE:
 ]
 }
 
-DATA STORAGE BRIDGE (Realtime Database & Persistence):
+${(function(){
+    const bridgeToggle = document.getElementById('firebase-bridge-toggle');
+    if (bridgeToggle && bridgeToggle.checked) {
+        return `DATA STORAGE BRIDGE (Realtime Database & Persistence):
 This app runs in a sandbox. DO NOT use localStorage or initialize Firebase. Use the built-in Parent Bridge for Realtime Sync:
 1. SAVE (Write): window.parent.postMessage({ action: 'SAVE_DATA', key: 'score', value: 100 }, '*');
 2. LOAD (Read Once): window.parent.postMessage({ action: 'LOAD_DATA', key: 'score', reqId: 'r1' }, '*');
@@ -3189,7 +3250,12 @@ window.addEventListener('message', (e) => {
        console.log('Realtime Update:', e.data.value);
        // Update UI immediately here to reflect changes from other users/tabs
    }
-});
+});`;
+    } else {
+        return `DATA STORAGE:
+DO NOT use localStorage or initialize Firebase, and DO NOT use any Parent Bridge or postMessage for data sync unless explicitly requested. If you see existing postMessage code for DATA_LOADED or SAVE_DATA that isn't needed, please remove it.`;
+    }
+})()}
 
 DESIGN SYSTEM (Use these classes):
 - Wrapper: <div class="container">
@@ -3249,26 +3315,28 @@ ${(await getKnowledgebaseContentParts(true)).extraText}
         const apiKeyInput = document.getElementById('mini-api-key');
         const select = document.getElementById('ai-tool-select');
         const cameraBtn = document.getElementById('camera-btn');
+        const bridgeToggleContainer = document.getElementById('bridge-toggle-container');
         const inputArea = document.getElementById('manual-input');
         const loader = document.getElementById('mini-loader');
 
+        const aiToolGroup = document.getElementById('ai-tool-group');
         if (isUpgraderAiMode) {
             const label = document.getElementById('upgrader-label');
             if(label) label.textContent = "Gemini Upgrader";
             // UI: AI Mode
             inputArea.placeholder = "Describe the change you want (e.g., 'Make the background blue')...";
-            contextBtn.textContent = "Get Gemini API Key";
+            contextBtn.textContent = "Get API Key";
             contextBtn.style.backgroundColor = "#8e44ad"; // Purple for Gemini
             contextBtn.onclick = () => window.open('https://aistudio.google.com/app/apikey', '_blank');
 
-            externalBtn.style.display = 'none';
+            if (aiToolGroup) aiToolGroup.style.display = 'none';
             apiKeyInput.style.display = 'none';
             document.getElementById('btn-mini-gemini-keys').style.display = 'block';
 
             // Hide select, show camera
-            select.style.display = 'none';
             loader.style.display = 'none'; // Ensure loader is hidden initially
-            cameraBtn.style.display = 'flex';
+            if (cameraBtn) cameraBtn.style.display = 'none';
+            if (bridgeToggleContainer) bridgeToggleContainer.style.display = 'flex';
             
             const usageTracker = document.getElementById('gemini-usage-tracker');
             if (usageTracker) usageTracker.style.display = 'block';
@@ -3284,13 +3352,13 @@ ${(await getKnowledgebaseContentParts(true)).extraText}
             contextBtn.style.backgroundColor = "var(--spotlight-1)";
             contextBtn.onclick = downloadAiContext;
 
-            externalBtn.style.display = 'inline-block';
+            if (aiToolGroup) aiToolGroup.style.display = 'flex';
             apiKeyInput.style.display = 'none';
             document.getElementById('btn-mini-gemini-keys').style.display = 'none';
 
             // Show select, hide camera
-            select.style.display = 'block';
-            cameraBtn.style.display = 'none';
+            if (cameraBtn) cameraBtn.style.display = 'none';
+            if (bridgeToggleContainer) bridgeToggleContainer.style.display = 'flex';
             loader.style.display = 'none';
             
             const usageTracker = document.getElementById('gemini-usage-tracker');
@@ -3359,13 +3427,18 @@ ${(await getKnowledgebaseContentParts(true)).extraText}
 
         const usage = getUsage(selectedGeminiModel);
         const modelDef = geminiModels.find(m => m.id === selectedGeminiModel);
-        if (usage >= modelDef.limit) {
+        const localKeys = JSON.parse(localStorage.getItem('geminiKeys') || '[]');
+        const keyMultiplier = Math.max(1, localKeys.length);
+        const effectiveLimit = modelDef.limit * keyMultiplier;
+        
+        if (usage >= effectiveLimit) {
             alert(modelDef.name + " limit reached for today! Please select another model.");
             return;
         }
 
         const upgradeBtn = document.getElementById('manual-upgrade-btn');
         const cameraBtn = document.getElementById('camera-btn');
+        const bridgeToggleContainer = document.getElementById('bridge-toggle-container');
         const select = document.getElementById('ai-tool-select');
         const loader = document.getElementById('mini-loader');
 
@@ -3374,10 +3447,13 @@ ${(await getKnowledgebaseContentParts(true)).extraText}
         upgradeBtn.textContent = "Thinking...";
 
         if (isUpgraderAiMode) {
-            cameraBtn.style.display = 'none';
+            if (cameraBtn) cameraBtn.style.display = 'none';
+            if (bridgeToggleContainer) bridgeToggleContainer.style.display = 'none';
             loader.style.display = 'block';
         } else {
-            select.style.display = 'none';
+            const aiToolGroup = document.getElementById('ai-tool-group');
+            if (aiToolGroup) aiToolGroup.style.display = 'none';
+            if (bridgeToggleContainer) bridgeToggleContainer.style.display = 'none';
             loader.style.display = 'block';
         }
 
@@ -3410,7 +3486,10 @@ JSON STRUCTURE:
 ]
 }
 
-DATA STORAGE BRIDGE (Realtime Database & Persistence):
+${(function(){
+    const bridgeToggle = document.getElementById('firebase-bridge-toggle');
+    if (bridgeToggle && bridgeToggle.checked) {
+        return `DATA STORAGE BRIDGE (Realtime Database & Persistence):
 This app runs in a sandbox. DO NOT use localStorage or initialize Firebase. Use the built-in Parent Bridge for Realtime Sync:
 1. SAVE (Write): window.parent.postMessage({ action: 'SAVE_DATA', key: 'score', value: 100 }, '*');
 2. LOAD (Read Once): window.parent.postMessage({ action: 'LOAD_DATA', key: 'score', reqId: 'r1' }, '*');
@@ -3424,7 +3503,12 @@ window.addEventListener('message', (e) => {
        console.log('Realtime Update:', e.data.value);
        // Update UI immediately here to reflect changes from other users/tabs
    }
-});
+});`;
+    } else {
+        return `DATA STORAGE:
+DO NOT use localStorage or initialize Firebase, and DO NOT use any Parent Bridge or postMessage for data sync unless explicitly requested. If you see existing postMessage code for DATA_LOADED or SAVE_DATA that isn't needed, please remove it.`;
+    }
+})()}
 
 DESIGN SYSTEM (Use these classes):
 - Wrapper: <div class="container">
@@ -3482,9 +3566,12 @@ ${getGlobalProjectContextStr()}
             loader.style.display = 'none';
 
             if (isUpgraderAiMode) {
-                 document.getElementById('camera-btn').style.display = 'flex';
+                 if (document.getElementById('camera-btn')) document.getElementById('camera-btn').style.display = 'none';
+                 if (document.getElementById('bridge-toggle-container')) document.getElementById('bridge-toggle-container').style.display = 'flex';
             } else {
-                 document.getElementById('ai-tool-select').style.display = 'block';
+                 const aiToolGroup = document.getElementById('ai-tool-group');
+                 if (aiToolGroup) aiToolGroup.style.display = 'flex';
+                 if (document.getElementById('bridge-toggle-container')) document.getElementById('bridge-toggle-container').style.display = 'flex';
             }
         }
     }
@@ -3566,6 +3653,7 @@ ${getGlobalProjectContextStr()}
             const mainKeyEl = document.getElementById('api-key');
             if(mainKeyEl) mainKeyEl.value = apiKey;
         }
+        renderGeminiUsage();
         document.getElementById('gemini-keys-modal').style.display = 'none';
     });
 

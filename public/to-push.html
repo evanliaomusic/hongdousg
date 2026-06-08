@@ -353,7 +353,7 @@
                 <button id="send-button" data-translate-key="sendButton">Send</button>
             </div>
         </div>
-        <div id="middle-panel" class="panel"><div class="panel-header"><h3 data-translate-key="codeEditorHeader">Code Editor</h3><div style="display: flex; align-items: center; gap: 10px;"><button class="icon-button" onclick="togglePanel('middle-panel')" style="color: #ff5555; font-weight: bold;">✕</button></div></div><div id="code-editor-container"><textarea id="main-code" spellcheck="false"></textarea></div><div class="panel-footer"><button id="save-version-button" class="action-button" style="background-color: #007bff;">Save Version</button><button id="reset-code-button" class="action-button" data-translate-key="resetButton">Reset</button><button id="copy-html-button" class="action-button" style="background-color: #6c757d;">Copy HTML</button><button id="download-button" class="action-button" data-translate-key="downloadHtmlButton">Download HTML</button></div></div>
+        <div id="middle-panel" class="panel"><div class="panel-header"><h3 data-translate-key="codeEditorHeader">Code Editor</h3><div style="display: flex; align-items: center; gap: 10px;"><button class="icon-button" onclick="togglePanel('middle-panel')" style="color: #ff5555; font-weight: bold;">✕</button></div></div><div id="code-editor-container"><textarea id="main-code" spellcheck="false"></textarea></div><div class="panel-footer"><button id="update-version-button" class="action-button" style="background-color: #28a745;">Update Version</button><button id="save-version-button" class="action-button" style="background-color: #007bff;">Save New</button><button id="reset-code-button" class="action-button" data-translate-key="resetButton">Reset</button><button id="copy-html-button" class="action-button" style="background-color: #6c757d;">Copy HTML</button><button id="download-button" class="action-button" data-translate-key="downloadHtmlButton">Download HTML</button></div></div>
         <div id="right-panel" class="panel">
             <iframe id="live-preview"></iframe>
         </div>
@@ -2278,12 +2278,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 code = marker + '\n' + code;
             }
             codeEditor.value = code;
+            if (currentlySelectedVersionId) {
+                const currentItem = findItem(currentlySelectedVersionId);
+                if (currentItem) { currentItem.code = code; saveVersionsToStorage(); }
+            }
             updatePreview();
             broadcastChange();
         } else if (!isChecked && checkRegex.test(code)) {
             const removeRegex = /[ \t]*<meta\s+name=["']firebase-bridge["']\s+content=["']enabled["']\s*\/?>\r?\n?/gi;
             code = code.replace(removeRegex, '');
             codeEditor.value = code;
+            if (currentlySelectedVersionId) {
+                const currentItem = findItem(currentlySelectedVersionId);
+                if (currentItem) { currentItem.code = code; saveVersionsToStorage(); }
+            }
             updatePreview();
             broadcastChange();
         }
@@ -2788,6 +2796,20 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    document.getElementById('update-version-button').addEventListener('click', () => {
+        if (currentlySelectedVersionId) {
+            const currentItem = findItem(currentlySelectedVersionId);
+            if (currentItem) {
+                currentItem.code = codeEditor.value;
+                saveVersionsToStorage();
+                alert('Current version updated!');
+            } else {
+                alert('No active version selected to update.');
+            }
+        } else {
+            alert('No active version selected. Please save a new version instead.');
+        }
+    });
     document.getElementById('save-version-button').addEventListener('click', () => {
         createNewVersion(codeEditor.value, "Manual Save " + new Date().toLocaleTimeString(), false);
         alert('New version saved!');

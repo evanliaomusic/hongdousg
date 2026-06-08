@@ -3280,7 +3280,7 @@ window.addEventListener('message', (e) => {
 });`;
     } else {
         return `DATA STORAGE:
-DO NOT use localStorage or initialize Firebase, and DO NOT use any Parent Bridge or postMessage for data sync unless explicitly requested. If you see existing postMessage code for DATA_LOADED or SAVE_DATA that isn't needed, please remove it.`;
+DO NOT initialize Firebase, and DO NOT use any Parent Bridge or postMessage for data sync. Please use localStorage or IndexedDB for data persistence. If you see existing postMessage code for DATA_LOADED or SAVE_DATA that isn't needed, please remove it.`;
     }
 })()}
 
@@ -3533,7 +3533,7 @@ window.addEventListener('message', (e) => {
 });`;
     } else {
         return `DATA STORAGE:
-DO NOT use localStorage or initialize Firebase, and DO NOT use any Parent Bridge or postMessage for data sync unless explicitly requested. If you see existing postMessage code for DATA_LOADED or SAVE_DATA that isn't needed, please remove it.`;
+DO NOT initialize Firebase, and DO NOT use any Parent Bridge or postMessage for data sync. Please use localStorage or IndexedDB for data persistence. If you see existing postMessage code for DATA_LOADED or SAVE_DATA that isn't needed, please remove it.`;
     }
 })()}
 

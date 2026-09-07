@@ -474,17 +474,21 @@
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 <script>
-    let apiKey = ''; let deepseekApiKey = ''; let model = 'gemini-3.5-flash';
+    let apiKey = ''; let deepseekApiKey = ''; let model = 'gemini-3.6-flash';
 
     let pinState = { mode: 'check', input: '', temp: '' }; let remotePin = null;
 
     const geminiModels =[
+        { id: 'gemini-3.8-flash', name: 'Gemini 3.8 Flash', limit: 20 },
+        { id: 'gemini-3.7-flash', name: 'Gemini 3.7 Flash', limit: 20 },
+        { id: 'gemini-3.6-flash', name: 'Gemini 3.6 Flash', limit: 20 },
         { id: 'gemini-3.5-flash', name: 'Gemini 3.5 Flash', limit: 20 },
+        { id: 'gemini-3.5-flash-lite', name: 'Gemini 3.5 Flash Lite', limit: 500 },
         { id: 'gemini-3-flash-preview', name: 'Gemini 3.0 Flash', limit: 20 },
         { id: 'gemini-3.1-flash-lite-preview', name: 'Gemini 3.1 Flash Lite', limit: 500 },
         { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash', limit: 20 }
     ];
-    let selectedGeminiModel = 'gemini-3.5-flash';
+    let selectedGeminiModel = 'gemini-3.6-flash';
 
     function initGeminiUsage() {
         const today = new Date().toDateString();

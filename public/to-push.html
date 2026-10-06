@@ -250,7 +250,7 @@
             </div>
             <textarea id="manual-input" style="width: 100%; height: 65px; background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); color: var(--text-color); border-radius: 5px; font-family: 'SF Mono', monospace; font-size: 11px; resize: none; padding: 8px; box-sizing: border-box;" placeholder="1. Type instruction here.
 2. Click 'Get AI Context'.
-3. Copy AI Response (Search/Replace).
+3. Copy AI Response (SEARCH/REPLACE).
 4. Click 'Upgrade'."></textarea>
             <div style="display: flex; gap: 8px; width: 100%;">
                 <button id="btn-open-kb" class="action-button" style="flex: 1.2; padding: 8px 5px; font-size: 11px; background-color: #f39c12; text-align: center; display: flex; align-items: center; justify-content: center;" onclick="openKnowledgebase()">Knowledgebase</button>
@@ -689,7 +689,7 @@
     const translations = {
         en: {
             coderTab: "Coder", settingsTab: "Settings", creditsTab: "Credits", chatToggle: "Chat", codeToggle: "Code", previewToggle: "Preview", versionsToggle: "Versions", manualToggle: "Manual",
-            chatHeader: "Chat with AI", manualHeader: "Manual Upgrade", manualInstructions: "Paste JSON patch data here:", upgradeButton: "Upgrade", undoButton: "Undo", downloadContextButton: "Get AI Context",
+            chatHeader: "Chat with AI", manualHeader: "Manual Upgrade", manualInstructions: "Paste SEARCH/REPLACE patch blocks here:", upgradeButton: "Upgrade", undoButton: "Undo", downloadContextButton: "Get AI Context",
             appGoalLabel: "App Creation Goal:", goalGeneral: "General Purpose", goalSlides: "Lesson Slides",
             goalTest: "Formal Test/Quiz", goalTool: "Interactive Tool", goalPortfolio: "Portfolio Page", goal3D: "3D Gamified Quiz",
             goalNetlifyBlob: "Netlify Blob Backend App",
@@ -708,7 +708,7 @@
         },
         zh: {
             coderTab: "编程", settingsTab: "设置", creditsTab: "鸣谢", chatToggle: "聊天", codeToggle: "代码", previewToggle: "预览", versionsToggle: "版本", manualToggle: "手动",
-            chatHeader: "与AI聊天", manualHeader: "手动升级", manualInstructions: "在此粘贴JSON补丁数据:", upgradeButton: "升级", undoButton: "撤销", downloadContextButton: "获取AI上下文",
+            chatHeader: "与AI聊天", manualHeader: "手动升级", manualInstructions: "在此粘贴 SEARCH/REPLACE 补丁代码块:", upgradeButton: "升级", undoButton: "撤销", downloadContextButton: "获取AI上下文",
             appGoalLabel: "应用创建目标：", goalGeneral: "通用", goalSlides: "课程幻灯片",
             goalTest: "正式测试/测验", goalTool: "互动工具", goalPortfolio: "作品集页面", goal3D: "3D 游戏化测验",
             goalNetlifyBlob: "Netlify Blob 后端应用",
@@ -727,7 +727,7 @@
         },
         ms: {
             coderTab: "Pengekod", settingsTab: "Tetapan", creditsTab: "Kredit", chatToggle: "Sembang", codeToggle: "Kod", previewToggle: "Pratonton", versionsToggle: "Versi", manualToggle: "Manual",
-            chatHeader: "Sembang dengan AI", manualHeader: "Penaiktarafan Manual", manualInstructions: "Tampal data tampalan JSON di sini:", upgradeButton: "Tingkatkan", undoButton: "Buat Asal", downloadContextButton: "Dapatkan Konteks AI",
+            chatHeader: "Sembang dengan AI", manualHeader: "Penaiktarafan Manual", manualInstructions: "Tampal blok tampalan SEARCH/REPLACE di sini:", upgradeButton: "Tingkatkan", undoButton: "Buat Asal", downloadContextButton: "Dapatkan Konteks AI",
             appGoalLabel: "Matlamat Penciptaan Aplikasi:", goalGeneral: "Tujuan Umum", goalSlides: "Slaid Pengajaran",
             goalTest: "Ujian/Kuiz Formal", goalTool: "Alat Interaktif", goalPortfolio: "Halaman Portfolio", goal3D: "Kuiz Gamified 3D",
             goalNetlifyBlob: "Aplikasi Backend Netlify Blob",
@@ -746,7 +746,7 @@
         },
         ta: {
             coderTab: "குறியீட்டாளர்", settingsTab: "அமைப்புகள்", creditsTab: "நன்றிகள்", chatToggle: "அரட்டை", codeToggle: "குறியீடு", previewToggle: "முன்னோட்டம்", versionsToggle: "பதிப்புகள்", manualToggle: "கையேடு",
-            chatHeader: "AI உடன் அரட்டை", manualHeader: "கைமுறை மேம்படுத்தல்", manualInstructions: "JSON பேட்ச் தரவை இங்கே ஒட்டவும்:", upgradeButton: "மேம்படுத்து", undoButton: "செயல்தவிர்", downloadContextButton: "AI சூழலைப் பெறுக",
+            chatHeader: "AI உடன் அரட்டை", manualHeader: "கைமுறை மேம்படுத்தல்", manualInstructions: "SEARCH/REPLACE பேட்ச் தொகுதிகளை இங்கே ஒட்டவும்:", upgradeButton: "மேம்படுத்து", undoButton: "செயல்தவிர்", downloadContextButton: "AI சூழலைப் பெறுக",
             appGoalLabel: "பயன்பாட்டு உருவாக்கும் நோக்கம்:", goalGeneral: "பொது நோக்கம்", goalSlides: "பாடம் ஸ்லைடுகள்",
             goalTest: "முறையான தேர்வு/வினாடி வினா", goalTool: "ஊடாடும் கருவி", goalPortfolio: "தனிப்பட்ட பக்கம்", goal3D: "3D கேமிஃபைட் வினாடி வினா",
             goalNetlifyBlob: "Netlify Blob பின்தள பயன்பாடு",
@@ -3101,7 +3101,12 @@ document.addEventListener('DOMContentLoaded', function() {
             return { success: true, code: normSource.replace(normSearch, () => normReplace) };
         }
 
-        // 3. Flexible whitespace & indentation regex match
+        // 3. Trimmed edges match (handles trailing line break discrepancies)
+        if (normSearch.trim() && normSource.includes(normSearch.trim())) {
+            return { success: true, code: normSource.replace(normSearch.trim(), () => normReplace.trim()) };
+        }
+
+        // 4. Flexible whitespace & indentation token match
         const escapeRegex = (s) => s.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
         const trimmedSearch = normSearch.trim();
         if (!trimmedSearch) return { success: false, code: source };
@@ -3134,8 +3139,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         const cleanText = rawText.replace(/\r\n/g, '\n');
-        // Match <<<<<<< SEARCH ... ======= ... >>>>>>> REPLACE blocks
-        const blockRegex = /<{3,}\s*SEARCH[^\n]*\n([\s\S]*?)\n\s*={3,}\s*(?:\n([\s\S]*?))?\n\s*>{3,}\s*REPLACE/gi;
+        // Robust match for <<<<<<< SEARCH ... ======= ... >>>>>>> REPLACE (or >>>>>>>)
+        const blockRegex = /<{3,}[ \t]*SEARCH[^\r\n]*\r?\n([\s\S]*?)\r?\n[ \t]*={3,}[^\r\n]*(?:\r?\n([\s\S]*?))?\r?\n[ \t]*>{3,}(?:[ \t]*(?:REPLACE|END))?[^\r\n]*/gi;
         const matches = [...cleanText.matchAll(blockRegex)];
 
         if (matches.length > 0) {
@@ -3143,11 +3148,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 let searchBlock = m[1];
                 let replaceBlock = m[2] !== undefined ? m[2] : '';
 
-                if (/^```[a-zA-Z0-9_-]*\n/.test(searchBlock)) {
-                    searchBlock = searchBlock.replace(/^```[a-zA-Z0-9_-]*\n/, '').replace(/\n```\s*$/, '');
+                if (/^```[a-zA-Z0-9_-]*\r?\n/.test(searchBlock)) {
+                    searchBlock = searchBlock.replace(/^```[a-zA-Z0-9_-]*\r?\n/, '').replace(/\r?\n```\s*$/, '');
                 }
-                if (/^```[a-zA-Z0-9_-]*\n/.test(replaceBlock)) {
-                    replaceBlock = replaceBlock.replace(/^```[a-zA-Z0-9_-]*\n/, '').replace(/\n```\s*$/, '');
+                if (/^```[a-zA-Z0-9_-]*\r?\n/.test(replaceBlock)) {
+                    replaceBlock = replaceBlock.replace(/^```[a-zA-Z0-9_-]*\r?\n/, '').replace(/\r?\n```\s*$/, '');
                 }
 
                 const res = fuzzyReplace(updatedCode, searchBlock, replaceBlock);
@@ -3157,7 +3162,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         } else {
-            // Fallback: Legacy JSON patch parsing
+            // Fallback: Legacy JSON patch parsing if user still provides JSON
             try {
                 const patchData = parseAIPatchJSON(rawText);
                 if (patchData) {
@@ -3285,19 +3290,27 @@ document.addEventListener('DOMContentLoaded', function() {
         const inputEl = document.getElementById('manual-input');
         let rawInput = (typeof directPatchText === 'string' && directPatchText.trim()) ? directPatchText.trim() : inputEl.value.trim();
 
-        const hasPatchMarkers = rawInput && (rawInput.includes('SEARCH') || rawInput.includes('patches') || rawInput.includes('<html') || rawInput.includes('{'));
-        if (!rawInput || !hasPatchMarkers) {
+        const isPatchContent = (str) => {
+            if (!str) return false;
+            return (str.includes('<<<') && str.includes('===')) ||
+                   (str.includes('SEARCH') && str.includes('REPLACE')) ||
+                   str.includes('"patches"') || str.includes("'patches'") ||
+                   /<!doctype html|<html/i.test(str);
+        };
+
+        // If input box does not contain patch content (e.g. still has user instruction), auto-check clipboard
+        if (!isPatchContent(rawInput)) {
             try {
                 inputEl.focus();
                 const clip = await navigator.clipboard.readText();
-                if (clip && (clip.includes('SEARCH') || clip.includes('patches') || clip.includes('<html') || clip.includes('{'))) {
+                if (isPatchContent(clip)) {
                     rawInput = clip.trim();
                 }
             } catch(e) {}
         }
 
-        if (!rawInput) {
-            alert('Please paste the patch data (SEARCH/REPLACE blocks or JSON) in the box.');
+        if (!rawInput || !isPatchContent(rawInput)) {
+            alert('Please copy or paste SEARCH/REPLACE patch blocks (<<<<<<< SEARCH ... ======= ... >>>>>>> REPLACE) in the box.');
             return;
         }
 
@@ -3393,28 +3406,28 @@ document.addEventListener('DOMContentLoaded', function() {
     async function downloadAiContext() {
         const currentCode = codeEditor.value;
         const promptText = `I need you to act as an "App Patcher" for a specific HTML application.
-I will provide the current HTML code. You must generate a JSON object containing "patches" to upgrade the code based on my request.
+I will provide the current HTML code. You must generate search/replace blocks to upgrade the code based on my request.
 
 RESPONSE FORMAT:
-Please provide the response inside a Markdown JSON code block (e.g., \`\`\`json ... \`\`\`).
+Optional: Start with:
+TITLE: Short summary of what was updated
 
-IMPORTANT SYNTAX RULES:
-1. The output must be VALID JSON.
-2. Because HTML contains many double quotes (e.g., class="container"), you MUST escape existing double quotes inside the "search" and "replace" strings.
-- INCORRECT: "search": "<div class="container">"
-- CORRECT:   "search": "<div class=\\"container\\">"
+OUTPUT FORMAT:
+IMPORTANT: Put ALL search/replace blocks inside a SINGLE markdown code fence (\`\`\`). Do NOT use multiple code fences.
 
-JSON STRUCTURE:
-{
-"title": "Short summary of changes",
-"explanation": "Brief explanation of what you changed",
-"patches": [
-{
-  "search": "The EXACT string in the original code to be replaced",
-  "replace": "The NEW code to replace it with"
-}
-]
-}
+For each change, output standard search/replace blocks:
+\`\`\`
+<<<<<<< SEARCH
+[Exact code from the current file to replace]
+=======
+[New replacement code]
+>>>>>>> REPLACE
+\`\`\`
+
+CRITICAL RULES:
+1. Output RAW code directly inside the blocks. DO NOT escape quotes or newlines.
+2. The SEARCH block must match existing lines in the code with enough surrounding context lines to be unambiguous.
+3. Make minimal, surgical edits. Do not rewrite unchanged code.
 
 ${(function(){
     const bridgeToggle = document.getElementById('firebase-bridge-toggle');
@@ -3530,7 +3543,7 @@ ${(await getKnowledgebaseContentParts(true)).extraText}
             const label = document.getElementById('upgrader-label');
             if(label) label.textContent = "Manual Upgrader";
             // UI: Manual Mode
-            inputArea.placeholder = "1. Type instruction here.\n2. Click 'Get AI Context'.\n3. Copy AI Response (Search/Replace).\n4. Click 'Upgrade'.";
+            inputArea.placeholder = "1. Type instruction here.\n2. Click 'Get AI Context'.\n3. Copy AI Response (SEARCH/REPLACE).\n4. Click 'Upgrade'.";
             contextBtn.textContent = "Get AI Context";
             contextBtn.style.backgroundColor = "var(--spotlight-1)";
             contextBtn.onclick = downloadAiContext;

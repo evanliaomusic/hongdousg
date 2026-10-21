@@ -250,7 +250,7 @@
             </div>
             <textarea id="manual-input" style="width: 100%; height: 65px; background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); color: var(--text-color); border-radius: 5px; font-family: 'SF Mono', monospace; font-size: 11px; resize: none; padding: 8px; box-sizing: border-box;" placeholder="1. Type instruction here.
 2. Click 'Get AI Context'.
-3. Copy AI Response (SEARCH/REPLACE).
+3. Copy AI Response JSON.
 4. Click 'Upgrade'."></textarea>
             <div style="display: flex; gap: 8px; width: 100%;">
                 <button id="btn-open-kb" class="action-button" style="flex: 1.2; padding: 8px 5px; font-size: 11px; background-color: #f39c12; text-align: center; display: flex; align-items: center; justify-content: center;" onclick="openKnowledgebase()">Knowledgebase</button>
@@ -260,7 +260,7 @@
 
             <div style="display: flex; align-items: center; gap: 8px; margin-top: 5px; min-height: 32px;">
                 <button id="download-context-btn" class="action-button" style="flex: 1; padding: 8px 5px; font-size: 11px; background-color: var(--spotlight-1); text-align: center; white-space: nowrap;">Get AI Context</button>
-                
+
                 <div id="ai-tool-group" style="display: flex; flex: 1; border-radius: 5px; overflow: hidden; border: 1px solid var(--border-color);">
                     <button id="ai-tool-btn" class="action-button" style="flex: 1; padding: 8px 5px; font-size: 11px; background-color: #10a37f; text-align: center; border-radius: 0; border: none; margin: 0; box-shadow: none;" onclick="openAiTool()">Open ChatGPT</button>
                     <select id="ai-tool-select" onchange="updateAiLink()" style="width: 24px; background-color: #0d8a6a; border: none; border-left: 1px solid rgba(255,255,255,0.2); color: transparent; cursor: pointer; -webkit-appearance: none; appearance: none; padding: 0; background-image: url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22white%22%3e%3cpath d=%22M7 10l5 5 5-5z%22/%3e%3c/svg%3e'); background-repeat: no-repeat; background-position: center; background-size: 16px; border-radius: 0; margin: 0;">
@@ -490,6 +490,28 @@
     ];
     let selectedGeminiModel = 'gemini-3.6-flash';
 
+    function getFlashThinkingConfig(modelId) {
+        if (!modelId) return { thinkingLevel: 'high' };
+        const mid = String(modelId).toLowerCase();
+        if (mid.includes('flash')) {
+            if (mid.includes('2.5')) return { thinkingBudget: 24576 };
+            return { thinkingLevel: 'high' };
+        }
+        return null;
+    }
+
+    function normalizeCodeLines(text) {
+        if (!text) return '';
+        return text.replace(/\r\n/g, '\n').split('\n').map(l => l.trimEnd()).join('\n');
+    }
+
+    function budgetCodePreview(code, maxLen = 35000) {
+        if (!code || code.length <= maxLen) return code;
+        const half = 15000;
+        const notice = '\n\n[Notice: File trimmed for AI prompt budget. Focus edits on requested areas.]\n\n';
+        return code.slice(0, half) + notice + code.slice(-half);
+    }
+
     function initGeminiUsage() {
         const today = new Date().toDateString();
         const storedDate = localStorage.getItem('geminiUsageDate');
@@ -538,9 +560,9 @@
             const usage = getUsage(model.id);
             const left = Math.max(0, effectiveLimit - usage);
             const percentage = left / effectiveLimit;
-            const color = percentage > 0.25 ? '#369b18' : '#ff3b3b'; 
+            const color = percentage > 0.25 ? '#369b18' : '#ff3b3b';
             const widthPct = Math.max(0, percentage * 100) + '%';
-            
+
             const text = model.name + ' [' + left + '/' + effectiveLimit + ' Left]';
 
             if (model.id === selectedGeminiModel) {
@@ -643,7 +665,7 @@
                     alert("Global PIN Saved to Database!");
                     closePinPad(true);
                 } else {
-                    remotePin = pinState.input; 
+                    remotePin = pinState.input;
                     localStorage.setItem('savedAdminPin', pinState.input);
                     alert("Offline Mode: PIN set for this session.");
                     closePinPad(true);
@@ -654,9 +676,9 @@
                 title.textContent = "Set Global PIN (DB)";
             }
         } else if (pinState.mode === 'unlock') {
-            if (pinState.input === remotePin || pinState.input === '872185') { 
+            if (pinState.input === remotePin || pinState.input === '872185') {
                 localStorage.setItem('savedAdminPin', pinState.input);
-                closePinPad(true); 
+                closePinPad(true);
             }
             else { alert("Incorrect PIN."); pinState.input = ''; }
         }
@@ -689,7 +711,7 @@
     const translations = {
         en: {
             coderTab: "Coder", settingsTab: "Settings", creditsTab: "Credits", chatToggle: "Chat", codeToggle: "Code", previewToggle: "Preview", versionsToggle: "Versions", manualToggle: "Manual",
-            chatHeader: "Chat with AI", manualHeader: "Manual Upgrade", manualInstructions: "Paste SEARCH/REPLACE patch blocks here:", upgradeButton: "Upgrade", undoButton: "Undo", downloadContextButton: "Get AI Context",
+            chatHeader: "Chat with AI", manualHeader: "Manual Upgrade", manualInstructions: "Paste JSON patch data here:", upgradeButton: "Upgrade", undoButton: "Undo", downloadContextButton: "Get AI Context",
             appGoalLabel: "App Creation Goal:", goalGeneral: "General Purpose", goalSlides: "Lesson Slides",
             goalTest: "Formal Test/Quiz", goalTool: "Interactive Tool", goalPortfolio: "Portfolio Page", goal3D: "3D Gamified Quiz",
             goalNetlifyBlob: "Netlify Blob Backend App",
@@ -708,7 +730,7 @@
         },
         zh: {
             coderTab: "编程", settingsTab: "设置", creditsTab: "鸣谢", chatToggle: "聊天", codeToggle: "代码", previewToggle: "预览", versionsToggle: "版本", manualToggle: "手动",
-            chatHeader: "与AI聊天", manualHeader: "手动升级", manualInstructions: "在此粘贴 SEARCH/REPLACE 补丁代码块:", upgradeButton: "升级", undoButton: "撤销", downloadContextButton: "获取AI上下文",
+            chatHeader: "与AI聊天", manualHeader: "手动升级", manualInstructions: "在此粘贴JSON补丁数据:", upgradeButton: "升级", undoButton: "撤销", downloadContextButton: "获取AI上下文",
             appGoalLabel: "应用创建目标：", goalGeneral: "通用", goalSlides: "课程幻灯片",
             goalTest: "正式测试/测验", goalTool: "互动工具", goalPortfolio: "作品集页面", goal3D: "3D 游戏化测验",
             goalNetlifyBlob: "Netlify Blob 后端应用",
@@ -727,7 +749,7 @@
         },
         ms: {
             coderTab: "Pengekod", settingsTab: "Tetapan", creditsTab: "Kredit", chatToggle: "Sembang", codeToggle: "Kod", previewToggle: "Pratonton", versionsToggle: "Versi", manualToggle: "Manual",
-            chatHeader: "Sembang dengan AI", manualHeader: "Penaiktarafan Manual", manualInstructions: "Tampal blok tampalan SEARCH/REPLACE di sini:", upgradeButton: "Tingkatkan", undoButton: "Buat Asal", downloadContextButton: "Dapatkan Konteks AI",
+            chatHeader: "Sembang dengan AI", manualHeader: "Penaiktarafan Manual", manualInstructions: "Tampal data tampalan JSON di sini:", upgradeButton: "Tingkatkan", undoButton: "Buat Asal", downloadContextButton: "Dapatkan Konteks AI",
             appGoalLabel: "Matlamat Penciptaan Aplikasi:", goalGeneral: "Tujuan Umum", goalSlides: "Slaid Pengajaran",
             goalTest: "Ujian/Kuiz Formal", goalTool: "Alat Interaktif", goalPortfolio: "Halaman Portfolio", goal3D: "Kuiz Gamified 3D",
             goalNetlifyBlob: "Aplikasi Backend Netlify Blob",
@@ -746,7 +768,7 @@
         },
         ta: {
             coderTab: "குறியீட்டாளர்", settingsTab: "அமைப்புகள்", creditsTab: "நன்றிகள்", chatToggle: "அரட்டை", codeToggle: "குறியீடு", previewToggle: "முன்னோட்டம்", versionsToggle: "பதிப்புகள்", manualToggle: "கையேடு",
-            chatHeader: "AI உடன் அரட்டை", manualHeader: "கைமுறை மேம்படுத்தல்", manualInstructions: "SEARCH/REPLACE பேட்ச் தொகுதிகளை இங்கே ஒட்டவும்:", upgradeButton: "மேம்படுத்து", undoButton: "செயல்தவிர்", downloadContextButton: "AI சூழலைப் பெறுக",
+            chatHeader: "AI உடன் அரட்டை", manualHeader: "கைமுறை மேம்படுத்தல்", manualInstructions: "JSON பேட்ச் தரவை இங்கே ஒட்டவும்:", upgradeButton: "மேம்படுத்து", undoButton: "செயல்தவிர்", downloadContextButton: "AI சூழலைப் பெறுக",
             appGoalLabel: "பயன்பாட்டு உருவாக்கும் நோக்கம்:", goalGeneral: "பொது நோக்கம்", goalSlides: "பாடம் ஸ்லைடுகள்",
             goalTest: "முறையான தேர்வு/வினாடி வினா", goalTool: "ஊடாடும் கருவி", goalPortfolio: "தனிப்பட்ட பக்கம்", goal3D: "3D கேமிஃபைட் வினாடி வினா",
             goalNetlifyBlob: "Netlify Blob பின்தள பயன்பாடு",
@@ -1546,9 +1568,9 @@ document.addEventListener('DOMContentLoaded', function() {
         panel.classList.toggle('hidden');
         const targetBtn = document.getElementById(buttonMap[panelId]);
         if (targetBtn) targetBtn.classList.toggle('active', !panel.classList.contains('hidden'));
-        
-        if (panelId === 'middle-panel') { 
-            localStorage.setItem('hongdouCodePanelState', panel.classList.contains('hidden') ? 'closed' : 'open'); 
+
+        if (panelId === 'middle-panel') {
+            localStorage.setItem('hongdouCodePanelState', panel.classList.contains('hidden') ? 'closed' : 'open');
         }
     }
 
@@ -1690,14 +1712,14 @@ document.addEventListener('DOMContentLoaded', function() {
         const zip = new JSZip();
         const rootFolder = wrapInFolder ? zip.folder(appTitle.replace(/[^a-z0-9]/gi, '-').toLowerCase() || 'my-app') : zip;
         rootFolder.file("index.html", htmlContent);
-        
+
         let folderToExport = null;
         if (currentlySelectedVersionId) {
             folderToExport = findParent(currentlySelectedVersionId);
         } else if (activeFolderId) {
             folderToExport = findItem(activeFolderId);
         }
-        
+
         const addAssetsToZip = async (folderItems, currentPath) => {
             for (const child of folderItems) {
                 if (child.name.toLowerCase() === 'knowledgebase') continue; // Skip knowledgebase in export
@@ -1801,7 +1823,7 @@ document.addEventListener('DOMContentLoaded', function() {
             name: folderName,
             children: []
         };
-        
+
         // If we are inside a folder, add as child, otherwise add to root
         if (activeFolderId) {
             const targetFolder = findItem(activeFolderId);
@@ -1964,7 +1986,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (statusDetail) statusDetail.textContent = 'Syncing to Database...';
         renderVersionsTree();
-        
+
         try {
             localStorage.setItem('hongdouVersionData', JSON.stringify(versionData));
             if (syncReference) {
@@ -2046,9 +2068,9 @@ document.addEventListener('DOMContentLoaded', function() {
         ensureKnowledgebaseFolder(true);
         const container = document.getElementById('versions-list-container');
         container.innerHTML = '';
-        
+
         let currentItems = getChildrenOf(activeFolderId);
-        
+
         if (activeFolderId) {
             const upBtn = document.createElement('div');
             upBtn.className = 'asset-thumbnail up-button';
@@ -2121,7 +2143,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     iconDiv.innerHTML = '&#128444;&#65039;';
                 }
             }
-            
+
             const nameDiv = document.createElement('div');
             nameDiv.className = 'name';
             nameDiv.textContent = item.name;
@@ -2129,12 +2151,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const actionsDiv = document.createElement('div');
             actionsDiv.className = 'item-actions';
-            
+
             const renameBtn = document.createElement('button');
             renameBtn.className = 'action-icon-btn';
             renameBtn.innerHTML = '&#9998;';
             renameBtn.onclick = (e) => { e.stopPropagation(); renameItem(item.id, thumb); };
-            
+
             const deleteBtn = document.createElement('button');
             deleteBtn.className = 'action-icon-btn';
             deleteBtn.innerHTML = '&times;';
@@ -2149,7 +2171,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             thumb.addEventListener('click', (e) => {
                 if (e.target.closest('.item-actions') || e.target.closest('.bulk-select-checkbox') || e.target.closest('.rename-input')) return;
-                
+
                 if (typeof isBulkSelectionMode !== 'undefined' && isBulkSelectionMode) {
                     const cb = thumb.querySelector('.bulk-select-checkbox');
                     if (cb) cb.checked = !cb.checked;
@@ -2178,50 +2200,50 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
 
-            thumb.addEventListener('dragstart', (e) => { 
-                e.stopPropagation(); 
-                draggedItemId = item.id; 
-                e.dataTransfer.setData('text/plain', item.id); 
-                setTimeout(() => thumb.classList.add('dragging'), 0); 
+            thumb.addEventListener('dragstart', (e) => {
+                e.stopPropagation();
+                draggedItemId = item.id;
+                e.dataTransfer.setData('text/plain', item.id);
+                setTimeout(() => thumb.classList.add('dragging'), 0);
             });
-            thumb.addEventListener('dragend', (e) => { 
-                e.stopPropagation(); 
-                thumb.classList.remove('dragging'); 
-                draggedItemId = null; 
+            thumb.addEventListener('dragend', (e) => {
+                e.stopPropagation();
+                thumb.classList.remove('dragging');
+                draggedItemId = null;
             });
-            
+
             if (item.type === 'folder') {
-                thumb.addEventListener('dragover', (e) => { 
-                    e.preventDefault(); e.stopPropagation(); 
-                    if (item.id === draggedItemId) return; 
-                    thumb.classList.add('drag-over'); 
+                thumb.addEventListener('dragover', (e) => {
+                    e.preventDefault(); e.stopPropagation();
+                    if (item.id === draggedItemId) return;
+                    thumb.classList.add('drag-over');
                 });
-                thumb.addEventListener('dragleave', (e) => { 
-                    e.stopPropagation(); 
-                    thumb.classList.remove('drag-over'); 
+                thumb.addEventListener('dragleave', (e) => {
+                    e.stopPropagation();
+                    thumb.classList.remove('drag-over');
                 });
                 thumb.addEventListener('drop', (e) => {
-                    e.preventDefault(); e.stopPropagation(); 
+                    e.preventDefault(); e.stopPropagation();
                     thumb.classList.remove('drag-over');
                     if (draggedItemId && draggedItemId !== item.id) {
                         const draggedItem = findItem(draggedItemId);
                         if (!draggedItem) return;
-                        
-                        let temp = item; 
-                        while(temp) { 
-                            if (temp.id === draggedItemId) return; 
-                            temp = findParent(temp.id); 
+
+                        let temp = item;
+                        while(temp) {
+                            if (temp.id === draggedItemId) return;
+                            temp = findParent(temp.id);
                         }
-                        
+
                         const sourceParent = findParent(draggedItemId);
                         const sourceArray = sourceParent ? sourceParent.children : versionData;
                         const sourceIndex = sourceArray.findIndex(i => i.id === draggedItemId);
-                        
+
                         if (sourceIndex > -1) {
                             sourceArray.splice(sourceIndex, 1);
                             if (!item.children) item.children =[];
                             item.children.push(draggedItem);
-                            saveVersionsToStorage(); 
+                            saveVersionsToStorage();
                             renderVersionsTree();
                         }
                     }
@@ -2230,7 +2252,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             container.appendChild(thumb);
         });
-        
+
         calculateStorageUsage();
     }
 
@@ -2270,7 +2292,7 @@ document.addEventListener('DOMContentLoaded', function() {
         let code = codeEditor.value;
         const marker = '<meta name="firebase-bridge" content="enabled">';
         const checkRegex = /<meta\s+name=["']firebase-bridge["']\s+content=["']enabled["']\s*\/?>/i;
-        
+
         if (isChecked && !checkRegex.test(code)) {
             if (/<\/head>/i.test(code)) {
                 code = code.replace(/<\/head>/i, '    ' + marker + '\n</head>');
@@ -2910,7 +2932,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Data is isolated by App Title to prevent apps overwriting each other
         const appTitle = document.getElementById('app-title-input').value.trim().replace(/[^a-zA-Z0-9]/g, '_') || 'untitled';
         const path = `hongdou_apps/${appTitle}/${e.data.key}`;
-        
+
         if (e.data.action === 'SAVE_DATA') {
             firebaseDb.ref(path).set(e.data.value).catch(err => console.error(err));
         } else if (e.data.action === 'LOAD_DATA') {
@@ -2918,11 +2940,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 const snap = await firebaseDb.ref(path).once('value');
                 const iframe = document.getElementById('live-preview');
                 if (iframe && iframe.contentWindow) {
-                    iframe.contentWindow.postMessage({ 
-                        action: 'DATA_LOADED', 
-                        key: e.data.key, 
-                        value: snap.val(), 
-                        reqId: e.data.reqId 
+                    iframe.contentWindow.postMessage({
+                        action: 'DATA_LOADED',
+                        key: e.data.key,
+                        value: snap.val(),
+                        reqId: e.data.reqId
                     }, '*');
                 }
             } catch (err) { console.error("Bridge Load Error:", err); }
@@ -3085,253 +3107,98 @@ document.addEventListener('DOMContentLoaded', function() {
 
     let previousManualCodeState = null;
 
-    function fuzzyReplace(source, search, replace) {
-        if (!search) return { success: false, code: source };
-
-        // 1. Direct exact match
-        if (source.includes(search)) {
-            return { success: true, code: source.replace(search, () => replace) };
-        }
-
-        // 2. CRLF newline normalization match
-        const normSource = source.replace(/\r\n/g, '\n');
-        const normSearch = search.replace(/\r\n/g, '\n');
-        const normReplace = replace.replace(/\r\n/g, '\n');
-        if (normSource.includes(normSearch)) {
-            return { success: true, code: normSource.replace(normSearch, () => normReplace) };
-        }
-
-        // 3. Trimmed edges match (handles trailing line break discrepancies)
-        if (normSearch.trim() && normSource.includes(normSearch.trim())) {
-            return { success: true, code: normSource.replace(normSearch.trim(), () => normReplace.trim()) };
-        }
-
-        // 4. Flexible whitespace & indentation token match
-        const escapeRegex = (s) => s.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
-        const trimmedSearch = normSearch.trim();
-        if (!trimmedSearch) return { success: false, code: source };
-
-        const tokens = trimmedSearch.split(/\s+/).filter(Boolean);
-        if (tokens.length > 0) {
-            const flexiblePattern = tokens.map(escapeRegex).join('\\s+');
-            try {
-                const reg = new RegExp(flexiblePattern, 'm');
-                if (reg.test(normSource)) {
-                    return { success: true, code: normSource.replace(reg, () => normReplace) };
-                }
-            } catch (e) {
-                console.warn("Regex compilation error in fuzzyReplace:", e);
-            }
-        }
-
-        return { success: false, code: source };
-    }
-
-    function parseAndApplyPatchText(currentCode, rawText) {
-        let updatedCode = currentCode;
-        let count = 0;
-        let title = '';
-
-        // Extract optional Title
-        const titleMatch = rawText.match(/(?:TITLE|Title):\s*([^\r\n]+)/);
-        if (titleMatch) {
-            title = titleMatch[1].trim().replace(/^["']|["']$/g, '');
-        }
-
-        const cleanText = rawText.replace(/\r\n/g, '\n');
-        // Robust match for <<<<<<< SEARCH ... ======= ... >>>>>>> REPLACE (or >>>>>>>)
-        const blockRegex = /<{3,}[ \t]*SEARCH[^\r\n]*\r?\n([\s\S]*?)\r?\n[ \t]*={3,}[^\r\n]*(?:\r?\n([\s\S]*?))?\r?\n[ \t]*>{3,}(?:[ \t]*(?:REPLACE|END))?[^\r\n]*/gi;
-        const matches = [...cleanText.matchAll(blockRegex)];
-
-        if (matches.length > 0) {
-            for (const m of matches) {
-                let searchBlock = m[1];
-                let replaceBlock = m[2] !== undefined ? m[2] : '';
-
-                if (/^```[a-zA-Z0-9_-]*\r?\n/.test(searchBlock)) {
-                    searchBlock = searchBlock.replace(/^```[a-zA-Z0-9_-]*\r?\n/, '').replace(/\r?\n```\s*$/, '');
-                }
-                if (/^```[a-zA-Z0-9_-]*\r?\n/.test(replaceBlock)) {
-                    replaceBlock = replaceBlock.replace(/^```[a-zA-Z0-9_-]*\r?\n/, '').replace(/\r?\n```\s*$/, '');
-                }
-
-                const res = fuzzyReplace(updatedCode, searchBlock, replaceBlock);
-                if (res.success) {
-                    updatedCode = res.code;
-                    count++;
-                }
-            }
-        } else {
-            // Fallback: Legacy JSON patch parsing if user still provides JSON
-            try {
-                const patchData = parseAIPatchJSON(rawText);
-                if (patchData) {
-                    if (patchData.title) title = patchData.title;
-                    const res = applyPatches(updatedCode, patchData);
-                    updatedCode = res.updatedCode;
-                    count = res.count;
-                }
-            } catch (e) {}
-        }
-
-        // Fallback: Full HTML document replacement if count is 0
-        if (count === 0) {
-            const docMatch = rawText.match(/<!DOCTYPE html[\s\S]*?<\/html>/i) || rawText.match(/<html[\s\S]*?<\/html>/i);
-            if (docMatch) {
-                if (!currentCode || currentCode.trim() === '' || confirm("No search/replace blocks matched, but the input contains a complete HTML document. Replace the editor with this new app?")) {
-                    updatedCode = docMatch[0];
-                    count = 1;
-                    const docTitleMatch = updatedCode.match(/<title[^>]*>([^<]+)<\/title>/i);
-                    if (!title && docTitleMatch) title = docTitleMatch[1].trim();
-                }
-            }
-        }
-
-        return { updatedCode, count, title };
-    }
-
-    function parseAIPatchJSON(rawText) {
-        let clean = rawText.replace(/```json/gi, '').replace(/```/g, '').trim();
-        const start = clean.indexOf('{');
-        const end = clean.lastIndexOf('}');
-        if (start === -1 || end === -1) throw new Error("No JSON object found in response.");
-        clean = clean.substring(start, end + 1);
-
-        try {
-            return JSON.parse(clean.replace(/,\s*([\]}])/g, '$1'));
-        } catch (e1) {
-            let repaired = "";
-            try {
-                let inString = false;
-                let escape = false;
-                for (let i = 0; i < clean.length; i++) {
-                    let char = clean[i];
-                    if (escape) { escape = false; repaired += char; continue; }
-                    if (char === '\\') { escape = true; repaired += char; continue; }
-                    if (char === '"') {
-                        if (inString) {
-                            let nextChars = clean.substring(i + 1, i + 30).trim();
-                            if (nextChars.startsWith(',') || nextChars.startsWith('}') || nextChars.startsWith(']') || nextChars.startsWith(':') || nextChars === "") {
-                                inString = false;
-                            } else {
-                                repaired += '\\';
-                            }
-                        } else {
-                            inString = true;
-                        }
-                    }
-                    if (inString) {
-                        if (char === '\n') repaired += '\\n';
-                        else if (char === '\r') repaired += '\\r';
-                        else if (char === '\t') repaired += '\\t';
-                        else repaired += char;
-                    } else {
-                        repaired += char;
-                    }
-                }
-                repaired = repaired.replace(/,\s*([\]}])/g, '$1');
-                return JSON.parse(repaired);
-            } catch (e2) {
-                try {
-                    return new Function("return " + repaired)();
-                } catch (e3) {
-                    throw new Error("AI generated invalid JSON.");
-                }
-            }
-        }
-    }
-
-    function applyPatches(currentCode, patchData) {
-        if (!patchData || !patchData.patches || !Array.isArray(patchData.patches)) {
-            throw new Error("Missing 'patches' array in JSON.");
-        }
-
-        let updatedCode = currentCode;
-        let count = 0;
-        const isCurrentEmpty = !updatedCode || updatedCode.trim() === '';
-
-        if (isCurrentEmpty) {
-            for (let p of patchData.patches) {
-                if (p.replace && p.replace.trim() !== '') {
-                    updatedCode = p.replace;
-                    count++;
-                    break;
-                }
-            }
-        } else {
-            patchData.patches.forEach(p => {
-                if ((!p.search || p.search === "") && patchData.patches.length === 1 && p.replace) {
-                    updatedCode = p.replace;
-                    count++;
-                } else if (p.search && p.replace !== undefined) {
-                    const res = fuzzyReplace(updatedCode, p.search, p.replace);
-                    if (res.success) {
-                        updatedCode = res.code;
-                        count++;
-                    }
-                }
-            });
-
-            if (count === 0) {
-                const fullDocPatch = patchData.patches.find(p => p.replace && (p.replace.includes('<!DOCTYPE html>') || p.replace.includes('<html')));
-                if (fullDocPatch) {
-                    if (confirm("Search strings did not match your current code, but the patch contains a complete application. Replace the editor with this new app?")) {
-                        updatedCode = fullDocPatch.replace;
-                        count = 1;
-                    }
-                }
-            }
-        }
-
-        return { updatedCode, count };
-    }
-
-    async function applyManualUpgrade(directPatchText = null) {
+    async function applyManualUpgrade() {
         const inputEl = document.getElementById('manual-input');
-        let rawInput = (typeof directPatchText === 'string' && directPatchText.trim()) ? directPatchText.trim() : inputEl.value.trim();
+        let rawInput = inputEl.value.trim();
 
-        const isPatchContent = (str) => {
-            if (!str) return false;
-            return (str.includes('<<<') && str.includes('===')) ||
-                   (str.includes('SEARCH') && str.includes('REPLACE')) ||
-                   str.includes('"patches"') || str.includes("'patches'") ||
-                   /<!doctype html|<html/i.test(str);
-        };
-
-        // If input box does not contain patch content (e.g. still has user instruction), auto-check clipboard
-        if (!isPatchContent(rawInput)) {
+        // Fix: If input is empty OR is just prompt text (no JSON braces), try clipboard
+        if (!rawInput || rawInput.indexOf('{') === -1) {
             try {
                 inputEl.focus();
                 const clip = await navigator.clipboard.readText();
-                if (isPatchContent(clip)) {
-                    rawInput = clip.trim();
-                }
+                if (clip && clip.indexOf('{') !== -1) rawInput = clip;
             } catch(e) {}
         }
 
-        if (!rawInput || !isPatchContent(rawInput)) {
-            alert('Please copy or paste SEARCH/REPLACE patch blocks (<<<<<<< SEARCH ... ======= ... >>>>>>> REPLACE) in the box.');
+        if (!rawInput || rawInput.indexOf('{') === -1) {
+            alert('Please paste the JSON patch data in the box.');
             return;
         }
 
         try {
-            const currentCode = codeEditor.value;
-            const { updatedCode, count, title } = parseAndApplyPatchText(currentCode, rawInput);
+            // 1. Cleanup Markdown and Smart Quotes
+            let cleanStr = rawInput
+                .replace(/[\u201C\u201D]/g, '"')
+                .replace(/```json/gi, '')
+                .replace(/```/g, '')
+                .trim();
 
-            if (count === 0) {
-                alert("Zero patches applied. Ensure 'SEARCH' blocks match the current code with sufficient context.");
+            // 2. Find outermost JSON object
+            const firstBrace = cleanStr.indexOf('{');
+            const lastBrace = cleanStr.lastIndexOf('}');
+
+            if (firstBrace === -1 || lastBrace === -1) {
+                throw new Error("No JSON object found (missing '{' or '}').");
+            }
+            cleanStr = cleanStr.substring(firstBrace, lastBrace + 1);
+
+            // 3. Robust Parsing (Strict -> Loose Fallback)
+            let data;
+            try {
+                data = JSON.parse(cleanStr);
+            } catch (strictErr) {
+                // Fallback to JS evaluation to handle trailing commas or unescaped newlines
+                try {
+                    data = new Function('return ' + cleanStr)();
+                } catch (evalErr) {
+                    console.error("Parse failed:", strictErr, evalErr);
+                    throw new Error("JSON is invalid. Check console for details.");
+                }
+            }
+
+            // 4. Validate Data
+            if (!data.patches || !Array.isArray(data.patches)) throw new Error("JSON found, but missing 'patches' array.");
+
+            // 5. Atomic Two-Phase Validation (Ported from Python Web Studio)
+            const previousStateTemp = codeEditor.value;
+            const hasCrlf = previousStateTemp.includes('\r\n');
+            let simulatedContent = normalizeCodeLines(previousStateTemp);
+            const failedBlocks = [];
+
+            data.patches.forEach((patch, idx) => {
+                const searchTarget = normalizeCodeLines(patch.search || '');
+                const replaceTarget = normalizeCodeLines(patch.replace || '');
+
+                if (!searchTarget) {
+                    failedBlocks.push(`Block #${idx + 1}: <empty search string>`);
+                    return;
+                }
+
+                const occurrences = simulatedContent.split(searchTarget).length - 1;
+                if (occurrences === 0) {
+                    const snippet = searchTarget.slice(0, 70).replace(/\n/g, '\\n');
+                    failedBlocks.push(`Block #${idx + 1} not found: "${snippet}..."`);
+                } else if (occurrences > 1) {
+                    failedBlocks.push(`Block #${idx + 1} ambiguous (${occurrences} matches found). Include 2-3 lines of surrounding context.`);
+                } else {
+                    simulatedContent = simulatedContent.replace(searchTarget, () => replaceTarget);
+                }
+            });
+
+            if (failedBlocks.length > 0) {
+                alert("Patch Rejected (Zero Corruption Guarantee):\n\n• " + failedBlocks.join("\n• "));
                 return;
             }
 
-            previousManualCodeState = currentCode;
-            codeEditor.value = updatedCode;
+            // Success - write back validated code atomically
+            const finalCode = hasCrlf ? simulatedContent.replace(/\n/g, '\r\n') : simulatedContent;
+            previousManualCodeState = previousStateTemp;
+            codeEditor.value = finalCode;
             updatePreview();
 
-            inputEl.value = '';
-
-            const versionTitle = title || "Manual Upgrade (" + count + " patches)";
-            createNewVersion(updatedCode, versionTitle, false);
-            alert(`Success! Applied ${count} patch(es).${title ? ' · ' + title : ''}`);
+            document.getElementById('manual-input').value = '';
+            createNewVersion(finalCode, data.title || "Manual Upgrade", false);
+            alert(`Success! Applied all ${data.patches.length} patch(es) atomically.`);
 
         } catch (e) {
             console.error(e);
@@ -3343,7 +3210,7 @@ document.addEventListener('DOMContentLoaded', function() {
         let contextFolderId = activeFolderId;
         if (!contextFolderId && currentlySelectedVersionId) { const p = findParent(currentlySelectedVersionId); if (p) contextFolderId = p.id; }
         while (contextFolderId) { const p = findParent(contextFolderId); if (!p) break; contextFolderId = p.id; }
-        
+
         function getFolderStructureString(folderId, indent = '') {
             const rawItems = folderId ? (findItem(folderId)?.children ||[]) : versionData;
             const items = Array.isArray(rawItems) ? rawItems : Object.values(rawItems);
@@ -3362,7 +3229,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             return str;
         }
-        
+
         let folderStructureStr = "Project File Structure:\n";
         if (contextFolderId) {
             const f = findItem(contextFolderId);
@@ -3406,28 +3273,28 @@ document.addEventListener('DOMContentLoaded', function() {
     async function downloadAiContext() {
         const currentCode = codeEditor.value;
         const promptText = `I need you to act as an "App Patcher" for a specific HTML application.
-I will provide the current HTML code. You must generate search/replace blocks to upgrade the code based on my request.
+I will provide the current HTML code. You must generate a JSON object containing "patches" to upgrade the code based on my request.
 
 RESPONSE FORMAT:
-Optional: Start with:
-TITLE: Short summary of what was updated
+Please provide the response inside a Markdown JSON code block (e.g., \`\`\`json ... \`\`\`).
 
-OUTPUT FORMAT:
-IMPORTANT: Put ALL search/replace blocks inside a SINGLE markdown code fence (\`\`\`). Do NOT use multiple code fences.
+IMPORTANT SYNTAX RULES:
+1. The output must be VALID JSON.
+2. Because HTML contains many double quotes (e.g., class="container"), you MUST escape existing double quotes inside the "search" and "replace" strings.
+- INCORRECT: "search": "<div class="container">"
+- CORRECT:   "search": "<div class=\\"container\\">"
 
-For each change, output standard search/replace blocks:
-\`\`\`
-<<<<<<< SEARCH
-[Exact code from the current file to replace]
-=======
-[New replacement code]
->>>>>>> REPLACE
-\`\`\`
-
-CRITICAL RULES:
-1. Output RAW code directly inside the blocks. DO NOT escape quotes or newlines.
-2. The SEARCH block must match existing lines in the code with enough surrounding context lines to be unambiguous.
-3. Make minimal, surgical edits. Do not rewrite unchanged code.
+JSON STRUCTURE:
+{
+"title": "Short summary of changes",
+"explanation": "Brief explanation of what you changed",
+"patches": [
+{
+  "search": "The EXACT string in the original code to be replaced",
+  "replace": "The NEW code to replace it with"
+}
+]
+}
 
 ${(function(){
     const bridgeToggle = document.getElementById('firebase-bridge-toggle');
@@ -3470,7 +3337,10 @@ ${getGlobalProjectContextStr()}
 ${(await getKnowledgebaseContentParts(true)).extraText}
 `;
         try {
-            await navigator.clipboard.writeText(promptText);
+            const userReq = document.getElementById('manual-input').value.trim() || '[YOUR INSTRUCTION]';
+            const deterministicPrompt = `I need you to act as a Deterministic Code Patcher for this HTML file.\n\nProject Context:\n${getGlobalProjectContextStr()}\n\nOUTPUT REQUIREMENTS:\nYou MUST respond with ONLY a single valid JSON object enclosed in a \`\`\`json code fence:\n\`\`\`json\n{\n  "title": "Short summary of changes",\n  "explanation": "Brief explanation of what you changed",\n  "patches": [\n    {\n      "search": "EXACT literal code block from the current file including exact whitespace",\n      "replace": "NEW replacement code"\n    }\n  ]\n}\n\`\`\`\n\nCRITICAL RULES FOR SURGICAL PATCHES:\n1. ANCHOR LINES: Always include 2-3 lines of unchanged code directly BEFORE and AFTER the target edit in your "search" block. This guarantees it matches only once in large files.\n2. 1:1 LITERAL MATCH: The "search" string must match the exact lines from the file character-for-character including exact indentation and line breaks.\n3. NEVER summarize or omit lines using ellipses (e.g., '// ... existing code ...').\n4. ESCAPE INTERNAL DOUBLE QUOTES: All internal double quotes inside "search" and "replace" string values MUST be strictly escaped as \". Never leave an unescaped double quote (") inside a string value.\n5. NEVER ESCAPE SINGLE QUOTES: Under RFC 8259 strict JSON rules, escaping single quotes (\') is strictly prohibited and invalid. Single quotes (') MUST remain raw and unescaped.\n6. ESCAPE NEWLINES & BACKSLASHES: Encode newlines as \\n, tabs as \\t, and literal backslashes as \\\\ strictly according to standard JSON specification.\n7. Keep edits minimal and surgical. Do not replace unchanged parts of the file.\n\nMY REQUEST:\n${userReq}\n\nCURRENT HTML CODE:\n\`\`\`html\n${currentCode}\n\`\`\`\n\n${(await getKnowledgebaseContentParts(true)).extraText}`;
+
+            await navigator.clipboard.writeText(deterministicPrompt);
             const btn = document.getElementById('download-context-btn');
             const originalText = btn.textContent;
             btn.textContent = "Copied to Clipboard!";
@@ -3483,7 +3353,7 @@ ${(await getKnowledgebaseContentParts(true)).extraText}
             console.warn("Clipboard API failed, falling back to download", err);
             const btn = document.getElementById('download-context-btn');
             btn.textContent = "Downloading...";
-            const blob = new Blob([promptText], { type: 'text/plain' });
+            const blob = new Blob([deterministicPrompt || promptText], { type: 'text/plain' });
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
             a.download = 'hongdou-ai-context.txt';
@@ -3533,7 +3403,7 @@ ${(await getKnowledgebaseContentParts(true)).extraText}
             loader.style.display = 'none'; // Ensure loader is hidden initially
             if (cameraBtn) cameraBtn.style.display = 'none';
             if (bridgeToggleContainer) bridgeToggleContainer.style.display = 'flex';
-            
+
             const usageTracker = document.getElementById('gemini-usage-tracker');
             if (usageTracker) usageTracker.style.display = 'block';
 
@@ -3543,7 +3413,7 @@ ${(await getKnowledgebaseContentParts(true)).extraText}
             const label = document.getElementById('upgrader-label');
             if(label) label.textContent = "Manual Upgrader";
             // UI: Manual Mode
-            inputArea.placeholder = "1. Type instruction here.\n2. Click 'Get AI Context'.\n3. Copy AI Response (SEARCH/REPLACE).\n4. Click 'Upgrade'.";
+            inputArea.placeholder = "1. Type instruction here.\n2. Click 'Get AI Context'.\n3. Copy AI Response JSON.\n4. Click 'Upgrade'.";
             contextBtn.textContent = "Get AI Context";
             contextBtn.style.backgroundColor = "var(--spotlight-1)";
             contextBtn.onclick = downloadAiContext;
@@ -3556,7 +3426,7 @@ ${(await getKnowledgebaseContentParts(true)).extraText}
             if (cameraBtn) cameraBtn.style.display = 'none';
             if (bridgeToggleContainer) bridgeToggleContainer.style.display = 'flex';
             loader.style.display = 'none';
-            
+
             const usageTracker = document.getElementById('gemini-usage-tracker');
             if (usageTracker) usageTracker.style.display = 'none';
         }
@@ -3626,7 +3496,7 @@ ${(await getKnowledgebaseContentParts(true)).extraText}
         const localKeys = JSON.parse(localStorage.getItem('geminiKeys') || '[]');
         const keyMultiplier = Math.max(1, localKeys.length);
         const effectiveLimit = modelDef.limit * keyMultiplier;
-        
+
         if (usage >= effectiveLimit) {
             alert(modelDef.name + " limit reached for today! Please select another model.");
             return;
@@ -3658,36 +3528,29 @@ ${(await getKnowledgebaseContentParts(true)).extraText}
         // Since we want the result when it arrives, we won't artificially delay success if it's fast,
         // but standard Gemini calls for code can take 10-20s.
 
-        const promptText = `I need you to act as an "App Patcher" for my single-file HTML application.
-
-MY REQUEST:
-${instruction}
-
-CURRENT CODE:
-\`\`\`html
-${currentCode}
-\`\`\`
+        const promptText = `I need you to act as an "App Patcher" for a specific HTML application.
+I will provide the current HTML code. You must generate a JSON object containing "patches" to upgrade the code based on my request.
 
 RESPONSE FORMAT:
-Optional: Start with:
-TITLE: Short summary of what was updated
+Please provide the response inside a Markdown JSON code block (e.g., \`\`\`json ... \`\`\`).
 
-OUTPUT FORMAT:
-IMPORTANT: Put ALL search/replace blocks inside a SINGLE markdown code fence (\`\`\`). Do NOT use multiple code fences.
+IMPORTANT SYNTAX RULES:
+1. The output must be VALID JSON.
+2. Because HTML contains many double quotes (e.g., class="container"), you MUST escape existing double quotes inside the "search" and "replace" strings.
+- INCORRECT: "search": "<div class="container">"
+- CORRECT:   "search": "<div class=\\\"container\\\">"
 
-For each change, output standard search/replace blocks:
-\`\`\`
-<<<<<<< SEARCH
-[Exact code from the current file to replace]
-=======
-[New replacement code]
->>>>>>> REPLACE
-\`\`\`
-
-CRITICAL RULES:
-1. Output RAW code directly inside the blocks. DO NOT escape quotes or newlines.
-2. The SEARCH block must match existing lines in the code with enough surrounding context lines to be unambiguous.
-3. Make minimal, surgical edits. Do not rewrite unchanged code.
+JSON STRUCTURE:
+{
+"title": "Short summary of changes",
+"explanation": "Brief explanation of what you changed",
+"patches": [
+{
+  "search": "The EXACT string in the original code to be replaced",
+  "replace": "The NEW code to replace it with"
+}
+]
+}
 
 ${(function(){
     const bridgeToggle = document.getElementById('firebase-bridge-toggle');
@@ -3704,6 +3567,7 @@ window.addEventListener('message', (e) => {
    if(e.data.action === 'DATA_LOADED') console.log('Loaded:', e.data.value);
    if(e.data.action === 'DATA_UPDATED') {
        console.log('Realtime Update:', e.data.value);
+       // Update UI immediately here to reflect changes from other users/tabs
    }
 });`;
     } else {
@@ -3718,35 +3582,102 @@ DESIGN SYSTEM (Use these classes):
 - Buttons: <button class="button">
 - Feedback: <div class="feedback correct"> or <div class="feedback incorrect">
 
+CURRENT HTML CODE:
+${currentCode}
+
+MY REQUEST:
+${instruction}
+
 ${getGlobalProjectContextStr()}
 `;
 
         try {
             const kbData = await getKnowledgebaseContentParts(false);
-            const finalPromptText = promptText + kbData.extraText;
-            const contentParts = [{ text: finalPromptText }, ...kbData.parts];
+            const aiPatcherPrompt = `I need you to act as a Deterministic Code Patcher for this HTML file.\n\nOUTPUT REQUIREMENTS:\nRespond ONLY with a single valid JSON object adhering to the schema with surgical patches.\n\nCRITICAL RULES FOR SURGICAL PATCHES:\n1. ANCHOR LINES: Always include 2-3 lines of unchanged code directly BEFORE and AFTER the target edit in your "search" block.\n2. 1:1 LITERAL MATCH: The "search" string must match the exact lines from the file character-for-character including exact indentation and line breaks.\n3. NEVER summarize or omit lines using ellipses (e.g., '// ... existing code ...').\n4. ESCAPE INTERNAL DOUBLE QUOTES: All internal double quotes inside "search" and "replace" strings MUST be strictly escaped as \".\n5. NEVER ESCAPE SINGLE QUOTES: Single quotes (') MUST remain raw and unescaped.\n\nMY REQUEST:\n${instruction}\n\nCURRENT HTML CODE:\n${currentCode}\n\n${getGlobalProjectContextStr()}\n${kbData.extraText}`;
+
+            const contentParts = [{ text: aiPatcherPrompt }, ...kbData.parts];
+
+            const genConfig = {
+                responseMimeType: "application/json",
+                responseSchema: {
+                    type: "OBJECT",
+                    properties: {
+                        title: { type: "STRING" },
+                        explanation: { type: "STRING" },
+                        patches: {
+                            type: "ARRAY",
+                            items: {
+                                type: "OBJECT",
+                                properties: {
+                                    search: { type: "STRING" },
+                                    replace: { type: "STRING" }
+                                },
+                                required: ["search", "replace"]
+                            }
+                        }
+                    },
+                    required: ["patches"]
+                },
+                maxOutputTokens: 65536
+            };
+            const thinkingCfg = getFlashThinkingConfig(selectedGeminiModel);
+            if (thinkingCfg) genConfig.thinkingConfig = thinkingCfg;
+
             let response;
-            let maxAttempts = (typeof geminiKeys !== 'undefined' && geminiKeys.length > 0) ? geminiKeys.length : 1;
+            let maxAttempts = (typeof geminiKeys !== 'undefined' && geminiKeys.length > 0) ? geminiKeys.length * 2 : 2;
             for (let attempt = 0; attempt < maxAttempts; attempt++) {
-                response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${selectedGeminiModel}:generateContent?key=${activeKey}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ parts: contentParts }]
-                    })
-                });
-                if (!response.ok && (response.status === 429 || response.status === 403 || response.status === 400) && maxAttempts > 1) {
-                    if (typeof rotateGeminiKey === 'function') { rotateGeminiKey(); activeKey = getCurrentGeminiKey(); continue; }
+                upgradeBtn.textContent = `Connecting (${attempt + 1}/${maxAttempts})...`;
+                try {
+                    response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${selectedGeminiModel}:generateContent?key=${activeKey}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: [{ parts: contentParts }],
+                            safetySettings: [
+                                { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
+                                { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
+                                { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
+                                { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" }
+                            ],
+                            generationConfig: genConfig
+                        })
+                    });
+                } catch (netErr) {
+                    console.warn("Network error on attempt " + (attempt + 1), netErr);
+                }
+
+                if (response && response.ok) break;
+
+                const status = response ? response.status : 0;
+                if ([429, 500, 502, 503, 504, 529].includes(status) || !response) {
+                    if (typeof rotateGeminiKey === 'function') {
+                        rotateGeminiKey();
+                        activeKey = getCurrentGeminiKey();
+                    }
+                    await new Promise(r => setTimeout(r, 2000));
+                    continue;
+                } else if ([400, 403].includes(status)) {
+                    if (typeof rotateGeminiKey === 'function') {
+                        rotateGeminiKey();
+                        activeKey = getCurrentGeminiKey();
+                    }
+                    continue;
                 }
                 break;
             }
-            if (!response.ok) throw new Error("API Error: " + response.status);
+            if (!response || !response.ok) throw new Error("API Error: " + (response ? response.status : "Connection failed"));
             incrementUsage(selectedGeminiModel);
             const data = await response.json();
-            const rawText = data.candidates[0].content.parts[0].text;
+            const candidate = data.candidates?.[0];
+            if (!candidate) throw new Error("No completion candidate returned by Gemini.");
+            const rawText = candidate.content?.parts?.map(p => p.text || '').join('').trim();
+            if (!rawText) throw new Error("Empty response: " + (candidate.finishReason || "EMPTY"));
 
-            await applyManualUpgrade(rawText);
+            // Apply patches using the existing manual logic's core (we simulate the input value)
+            document.getElementById('manual-input').value = rawText;
+            applyManualUpgrade(); // Handles atomic dry-run verification, patching, versioning, and success alerts
 
+            // Clear input after success so they can type new instruction
             document.getElementById('manual-input').value = '';
             document.getElementById('manual-input').placeholder = "Upgrade complete! Type next instruction...";
 
@@ -3902,12 +3833,12 @@ ${getGlobalProjectContextStr()}
     function openKnowledgebase() {
         ensureKnowledgebaseFolder(false);
         let targetKbId = null;
-        
+
         // 1. Identify local project root
         let root = null;
         if (currentlySelectedVersionId) root = getProjectRoot(currentlySelectedVersionId);
         else if (activeFolderId) root = getProjectRoot(activeFolderId);
-        
+
         const searchItems = root ? [root] : versionData;
 
         // 2. Find the KB folder

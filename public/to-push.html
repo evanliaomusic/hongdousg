@@ -360,15 +360,34 @@
         <div id="manual-panel" style="display: none;"></div>
         <div id="versions-panel" class="panel hidden">
             <button class="icon-button" onclick="togglePanel('versions-panel')" style="position: absolute; top: 15px; right: 15px; color: #ff5555; font-weight: bold; z-index: 10;">✕</button>
-            <div class="panel-header">
-                <h3>Assets</h3>
-                <div class="panel-header-actions">
+            <div class="panel-header" style="flex-wrap: wrap; gap: 8px; padding-right: 45px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <h3 style="margin: 0; padding: 12px 0;">Assets</h3>
+                    <div style="display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 20px; padding: 3px 8px; font-size: 11px;">
+                        <span id="asset-source-db-label" style="color: var(--primary-color); font-weight: bold; cursor: pointer; user-select: none;" onclick="setAssetSourceMode('db')">Database</span>
+                        <label class="toggle-switch" style="width: 28px; height: 16px; margin: 0;">
+                            <input type="checkbox" id="asset-source-toggle" onchange="toggleAssetSource(this.checked)">
+                            <span class="slider round"></span>
+                        </label>
+                        <span id="asset-source-local-label" style="color: var(--text-color); opacity: 0.6; cursor: pointer; user-select: none;" onclick="setAssetSourceMode('local')">Local Folder</span>
+                    </div>
+                </div>
+                <div class="panel-header-actions" id="db-asset-actions">
                     <button id="bulk-select-button" class="action-button" style="padding: 6px 12px; font-size: 13px; background-color: #6c757d;" onclick="toggleBulkSelectionMode()">Select</button>
                     <button id="bulk-delete-button" class="action-button" style="padding: 6px 12px; font-size: 13px; background-color: #dc3545; display: none;" onclick="executeBulkDelete()">Delete</button>
                     <button id="upload-asset-button" class="action-button" style="padding: 6px 12px; font-size: 13px; background-color: #28a745;" onclick="document.getElementById('asset-file-input').click()">Upload</button>
                     <input type="file" id="asset-file-input" style="display: none;" multiple onchange="handleAssetUpload(event)">
                     <button id="new-folder-button" class="action-button" style="padding: 6px 12px; font-size: 13px; background-color: var(--primary-color);" data-translate-key="newFolderButton">New Folder</button>
                 </div>
+                <div class="panel-header-actions" id="local-asset-actions" style="display: none;">
+                    <button id="select-local-folder-btn" class="action-button" style="padding: 6px 12px; font-size: 13px; background-color: var(--primary-color);" onclick="selectLocalFolder()">📁 Choose Folder</button>
+                    <button id="refresh-local-folder-btn" class="action-button" style="padding: 6px 10px; font-size: 13px; background-color: #17a2b8;" onclick="refreshLocalFolder()" title="Refresh folder files">↻</button>
+                    <button id="new-local-folder-btn" class="action-button" style="padding: 6px 12px; font-size: 13px; background-color: #6c757d;" onclick="createLocalSubfolder()">+ Folder</button>
+                </div>
+            </div>
+            <div id="local-folder-status" style="display: none; padding: 6px 15px; font-size: 11px; background: rgba(74, 125, 255, 0.1); border-bottom: 1px solid var(--border-color); color: #aaa; justify-content: space-between; align-items: center;">
+                <span id="local-folder-path" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 75%;">No folder selected</span>
+                <span id="local-folder-count"></span>
             </div>
             <div id="versions-list-container"></div>
         </div>
@@ -692,6 +711,10 @@
         if (success) document.getElementById('app-sidebar').classList.remove('closed');
     } let language = 'en'; let chatHistoryLog = []; let currentRequestController = null; let progressSimulationTimeout = null; let countdownInterval = null;
     let versionData = []; let currentlySelectedVersionId = null; let draggedItemId = null; let activeFolderId = null; let html5QrCode = null;
+    let assetSourceMode = 'db'; // 'db' | 'local'
+    let localRootHandle = null;
+    let localCurrentHandle = null;
+    let localDirStack = []; // [{ name, handle }]
     const dbName = "HongDouAssetsDB";
     const storeName = "assets";
     function initDB() { return new Promise((resolve, reject) => { const request = indexedDB.open(dbName, 1); request.onupgradeneeded = (e) => { e.target.result.createObjectStore(storeName); }; request.onsuccess = () => resolve(request.result); request.onerror = () => reject(request.error); }); }
@@ -1713,6 +1736,23 @@ document.addEventListener('DOMContentLoaded', function() {
         const rootFolder = wrapInFolder ? zip.folder(appTitle.replace(/[^a-z0-9]/gi, '-').toLowerCase() || 'my-app') : zip;
         rootFolder.file("index.html", htmlContent);
 
+        if (assetSourceMode === 'local' && localRootHandle) {
+            const addLocalDirToZip = async (dirHandle, folderInZip) => {
+                for await (const entry of dirHandle.values()) {
+                    if (entry.kind === 'file') {
+                        if (entry.name.toLowerCase() === 'index.html') continue;
+                        const f = await entry.getFile();
+                        folderInZip.file(entry.name, f);
+                    } else if (entry.kind === 'directory') {
+                        const subFolder = folderInZip.folder(entry.name);
+                        await addLocalDirToZip(entry, subFolder);
+                    }
+                }
+            };
+            await addLocalDirToZip(localRootHandle, rootFolder);
+            return zip;
+        }
+
         let folderToExport = null;
         if (currentlySelectedVersionId) {
             folderToExport = findParent(currentlySelectedVersionId);
@@ -2065,6 +2105,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function renderVersionsTree() {
+        if (assetSourceMode === 'local') {
+            renderLocalFolderTree();
+            return;
+        }
         ensureKnowledgebaseFolder(true);
         const container = document.getElementById('versions-list-container');
         container.innerHTML = '';
@@ -2326,6 +2370,36 @@ document.addEventListener('DOMContentLoaded', function() {
     async function updatePreview() {
         syncBridgeToggleFromCode();
         let processedHtml = codeEditor.value;
+
+        if (assetSourceMode === 'local' && localRootHandle) {
+            try {
+                const handlesToScan = [localRootHandle];
+                if (localCurrentHandle && localCurrentHandle !== localRootHandle) {
+                    handlesToScan.push(localCurrentHandle);
+                }
+                for (const dirH of handlesToScan) {
+                    for await (const entry of dirH.values()) {
+                        if (entry.kind === 'file') {
+                            const n = entry.name;
+                            if (processedHtml.includes(n)) {
+                                const f = await entry.getFile();
+                                const url = URL.createObjectURL(f);
+                                processedHtml = processedHtml.split('"' + n + '"').join('"' + url + '"')
+                                                             .split("'" + n + "'").join("'" + url + "'")
+                                                             .split('"./' + n + '"').join('"' + url + '"')
+                                                             .split("'./" + n + "'").join("'" + url + "'")
+                                                             .split("(" + n + ")").join("(" + url + ")");
+                            }
+                        }
+                    }
+                }
+            } catch (err) {
+                console.warn("Local asset resolution warning:", err);
+            }
+            document.getElementById('live-preview').srcdoc = processedHtml;
+            return;
+        }
+
         let contextFolderId = activeFolderId;
         if (!contextFolderId && currentlySelectedVersionId) { const p = findParent(currentlySelectedVersionId); if (p) contextFolderId = p.id; }
         while (contextFolderId) { const p = findParent(contextFolderId); if (!p) break; contextFolderId = p.id; }
@@ -2672,6 +2746,25 @@ document.addEventListener('DOMContentLoaded', function() {
         versionsPanel.addEventListener('drop', async (e) => {
             if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
                 e.preventDefault(); e.stopPropagation(); versionsPanel.classList.remove('drag-over-container');
+                if (assetSourceMode === 'local') {
+                    if (!localCurrentHandle) {
+                        alert("Please select a local folder first before dropping files.");
+                        return;
+                    }
+                    for (const file of e.dataTransfer.files) {
+                        try {
+                            const fileHandle = await localCurrentHandle.getFileHandle(file.name, { create: true });
+                            const writable = await fileHandle.createWritable();
+                            await writable.write(file);
+                            await writable.close();
+                        } catch (err) {
+                            console.error("Local write error:", err);
+                        }
+                    }
+                    await renderLocalFolderTree();
+                    updatePreview();
+                    return;
+                }
                 let destArray = getChildrenOf(activeFolderId);
                 const closestThumb = e.target.closest('.asset-thumbnail');
                 if (closestThumb) {
@@ -3862,6 +3955,263 @@ ${getGlobalProjectContextStr()}
             renderVersionsTree();
         } else {
             alert("Knowledgebase folder not found for this project context.");
+        }
+    }
+
+    // --- Local Folder / File System Access API ---
+    function setAssetSourceMode(mode) {
+        const toggle = document.getElementById('asset-source-toggle');
+        if (toggle) toggle.checked = (mode === 'local');
+        toggleAssetSource(mode === 'local');
+    }
+
+    function toggleAssetSource(isLocal) {
+        assetSourceMode = isLocal ? 'local' : 'db';
+        const dbLabel = document.getElementById('asset-source-db-label');
+        const localLabel = document.getElementById('asset-source-local-label');
+        const dbActions = document.getElementById('db-asset-actions');
+        const localActions = document.getElementById('local-asset-actions');
+        const localStatus = document.getElementById('local-folder-status');
+
+        if (assetSourceMode === 'local') {
+            if (dbLabel) { dbLabel.style.color = 'var(--text-color)'; dbLabel.style.opacity = '0.6'; dbLabel.style.fontWeight = 'normal'; }
+            if (localLabel) { localLabel.style.color = 'var(--primary-color)'; localLabel.style.opacity = '1'; localLabel.style.fontWeight = 'bold'; }
+            if (dbActions) dbActions.style.display = 'none';
+            if (localActions) localActions.style.display = 'flex';
+            if (localStatus) localStatus.style.display = 'flex';
+
+            if (!localRootHandle) {
+                renderLocalFolderPrompt();
+            } else {
+                renderLocalFolderTree();
+            }
+        } else {
+            if (dbLabel) { dbLabel.style.color = 'var(--primary-color)'; dbLabel.style.opacity = '1'; dbLabel.style.fontWeight = 'bold'; }
+            if (localLabel) { localLabel.style.color = 'var(--text-color)'; localLabel.style.opacity = '0.6'; localLabel.style.fontWeight = 'normal'; }
+            if (dbActions) dbActions.style.display = 'flex';
+            if (localActions) localActions.style.display = 'none';
+            if (localStatus) localStatus.style.display = 'none';
+
+            renderVersionsTree();
+        }
+        updatePreview();
+    }
+
+    function renderLocalFolderPrompt() {
+        const container = document.getElementById('versions-list-container');
+        container.innerHTML = `
+            <div style="grid-column: 1 / -1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; text-align: center; gap: 14px;">
+                <div style="font-size: 46px;">📁</div>
+                <h4 style="margin: 0; color: #fff;">Open a Local Computer Folder</h4>
+                <p style="margin: 0; font-size: 13px; color: #aaa; max-width: 360px; line-height: 1.5;">
+                    Select a folder on your computer to view, manage, and use local images, scripts, and media directly in your project.
+                </p>
+                <button class="action-button" style="background-color: var(--primary-color); padding: 10px 20px; font-size: 14px; font-weight: bold; cursor: pointer;" onclick="selectLocalFolder()">Choose Local Folder</button>
+                <div style="font-size: 11px; color: #777; margin-top: 5px;">
+                    Tip: Uses File System Access API. Edge or Chrome on HTTPS/localhost required.
+                </div>
+            </div>
+        `;
+        const pathEl = document.getElementById('local-folder-path');
+        if (pathEl) pathEl.textContent = 'No folder connected';
+        const countEl = document.getElementById('local-folder-count');
+        if (countEl) countEl.textContent = '';
+    }
+
+    async function selectLocalFolder() {
+        if (!window.showDirectoryPicker) {
+            alert("The File System Access API is not supported in this browser environment.\nPlease open this app in Google Chrome or Microsoft Edge served over HTTPS.");
+            return;
+        }
+        try {
+            const handle = await window.showDirectoryPicker({ mode: 'readwrite' });
+            localRootHandle = handle;
+            localCurrentHandle = handle;
+            localDirStack = [];
+            await renderLocalFolderTree();
+            updatePreview();
+        } catch (err) {
+            if (err.name !== 'AbortError') {
+                console.error("Folder select error:", err);
+                alert("Could not open folder: " + err.message);
+            }
+        }
+    }
+
+    async function refreshLocalFolder() {
+        if (localCurrentHandle) {
+            await renderLocalFolderTree();
+            updatePreview();
+        } else {
+            selectLocalFolder();
+        }
+    }
+
+    async function createLocalSubfolder() {
+        if (!localCurrentHandle) {
+            alert("Please select a local folder first.");
+            return;
+        }
+        const name = prompt("Enter new folder name:");
+        if (!name || !name.trim()) return;
+        try {
+            await localCurrentHandle.getDirectoryHandle(name.trim(), { create: true });
+            await renderLocalFolderTree();
+        } catch (err) {
+            alert("Could not create folder: " + err.message);
+        }
+    }
+
+    async function renderLocalFolderTree() {
+        if (!localCurrentHandle) {
+            renderLocalFolderPrompt();
+            return;
+        }
+        const container = document.getElementById('versions-list-container');
+        container.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 25px; color: #aaa;">Reading folder...</div>';
+
+        try {
+            const entries = [];
+            for await (const entry of localCurrentHandle.values()) {
+                entries.push(entry);
+            }
+            entries.sort((a, b) => {
+                if (a.kind === b.kind) return a.name.localeCompare(b.name);
+                return a.kind === 'directory' ? -1 : 1;
+            });
+
+            const fullPath = [localRootHandle.name, ...localDirStack.map(s => s.name)].join(' / ');
+            const pathEl = document.getElementById('local-folder-path');
+            if (pathEl) pathEl.textContent = '📁 ' + fullPath;
+            const countEl = document.getElementById('local-folder-count');
+            if (countEl) countEl.textContent = `${entries.length} items`;
+
+            container.innerHTML = '';
+
+            if (localDirStack.length > 0) {
+                const upBtn = document.createElement('div');
+                upBtn.className = 'asset-thumbnail up-button';
+                upBtn.innerHTML = '<div class="icon">&#128193;</div><div class="name">.. (Up)</div>';
+                upBtn.onclick = async () => {
+                    localDirStack.pop();
+                    localCurrentHandle = localDirStack.length > 0 ? localDirStack[localDirStack.length - 1].handle : localRootHandle;
+                    await renderLocalFolderTree();
+                };
+                container.appendChild(upBtn);
+            }
+
+            if (entries.length === 0 && localDirStack.length === 0) {
+                const emptyNotice = document.createElement('div');
+                emptyNotice.style.cssText = 'grid-column: 1 / -1; text-align: center; padding: 30px; color: #777; font-size: 13px;';
+                emptyNotice.innerHTML = 'This folder is empty.<br><button class="action-button" style="margin-top: 10px; background-color: #555;" onclick="createLocalSubfolder()">+ New Subfolder</button>';
+                container.appendChild(emptyNotice);
+                return;
+            }
+
+            for (const entry of entries) {
+                const thumb = document.createElement('div');
+                thumb.className = 'asset-thumbnail';
+                thumb.title = entry.name;
+
+                const iconDiv = document.createElement('div');
+                iconDiv.className = 'icon';
+
+                const nameDiv = document.createElement('div');
+                nameDiv.className = 'name';
+                nameDiv.textContent = entry.name;
+
+                const actionsDiv = document.createElement('div');
+                actionsDiv.className = 'item-actions';
+
+                const delBtn = document.createElement('button');
+                delBtn.className = 'action-icon-btn';
+                delBtn.innerHTML = '&times;';
+                delBtn.title = 'Delete item';
+                delBtn.onclick = async (e) => {
+                    e.stopPropagation();
+                    if (confirm(`Delete "${entry.name}" from your disk?`)) {
+                        try {
+                            await localCurrentHandle.removeEntry(entry.name, { recursive: entry.kind === 'directory' });
+                            await renderLocalFolderTree();
+                            updatePreview();
+                        } catch (err) {
+                            alert("Delete failed: " + err.message);
+                        }
+                    }
+                };
+                actionsDiv.appendChild(delBtn);
+
+                if (entry.kind === 'directory') {
+                    iconDiv.innerHTML = '&#128193;';
+                    thumb.onclick = async () => {
+                        localDirStack.push({ name: entry.name, handle: entry });
+                        localCurrentHandle = entry;
+                        await renderLocalFolderTree();
+                    };
+                } else {
+                    const lowerName = entry.name.toLowerCase();
+                    const isImg = /\.(png|jpe?g|gif|webp|svg|bmp|ico)$/i.test(lowerName);
+                    const isHtml = /\.(html|htm)$/i.test(lowerName);
+                    const isCode = /\.(js|css|json|md|txt)$/i.test(lowerName);
+
+                    if (isImg) {
+                        try {
+                            const file = await entry.getFile();
+                            const blobUrl = URL.createObjectURL(file);
+                            const img = document.createElement('img');
+                            img.src = blobUrl;
+                            img.style.width = '32px';
+                            img.style.height = '32px';
+                            img.style.objectFit = 'cover';
+                            img.style.borderRadius = '4px';
+                            iconDiv.appendChild(img);
+                        } catch (e) {
+                            iconDiv.innerHTML = '&#128444;&#65039;';
+                        }
+                    } else if (isHtml) {
+                        iconDiv.innerHTML = '&#127760;';
+                    } else if (isCode) {
+                        iconDiv.innerHTML = '&#128196;';
+                    } else {
+                        iconDiv.innerHTML = '&#128190;';
+                    }
+
+                    thumb.onclick = async () => {
+                        try {
+                            const file = await entry.getFile();
+                            if (isHtml || isCode) {
+                                if (confirm(`Open "${entry.name}" in Code Editor? Current unsaved edits in editor will be replaced.`)) {
+                                    const text = await file.text();
+                                    codeEditor.value = text;
+                                    updatePreview();
+                                }
+                            } else if (isImg) {
+                                const reader = new FileReader();
+                                reader.onload = () => {
+                                    navigator.clipboard.writeText(reader.result).then(() => {
+                                        alert(`Copied "${entry.name}" Data URI to clipboard!\nOr use <img src="${entry.name}"> in code.`);
+                                    });
+                                };
+                                reader.readAsDataURL(file);
+                            } else {
+                                navigator.clipboard.writeText(entry.name).then(() => {
+                                    alert(`Copied filename "${entry.name}" to clipboard!`);
+                                });
+                            }
+                        } catch (err) {
+                            alert("Could not read file: " + err.message);
+                        }
+                    };
+                }
+
+                thumb.appendChild(iconDiv);
+                thumb.appendChild(nameDiv);
+                thumb.appendChild(actionsDiv);
+                container.appendChild(thumb);
+            }
+        } catch (err) {
+            console.error("Local folder read error:", err);
+            container.innerHTML = `<div style="grid-column: 1 / -1; color: #ff5555; padding: 25px; text-align: center;">Error reading folder: ${err.message}<br><button class="action-button" style="margin-top: 10px; background: var(--primary-color);" onclick="selectLocalFolder()">Re-select Folder</button></div>`;
         }
     }
 </script>

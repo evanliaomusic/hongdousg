@@ -626,7 +626,7 @@
             return;
         }
         const savedPin = localStorage.getItem('savedAdminPin');
-        if (savedPin && (savedPin === remotePin || savedPin === '872185')) {
+        if (savedPin && (savedPin === remotePin)) {
             sidebar.classList.remove('closed');
             return;
         }
@@ -695,7 +695,7 @@
                 title.textContent = "Set Global PIN (DB)";
             }
         } else if (pinState.mode === 'unlock') {
-            if (pinState.input === remotePin || pinState.input === '872185') {
+            if (pinState.input === remotePin) {
                 localStorage.setItem('savedAdminPin', pinState.input);
                 closePinPad(true);
             }

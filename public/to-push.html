@@ -715,6 +715,9 @@
     let localRootHandle = null;
     let localCurrentHandle = null;
     let localDirStack = []; // [{ name, handle }]
+    let currentLocalFileName = 'index.html';
+    let currentLocalVersionId = null;
+    let cachedLocalStructureStr = '';
     const dbName = "HongDouAssetsDB";
     const storeName = "assets";
     function initDB() { return new Promise((resolve, reject) => { const request = indexedDB.open(dbName, 1); request.onupgradeneeded = (e) => { e.target.result.createObjectStore(storeName); }; request.onsuccess = () => resolve(request.result); request.onerror = () => reject(request.error); }); }
@@ -1744,6 +1747,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         const f = await entry.getFile();
                         folderInZip.file(entry.name, f);
                     } else if (entry.kind === 'directory') {
+                        if (entry.name.toLowerCase() === 'versions' || entry.name.toLowerCase() === '.versions') continue;
                         const subFolder = folderInZip.folder(entry.name);
                         await addLocalDirToZip(entry, subFolder);
                     }
@@ -1825,7 +1829,14 @@ document.addEventListener('DOMContentLoaded', function() {
         return null;
     }
 
-    function createNewVersion(newCode, title, isInitial) {
+    async function createNewVersion(newCode, title, isInitial) {
+        if (assetSourceMode === 'local' && localRootHandle) {
+            await createLocalVersion(newCode, title, isInitial);
+            codeEditor.value = newCode;
+            updatePreview();
+            await renderLocalFolderTree();
+            return;
+        }
         const newVersion = { id: `v-${Date.now()}`, type: 'version', name: title, code: newCode, timestamp: Date.now(), children: [] };
         if (isInitial) {
             const folderName = document.getElementById('app-title-input').value.trim() || title || `New App ${new Date().toLocaleDateString()}`;
@@ -2915,7 +2926,14 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    document.getElementById('update-version-button').addEventListener('click', () => {
+    document.getElementById('update-version-button').addEventListener('click', async () => {
+        if (assetSourceMode === 'local' && localRootHandle) {
+            await updateLocalCurrentVersion(codeEditor.value);
+            updatePreview();
+            await renderLocalFolderTree();
+            alert(`File "${currentLocalFileName || 'index.html'}" and version updated on disk!`);
+            return;
+        }
         if (currentlySelectedVersionId) {
             const currentItem = findItem(currentlySelectedVersionId);
             if (currentItem) {
@@ -2929,8 +2947,10 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('No active version selected. Please save a new version instead.');
         }
     });
-    document.getElementById('save-version-button').addEventListener('click', () => {
-        createNewVersion(codeEditor.value, "Manual Save " + new Date().toLocaleTimeString(), false);
+    document.getElementById('save-version-button').addEventListener('click', async () => {
+        const title = prompt("Enter version title:", "Manual Save " + new Date().toLocaleTimeString());
+        if (title === null) return;
+        await createNewVersion(codeEditor.value, title || "Manual Save " + new Date().toLocaleTimeString(), false);
         alert('New version saved!');
     });
     document.getElementById('reset-code-button').addEventListener('click', resetCode);
@@ -3300,6 +3320,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function getGlobalProjectContextStr() {
+        if (assetSourceMode === 'local' && localRootHandle) {
+            const struct = cachedLocalStructureStr || `${localRootHandle.name}/\n  - ${currentLocalFileName || 'index.html'} (Active Document)\n`;
+            return `\n\n**PROJECT ASSETS CONTEXT:**\nProject File Structure:\n${struct}\n\nNote: You MUST use the asset filenames exactly as listed, WITHOUT any folder paths (e.g. use <img src="image.jpg">, NEVER <img src="folder/image.jpg">). The preview engine and ZIP exporter will automatically resolve them at the root level. DO NOT use Data URIs for these files in the code.\n`;
+        }
         let contextFolderId = activeFolderId;
         if (!contextFolderId && currentlySelectedVersionId) { const p = findParent(currentlySelectedVersionId); if (p) contextFolderId = p.id; }
         while (contextFolderId) { const p = findParent(contextFolderId); if (!p) break; contextFolderId = p.id; }
@@ -3333,13 +3357,34 @@ document.addEventListener('DOMContentLoaded', function() {
         return `\n\n**PROJECT ASSETS CONTEXT:**\n${folderStructureStr}\n\nNote: You MUST use the asset filenames exactly as listed, WITHOUT any folder paths (e.g. use <img src="image.jpg">, NEVER <img src="folder/image.jpg">). The preview engine and ZIP exporter will automatically resolve them at the root level. DO NOT use Data URIs for these files in the code.\n`;
     }
 
-    function undoManualUpgrade() {
+    async function undoManualUpgrade() {
         // 1. Try memory buffer
         if (previousManualCodeState !== null) {
             codeEditor.value = previousManualCodeState;
+            if (assetSourceMode === 'local' && localRootHandle) {
+                await writeLocalFile(currentLocalFileName || 'index.html', previousManualCodeState);
+            }
             updatePreview();
             previousManualCodeState = null;
             alert("Reverted to pre-patch state.");
+            return;
+        }
+        if (assetSourceMode === 'local' && localRootHandle) {
+            const vList = await loadLocalVersions();
+            if (vList.length > 1) {
+                const prev = vList[vList.length - 2];
+                const prevCode = await loadLocalVersionContent(prev);
+                if (prevCode !== null) {
+                    codeEditor.value = prevCode;
+                    currentLocalVersionId = prev.id;
+                    await writeLocalFile(currentLocalFileName || 'index.html', prevCode);
+                    updatePreview();
+                    await renderLocalFolderTree();
+                    alert(`Reverted to previous version: "${prev.name}"`);
+                    return;
+                }
+            }
+            alert("No previous local version found in history.");
             return;
         }
         // 2. Try Version History
@@ -4018,6 +4063,164 @@ ${getGlobalProjectContextStr()}
         if (countEl) countEl.textContent = '';
     }
 
+    async function writeLocalFile(fileName, content) {
+        if (!localRootHandle) return false;
+        try {
+            const fileHandle = await localRootHandle.getFileHandle(fileName, { create: true });
+            const writable = await fileHandle.createWritable();
+            await writable.write(content);
+            await writable.close();
+            return true;
+        } catch (e) {
+            console.error("Failed to write to local file " + fileName, e);
+            return false;
+        }
+    }
+
+    async function getLocalVersionsDirHandle() {
+        if (!localRootHandle) return null;
+        try {
+            return await localRootHandle.getDirectoryHandle('versions', { create: true });
+        } catch (e) {
+            console.error("Could not get/create versions directory", e);
+            return null;
+        }
+    }
+
+    async function loadLocalVersions() {
+        if (!localRootHandle) return [];
+        try {
+            const vDir = await getLocalVersionsDirHandle();
+            if (!vDir) return [];
+            try {
+                const manifestHandle = await vDir.getFileHandle('versions.json');
+                const file = await manifestHandle.getFile();
+                const text = await file.text();
+                if (text && text.trim()) return JSON.parse(text);
+            } catch (e) {}
+
+            const list = [];
+            for await (const entry of vDir.values()) {
+                if (entry.kind === 'file' && entry.name.toLowerCase().endsWith('.html')) {
+                    const nameClean = entry.name.replace(/\.html$/i, '').replace(/^v\d+[_ -]*/i, '').replace(/_/g, ' ') || entry.name;
+                    list.push({
+                        id: `v-local-${entry.name}`,
+                        name: nameClean,
+                        fileName: entry.name,
+                        timestamp: Date.now()
+                    });
+                }
+            }
+            list.sort((a, b) => a.fileName.localeCompare(b.fileName));
+            return list;
+        } catch (e) {
+            console.warn("Could not load local versions:", e);
+            return [];
+        }
+    }
+
+    async function saveLocalVersionsManifest(versionsList) {
+        if (!localRootHandle) return false;
+        try {
+            const vDir = await getLocalVersionsDirHandle();
+            if (!vDir) return false;
+            const fileHandle = await vDir.getFileHandle('versions.json', { create: true });
+            const writable = await fileHandle.createWritable();
+            await writable.write(JSON.stringify(versionsList, null, 2));
+            await writable.close();
+            return true;
+        } catch (e) {
+            console.error("Could not save versions.json", e);
+            return false;
+        }
+    }
+
+    async function createLocalVersion(newCode, title, isInitial = false) {
+        if (!localRootHandle) return null;
+        try {
+            await writeLocalFile(currentLocalFileName || 'index.html', newCode);
+            const vDir = await getLocalVersionsDirHandle();
+            if (!vDir) return null;
+
+            const versionsList = await loadLocalVersions();
+            const vNumber = versionsList.length + 1;
+            const safeTitle = (title || 'Version ' + vNumber).replace(/[/\\?%*:|"<>]/g, '_').trim().substring(0, 35) || ('Version ' + vNumber);
+            const fileName = `v${vNumber}_${safeTitle.replace(/\s+/g, '_')}.html`;
+
+            const vFileHandle = await vDir.getFileHandle(fileName, { create: true });
+            const writable = await vFileHandle.createWritable();
+            await writable.write(newCode);
+            await writable.close();
+
+            const newVersionObj = {
+                id: `v-local-${Date.now()}`,
+                name: title || `Version ${vNumber}`,
+                fileName: fileName,
+                timestamp: Date.now()
+            };
+
+            versionsList.push(newVersionObj);
+            await saveLocalVersionsManifest(versionsList);
+            currentLocalVersionId = newVersionObj.id;
+            return newVersionObj;
+        } catch (e) {
+            console.error("Failed to create local version:", e);
+            return null;
+        }
+    }
+
+    async function updateLocalCurrentVersion(updatedCode) {
+        if (!localRootHandle) return false;
+        try {
+            await writeLocalFile(currentLocalFileName || 'index.html', updatedCode);
+            const versionsList = await loadLocalVersions();
+            const vItem = versionsList.find(v => v.id === currentLocalVersionId) || versionsList[versionsList.length - 1];
+            if (vItem) {
+                const vDir = await getLocalVersionsDirHandle();
+                if (vDir) {
+                    const vFileHandle = await vDir.getFileHandle(vItem.fileName, { create: true });
+                    const writable = await vFileHandle.createWritable();
+                    await writable.write(updatedCode);
+                    await writable.close();
+                }
+            }
+            return true;
+        } catch (e) {
+            console.error("Failed to update local version:", e);
+            return false;
+        }
+    }
+
+    async function loadLocalVersionContent(vItem) {
+        if (!localRootHandle) return null;
+        try {
+            const vDir = await getLocalVersionsDirHandle();
+            if (!vDir) return null;
+            const vFileHandle = await vDir.getFileHandle(vItem.fileName);
+            const file = await vFileHandle.getFile();
+            return await file.text();
+        } catch (e) {
+            console.error("Failed to read local version file:", e);
+            return null;
+        }
+    }
+
+    async function updateCachedLocalStructure() {
+        if (!localRootHandle) return;
+        try {
+            let str = `${localRootHandle.name}/\n  - ${currentLocalFileName || 'index.html'} (Active Document)\n`;
+            for await (const entry of localRootHandle.values()) {
+                if (entry.name === 'versions' || entry.name === '.versions' || entry.name === (currentLocalFileName || 'index.html')) continue;
+                if (entry.kind === 'file') {
+                    str += `  - ${entry.name}\n`;
+                } else if (entry.kind === 'directory') {
+                    str += `  - ${entry.name}/\n`;
+                }
+            }
+            cachedLocalStructureStr = str;
+        } catch(e) {}
+    }
+
     async function selectLocalFolder() {
         if (!window.showDirectoryPicker) {
             alert("The File System Access API is not supported in this browser environment.\nPlease open this app in Google Chrome or Microsoft Edge served over HTTPS.");
@@ -4028,6 +4231,47 @@ ${getGlobalProjectContextStr()}
             localRootHandle = handle;
             localCurrentHandle = handle;
             localDirStack = [];
+
+            const appTitleInput = document.getElementById('app-title-input');
+            if (appTitleInput && handle.name) {
+                appTitleInput.value = handle.name;
+                localStorage.setItem('hongdouAppTitle', handle.name);
+            }
+
+            let htmlEntry = null;
+            for await (const entry of handle.values()) {
+                if (entry.kind === 'file' && entry.name.toLowerCase() === 'index.html') {
+                    htmlEntry = entry;
+                    break;
+                }
+            }
+            if (!htmlEntry) {
+                for await (const entry of handle.values()) {
+                    if (entry.kind === 'file' && entry.name.toLowerCase().endsWith('.html') && !entry.name.toLowerCase().includes('.version')) {
+                        htmlEntry = entry;
+                        break;
+                    }
+                }
+            }
+
+            if (htmlEntry) {
+                currentLocalFileName = htmlEntry.name;
+                const file = await htmlEntry.getFile();
+                const text = await file.text();
+                codeEditor.value = text;
+            } else {
+                currentLocalFileName = 'index.html';
+                await writeLocalFile('index.html', codeEditor.value);
+            }
+
+            let vList = await loadLocalVersions();
+            if (vList.length === 0 && codeEditor.value) {
+                const initV = await createLocalVersion(codeEditor.value, "Initial Version", true);
+                if (initV) currentLocalVersionId = initV.id;
+            } else if (vList.length > 0) {
+                currentLocalVersionId = vList[vList.length - 1].id;
+            }
+
             await renderLocalFolderTree();
             updatePreview();
         } catch (err) {
@@ -4071,8 +4315,10 @@ ${getGlobalProjectContextStr()}
         container.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 25px; color: #aaa;">Reading folder...</div>';
 
         try {
+            await updateCachedLocalStructure();
             const entries = [];
             for await (const entry of localCurrentHandle.values()) {
+                if (localDirStack.length === 0 && (entry.name === 'versions' || entry.name === '.versions')) continue;
                 entries.push(entry);
             }
             entries.sort((a, b) => {
@@ -4100,7 +4346,83 @@ ${getGlobalProjectContextStr()}
                 container.appendChild(upBtn);
             }
 
-            if (entries.length === 0 && localDirStack.length === 0) {
+            if (localDirStack.length === 0) {
+                const localVersions = await loadLocalVersions();
+                localVersions.forEach(vItem => {
+                    const thumb = document.createElement('div');
+                    thumb.className = 'asset-thumbnail';
+                    thumb.dataset.id = vItem.id;
+                    if (vItem.id === currentLocalVersionId) thumb.classList.add('active');
+
+                    const iconDiv = document.createElement('div');
+                    iconDiv.className = 'icon';
+                    iconDiv.innerHTML = '&#128196;';
+
+                    const nameDiv = document.createElement('div');
+                    nameDiv.className = 'name';
+                    nameDiv.textContent = vItem.name;
+                    nameDiv.title = vItem.name + ` (${vItem.fileName})`;
+
+                    const actionsDiv = document.createElement('div');
+                    actionsDiv.className = 'item-actions';
+
+                    const renameBtn = document.createElement('button');
+                    renameBtn.className = 'action-icon-btn';
+                    renameBtn.innerHTML = '&#9998;';
+                    renameBtn.title = 'Rename version';
+                    renameBtn.onclick = async (e) => {
+                        e.stopPropagation();
+                        const newName = prompt('New version name:', vItem.name);
+                        if (newName && newName.trim()) {
+                            vItem.name = newName.trim();
+                            await saveLocalVersionsManifest(localVersions);
+                            await renderLocalFolderTree();
+                        }
+                    };
+
+                    const delBtn = document.createElement('button');
+                    delBtn.className = 'action-icon-btn';
+                    delBtn.innerHTML = '&times;';
+                    delBtn.title = 'Delete version';
+                    delBtn.onclick = async (e) => {
+                        e.stopPropagation();
+                        if (confirm(`Delete version "${vItem.name}"?`)) {
+                            try {
+                                const vDir = await getLocalVersionsDirHandle();
+                                if (vDir) await vDir.removeEntry(vItem.fileName);
+                                const updatedList = localVersions.filter(v => v.id !== vItem.id);
+                                await saveLocalVersionsManifest(updatedList);
+                                if (currentLocalVersionId === vItem.id) {
+                                    currentLocalVersionId = updatedList.length > 0 ? updatedList[updatedList.length - 1].id : null;
+                                }
+                                await renderLocalFolderTree();
+                            } catch (err) {
+                                alert("Could not delete version: " + err.message);
+                            }
+                        }
+                    };
+
+                    actionsDiv.appendChild(renameBtn);
+                    actionsDiv.appendChild(delBtn);
+                    thumb.appendChild(iconDiv);
+                    thumb.appendChild(nameDiv);
+                    thumb.appendChild(actionsDiv);
+
+                    thumb.onclick = async () => {
+                        const code = await loadLocalVersionContent(vItem);
+                        if (code !== null) {
+                            codeEditor.value = code;
+                            currentLocalVersionId = vItem.id;
+                            updatePreview();
+                            await renderLocalFolderTree();
+                        }
+                    };
+
+                    container.appendChild(thumb);
+                });
+            }
+
+            if (entries.length === 0 && localDirStack.length === 0 && container.children.length === 0) {
                 const emptyNotice = document.createElement('div');
                 emptyNotice.style.cssText = 'grid-column: 1 / -1; text-align: center; padding: 30px; color: #777; font-size: 13px;';
                 emptyNotice.innerHTML = 'This folder is empty.<br><button class="action-button" style="margin-top: 10px; background-color: #555;" onclick="createLocalSubfolder()">+ New Subfolder</button>';
@@ -4183,6 +4505,7 @@ ${getGlobalProjectContextStr()}
                                 if (confirm(`Open "${entry.name}" in Code Editor? Current unsaved edits in editor will be replaced.`)) {
                                     const text = await file.text();
                                     codeEditor.value = text;
+                                    currentLocalFileName = entry.name;
                                     updatePreview();
                                 }
                             } else if (isImg) {

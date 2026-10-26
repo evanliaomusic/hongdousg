@@ -259,7 +259,13 @@
             </div>
 
             <div style="display: flex; align-items: center; gap: 8px; margin-top: 5px; min-height: 32px;">
-                <button id="download-context-btn" class="action-button" style="flex: 1; padding: 8px 5px; font-size: 11px; background-color: var(--spotlight-1); text-align: center; white-space: nowrap;">Get AI Context</button>
+                <div id="ai-context-group" style="display: flex; flex: 1; min-width: 0; position: relative; border-radius: 5px;">
+                    <button id="download-context-btn" class="action-button" style="flex: 1; min-width: 0; padding: 8px 5px; font-size: 11px; background-color: var(--spotlight-1); text-align: center; white-space: nowrap; border-top-right-radius: 0; border-bottom-right-radius: 0;">Get AI Context</button>
+                    <button id="context-dropdown-arrow-btn" class="action-button" style="width: 24px; flex: 0 0 24px; padding: 0; background-color: var(--spotlight-1); border-left: 1px solid rgba(255,255,255,0.2); color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 10px; border-top-left-radius: 0; border-bottom-left-radius: 0;" onclick="toggleContextDropdown(event)" title="Structured Output Options">▼</button>
+                    <div id="context-dropdown-menu" style="display: none; position: absolute; top: calc(100% + 4px); left: 0; min-width: 210px; background: rgba(20, 20, 35, 0.98); border: 1px solid var(--border-color); border-radius: 5px; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.5); backdrop-filter: blur(10px); padding: 4px; box-sizing: border-box;">
+                        <button id="copy-structured-output-btn" class="action-button" style="width: 100%; text-align: left; padding: 8px 10px; font-size: 11px; background-color: transparent; color: var(--text-color); border: none; border-radius: 4px; cursor: pointer; white-space: nowrap;" onmouseover="this.style.backgroundColor='rgba(255,255,255,0.1)'" onmouseout="this.style.backgroundColor='transparent'" onclick="copyStructuredOutputPrompt(event)">Copy Structured Output Prompt</button>
+                    </div>
+                </div>
 
                 <div id="ai-tool-group" style="display: flex; flex: 1; border-radius: 5px; overflow: hidden; border: 1px solid var(--border-color);">
                     <button id="ai-tool-btn" class="action-button" style="flex: 1; padding: 8px 5px; font-size: 11px; background-color: #10a37f; text-align: center; border-radius: 0; border: none; margin: 0; box-shadow: none;" onclick="openAiTool()">Open ChatGPT</button>
@@ -3508,6 +3514,94 @@ ${(await getKnowledgebaseContentParts(true)).extraText}
         }
     }
 
+    const structuredOutputPromptCode = `{
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Short summary of changes"
+    },
+    "explanation": {
+      "type": "string",
+      "description": "Brief explanation of what you changed"
+    },
+    "patches": {
+      "type": "array",
+      "description": "List of search and replace code patches",
+      "items": {
+        "type": "object",
+        "properties": {
+          "search": {
+            "type": "string",
+            "description": "Exact literal code block from the current file to match"
+          },
+          "replace": {
+            "type": "string",
+            "description": "New replacement code"
+          }
+        },
+        "required": [
+          "search",
+          "replace"
+        ],
+        "propertyOrdering": [
+          "search",
+          "replace"
+        ]
+      }
+    }
+  },
+  "required": [
+    "title",
+    "explanation",
+    "patches"
+  ],
+  "propertyOrdering": [
+    "title",
+    "explanation",
+    "patches"
+  ]
+}`;
+
+    function toggleContextDropdown(event) {
+        if (event) event.stopPropagation();
+        const menu = document.getElementById('context-dropdown-menu');
+        if (menu) {
+            menu.style.display = (menu.style.display === 'none' || menu.style.display === '') ? 'block' : 'none';
+        }
+    }
+
+    async function copyStructuredOutputPrompt(event) {
+        if (event) event.stopPropagation();
+        const menu = document.getElementById('context-dropdown-menu');
+        if (menu) menu.style.display = 'none';
+
+        try {
+            await navigator.clipboard.writeText(structuredOutputPromptCode);
+            const mainBtn = document.getElementById('download-context-btn');
+            if (mainBtn) {
+                const origText = mainBtn.textContent;
+                mainBtn.textContent = "Copied Schema!";
+                mainBtn.style.backgroundColor = "#28a745";
+                setTimeout(() => {
+                    mainBtn.textContent = origText;
+                    mainBtn.style.backgroundColor = "var(--spotlight-1)";
+                }, 2000);
+            }
+        } catch (err) {
+            console.warn("Clipboard API failed for structured output", err);
+            alert("Failed to copy to clipboard.");
+        }
+    }
+
+    document.addEventListener('click', (e) => {
+        const menu = document.getElementById('context-dropdown-menu');
+        const group = document.getElementById('ai-context-group');
+        if (menu && menu.style.display !== 'none' && group && !group.contains(e.target)) {
+            menu.style.display = 'none';
+        }
+    });
+
     let isUpgraderAiMode = false;
 
     function toggleUpgraderMode() {
@@ -3531,7 +3625,14 @@ ${(await getKnowledgebaseContentParts(true)).extraText}
             inputArea.placeholder = "Describe the change you want (e.g., 'Make the background blue')...";
             contextBtn.textContent = "Get API Key";
             contextBtn.style.backgroundColor = "#8e44ad"; // Purple for Gemini
+            contextBtn.style.borderTopRightRadius = "5px";
+            contextBtn.style.borderBottomRightRadius = "5px";
             contextBtn.onclick = () => window.open('https://aistudio.google.com/app/apikey', '_blank');
+
+            const arrowBtn = document.getElementById('context-dropdown-arrow-btn');
+            if (arrowBtn) arrowBtn.style.display = 'none';
+            const menu = document.getElementById('context-dropdown-menu');
+            if (menu) menu.style.display = 'none';
 
             if (aiToolGroup) aiToolGroup.style.display = 'none';
             apiKeyInput.style.display = 'none';
@@ -3554,7 +3655,12 @@ ${(await getKnowledgebaseContentParts(true)).extraText}
             inputArea.placeholder = "1. Type instruction here.\n2. Click 'Get AI Context'.\n3. Copy AI Response JSON.\n4. Click 'Upgrade'.";
             contextBtn.textContent = "Get AI Context";
             contextBtn.style.backgroundColor = "var(--spotlight-1)";
+            contextBtn.style.borderTopRightRadius = "0";
+            contextBtn.style.borderBottomRightRadius = "0";
             contextBtn.onclick = downloadAiContext;
+
+            const arrowBtn = document.getElementById('context-dropdown-arrow-btn');
+            if (arrowBtn) arrowBtn.style.display = 'flex';
 
             if (aiToolGroup) aiToolGroup.style.display = 'flex';
             apiKeyInput.style.display = 'none';

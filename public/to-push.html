@@ -250,7 +250,7 @@
             </div>
             <textarea id="manual-input" style="width: 100%; height: 65px; background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); color: var(--text-color); border-radius: 5px; font-family: 'SF Mono', monospace; font-size: 11px; resize: none; padding: 8px; box-sizing: border-box;" placeholder="1. Type instruction here.
 2. Click 'Get AI Context'.
-3. Copy AI Response JSON.
+3. Copy AI Response (XML/CDATA).
 4. Click 'Upgrade'."></textarea>
             <div style="display: flex; gap: 8px; width: 100%;">
                 <button id="btn-open-kb" class="action-button" style="flex: 1.2; padding: 8px 5px; font-size: 11px; background-color: #f39c12; text-align: center; display: flex; align-items: center; justify-content: center;" onclick="openKnowledgebase()">Knowledgebase</button>
@@ -260,11 +260,7 @@
 
             <div style="display: flex; align-items: center; gap: 8px; margin-top: 5px; min-height: 32px;">
                 <div id="ai-context-group" style="display: flex; flex: 1; min-width: 0; position: relative; border-radius: 5px;">
-                    <button id="download-context-btn" class="action-button" style="flex: 1; min-width: 0; padding: 8px 5px; font-size: 11px; background-color: var(--spotlight-1); text-align: center; white-space: nowrap; border-top-right-radius: 0; border-bottom-right-radius: 0;">Get AI Context</button>
-                    <button id="context-dropdown-arrow-btn" class="action-button" style="width: 24px; flex: 0 0 24px; padding: 0; background-color: var(--spotlight-1); border-left: 1px solid rgba(255,255,255,0.2); color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 10px; border-top-left-radius: 0; border-bottom-left-radius: 0;" onclick="toggleContextDropdown(event)" title="Structured Output Options">▼</button>
-                    <div id="context-dropdown-menu" style="display: none; position: absolute; top: calc(100% + 4px); left: 0; min-width: 210px; background: rgba(20, 20, 35, 0.98); border: 1px solid var(--border-color); border-radius: 5px; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.5); backdrop-filter: blur(10px); padding: 4px; box-sizing: border-box;">
-                        <button id="copy-structured-output-btn" class="action-button" style="width: 100%; text-align: left; padding: 8px 10px; font-size: 11px; background-color: transparent; color: var(--text-color); border: none; border-radius: 4px; cursor: pointer; white-space: nowrap;" onmouseover="this.style.backgroundColor='rgba(255,255,255,0.1)'" onmouseout="this.style.backgroundColor='transparent'" onclick="copyStructuredOutputPrompt(event)">Copy Structured Output Prompt</button>
-                    </div>
+                    <button id="download-context-btn" class="action-button" style="flex: 1; min-width: 0; padding: 8px 5px; font-size: 11px; background-color: var(--spotlight-1); text-align: center; white-space: nowrap; border-radius: 5px;">Get AI Context</button>
                 </div>
 
                 <div id="ai-tool-group" style="display: flex; flex: 1; border-radius: 5px; overflow: hidden; border: 1px solid var(--border-color);">
@@ -3226,65 +3222,91 @@ document.addEventListener('DOMContentLoaded', function() {
 
     let previousManualCodeState = null;
 
+    function extractCdataOrTag(block, tag) {
+        const cdataRegex = new RegExp(`<${tag}[^>]*>\\s*<!\\[CDATA\\[([\\s\\S]*?)\\]\\]>\\s*<\\/${tag}>`, 'i');
+        const m = block.match(cdataRegex);
+        if (m) return m[1];
+        const fallbackRegex = new RegExp(`<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`, 'i');
+        const m2 = block.match(fallbackRegex);
+        return m2 ? m2[1] : null;
+    }
+
     async function applyManualUpgrade() {
         const inputEl = document.getElementById('manual-input');
         let rawInput = inputEl.value.trim();
 
-        // Fix: If input is empty OR is just prompt text (no JSON braces), try clipboard
-        if (!rawInput || rawInput.indexOf('{') === -1) {
+        // 1. Auto-check clipboard if textarea is empty or doesn't have patch tags
+        const hasPatchTags = (t) => /<patch[\s>]/i.test(t);
+        if (!rawInput || !hasPatchTags(rawInput)) {
             try {
                 inputEl.focus();
                 const clip = await navigator.clipboard.readText();
-                if (clip && clip.indexOf('{') !== -1) rawInput = clip;
+                if (clip && hasPatchTags(clip)) {
+                    rawInput = clip.trim();
+                }
             } catch(e) {}
         }
 
-        if (!rawInput || rawInput.indexOf('{') === -1) {
-            alert('Please paste the JSON patch data in the box.');
+        if (!rawInput) {
+            alert('Please paste the XML <patch> blocks in the box or copy them to your clipboard.');
+            return;
+        }
+
+        // 2. Extract patches (support XML CDATA and legacy JSON fallback)
+        let operations = [];
+        let versionTitle = "Manual Upgrade";
+
+        if (hasPatchTags(rawInput)) {
+            const titleMatch = rawInput.match(/<title>([\s\S]*?)<\/title>/i) || rawInput.match(/version[:\s]+([^\n\r]+)/i);
+            if (titleMatch) versionTitle = titleMatch[1].trim();
+
+            const patchMatches = [...rawInput.matchAll(/<patch[^>]*>([\s\S]*?)<\/patch>/gi)];
+            if (patchMatches.length === 0) {
+                alert("No <patch>...</patch> blocks found in the input.");
+                return;
+            }
+
+            for (let i = 0; i < patchMatches.length; i++) {
+                const block = patchMatches[i][1];
+                const s = extractCdataOrTag(block, "search");
+                const r = extractCdataOrTag(block, "replace");
+                if (s === null || r === null) {
+                    alert(`Patch #${i + 1} is missing <search> or <replace> tags.`);
+                    return;
+                }
+                operations.push({ search: s, replace: r });
+            }
+        } else if (rawInput.includes('{') && rawInput.includes('}')) {
+            // Loose JSON fallback for backward compatibility
+            try {
+                let cleanStr = rawInput.replace(/```json/gi, '').replace(/```/g, '').trim();
+                const firstBrace = cleanStr.indexOf('{');
+                const lastBrace = cleanStr.lastIndexOf('}');
+                cleanStr = cleanStr.substring(firstBrace, lastBrace + 1);
+                const data = JSON.parse(cleanStr);
+                if (data.patches && Array.isArray(data.patches)) {
+                    operations = data.patches;
+                    if (data.title) versionTitle = data.title;
+                }
+            } catch(e) {
+                alert("Input contains neither valid XML <patch> blocks nor valid JSON patches.");
+                return;
+            }
+        }
+
+        if (operations.length === 0) {
+            alert("No patches found to apply.");
             return;
         }
 
         try {
-            // 1. Cleanup Markdown and Smart Quotes
-            let cleanStr = rawInput
-                .replace(/[\u201C\u201D]/g, '"')
-                .replace(/```json/gi, '')
-                .replace(/```/g, '')
-                .trim();
-
-            // 2. Find outermost JSON object
-            const firstBrace = cleanStr.indexOf('{');
-            const lastBrace = cleanStr.lastIndexOf('}');
-
-            if (firstBrace === -1 || lastBrace === -1) {
-                throw new Error("No JSON object found (missing '{' or '}').");
-            }
-            cleanStr = cleanStr.substring(firstBrace, lastBrace + 1);
-
-            // 3. Robust Parsing (Strict -> Loose Fallback)
-            let data;
-            try {
-                data = JSON.parse(cleanStr);
-            } catch (strictErr) {
-                // Fallback to JS evaluation to handle trailing commas or unescaped newlines
-                try {
-                    data = new Function('return ' + cleanStr)();
-                } catch (evalErr) {
-                    console.error("Parse failed:", strictErr, evalErr);
-                    throw new Error("JSON is invalid. Check console for details.");
-                }
-            }
-
-            // 4. Validate Data
-            if (!data.patches || !Array.isArray(data.patches)) throw new Error("JSON found, but missing 'patches' array.");
-
-            // 5. Atomic Two-Phase Validation (Ported from Python Web Studio)
+            // 3. Atomic Two-Phase Validation with strict character-for-character matching
             const previousStateTemp = codeEditor.value;
             const hasCrlf = previousStateTemp.includes('\r\n');
             let simulatedContent = normalizeCodeLines(previousStateTemp);
             const failedBlocks = [];
 
-            data.patches.forEach((patch, idx) => {
+            operations.forEach((patch, idx) => {
                 const searchTarget = normalizeCodeLines(patch.search || '');
                 const replaceTarget = normalizeCodeLines(patch.replace || '');
 
@@ -3295,7 +3317,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 const occurrences = simulatedContent.split(searchTarget).length - 1;
                 if (occurrences === 0) {
-                    const snippet = searchTarget.slice(0, 70).replace(/\n/g, '\\n');
+                    const snippet = searchTarget.slice(0, 75).replace(/\n/g, '\\n');
                     failedBlocks.push(`Block #${idx + 1} not found: "${snippet}..."`);
                 } else if (occurrences > 1) {
                     failedBlocks.push(`Block #${idx + 1} ambiguous (${occurrences} matches found). Include 2-3 lines of surrounding context.`);
@@ -3309,15 +3331,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
 
-            // Success - write back validated code atomically
+            // 4. Atomic Write
             const finalCode = hasCrlf ? simulatedContent.replace(/\n/g, '\r\n') : simulatedContent;
             previousManualCodeState = previousStateTemp;
             codeEditor.value = finalCode;
             updatePreview();
 
             document.getElementById('manual-input').value = '';
-            createNewVersion(finalCode, data.title || "Manual Upgrade", false);
-            alert(`Success! Applied all ${data.patches.length} patch(es) atomically.`);
+            createNewVersion(finalCode, versionTitle, false);
+            alert(`Success! Applied all ${operations.length} patch(es) atomically via CDATA.`);
 
         } catch (e) {
             console.error(e);
@@ -3416,78 +3438,87 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function downloadAiContext() {
         const currentCode = codeEditor.value;
-        const promptText = `I need you to act as an "App Patcher" for a specific HTML application.
-I will provide the current HTML code. You must generate a JSON object containing "patches" to upgrade the code based on my request.
+        const userReq = document.getElementById('manual-input').value.trim() || '[YOUR INSTRUCTION]';
+        const kbData = await getKnowledgebaseContentParts(true);
 
-RESPONSE FORMAT:
-Please provide the response inside a Markdown JSON code block (e.g., \`\`\`json ... \`\`\`).
+        const bridgeInfo = (function(){
+            const bridgeToggle = document.getElementById('firebase-bridge-toggle');
+            if (bridgeToggle && bridgeToggle.checked) {
+                return `DATA STORAGE BRIDGE (Realtime Database & Multi-User Sync):
+This app runs in an iframe sandbox. DO NOT initialize Firebase or use localStorage for shared state. Use the built-in Parent Bridge:
+- SAVE: window.parent.postMessage({ action: 'SAVE_DATA', key: 'score', value: 100 }, '*');
+- LOAD: window.parent.postMessage({ action: 'LOAD_DATA', key: 'score', reqId: 'r1' }, '*');
+- SUBSCRIBE: window.parent.postMessage({ action: 'SUBSCRIBE_DATA', key: 'score' }, '*');
+- LISTENER: window.addEventListener('message', (e) => {
+    if(e.data.action === 'DATA_LOADED') console.log('Loaded:', e.data.value);
+    if(e.data.action === 'DATA_UPDATED') { /* update UI */ }
+  });`;
+            } else {
+                return `DATA STORAGE:
+Use standard localStorage or IndexedDB for persistence. Do NOT initialize Firebase or use postMessage bridges.`;
+            }
+        })();
 
-IMPORTANT SYNTAX RULES:
-1. The output must be VALID JSON.
-2. Because HTML contains many double quotes (e.g., class="container"), you MUST escape existing double quotes inside the "search" and "replace" strings.
-- INCORRECT: "search": "<div class="container">"
-- CORRECT:   "search": "<div class=\\"container\\">"
+        const cdataPrompt = `Update this single-file web application.
 
-JSON STRUCTURE:
-{
-"title": "Short summary of changes",
-"explanation": "Brief explanation of what you changed",
-"patches": [
-{
-  "search": "The EXACT string in the original code to be replaced",
-  "replace": "The NEW code to replace it with"
-}
-]
-}
-
-${(function(){
-    const bridgeToggle = document.getElementById('firebase-bridge-toggle');
-    if (bridgeToggle && bridgeToggle.checked) {
-        return `DATA STORAGE BRIDGE (Realtime Database & Persistence):
-This app runs in a sandbox. DO NOT use localStorage or initialize Firebase. Use the built-in Parent Bridge for Realtime Sync:
-1. SAVE (Write): window.parent.postMessage({ action: 'SAVE_DATA', key: 'score', value: 100 }, '*');
-2. LOAD (Read Once): window.parent.postMessage({ action: 'LOAD_DATA', key: 'score', reqId: 'r1' }, '*');
-3. SUBSCRIBE (Realtime Listen): window.parent.postMessage({ action: 'SUBSCRIBE_DATA', key: 'score' }, '*');
-4. UNSUBSCRIBE: window.parent.postMessage({ action: 'UNSUBSCRIBE_DATA', key: 'score' }, '*');
-
-LISTENER (Handle Responses):
-window.addEventListener('message', (e) => {
-   if(e.data.action === 'DATA_LOADED') console.log('Loaded:', e.data.value);
-   if(e.data.action === 'DATA_UPDATED') {
-       console.log('Realtime Update:', e.data.value);
-       // Update UI immediately here to reflect changes from other users/tabs
-   }
-});`;
-    } else {
-        return `DATA STORAGE:
-DO NOT initialize Firebase, and DO NOT use any Parent Bridge or postMessage for data sync. Please use localStorage or IndexedDB for data persistence. If you see existing postMessage code for DATA_LOADED or SAVE_DATA that isn't needed, please remove it.`;
-    }
-})()}
-
-DESIGN SYSTEM (Use these classes):
-- Wrapper: <div class="container">
-- Headings: <h1>, <h2>
-- Buttons: <button class="button">
-- Feedback: <div class="feedback correct"> or <div class="feedback incorrect">
+USER REQUEST:
+${userReq}
 
 CURRENT HTML CODE:
+\`\`\`html
 ${currentCode}
-
-MY REQUEST:
-${document.getElementById('manual-input').value.trim()}
+\`\`\`
 
 ${getGlobalProjectContextStr()}
 
-${(await getKnowledgebaseContentParts(true)).extraText}
-`;
-        try {
-            const userReq = document.getElementById('manual-input').value.trim() || '[YOUR INSTRUCTION]';
-            const deterministicPrompt = `I need you to act as a Deterministic Code Patcher for this HTML file.\n\nProject Context:\n${getGlobalProjectContextStr()}\n\nOUTPUT REQUIREMENTS:\nYou MUST respond with ONLY a single valid JSON object enclosed in a \`\`\`json code fence:\n\`\`\`json\n{\n  "title": "Short summary of changes",\n  "explanation": "Brief explanation of what you changed",\n  "patches": [\n    {\n      "search": "EXACT literal code block from the current file including exact whitespace",\n      "replace": "NEW replacement code"\n    }\n  ]\n}\n\`\`\`\n\nCRITICAL RULES FOR SURGICAL PATCHES:\n1. ANCHOR LINES: Always include 2-3 lines of unchanged code directly BEFORE and AFTER the target edit in your "search" block. This guarantees it matches only once in large files.\n2. 1:1 LITERAL MATCH: The "search" string must match the exact lines from the file character-for-character including exact indentation and line breaks.\n3. NEVER summarize or omit lines using ellipses (e.g., '// ... existing code ...').\n4. ESCAPE INTERNAL DOUBLE QUOTES: All internal double quotes inside "search" and "replace" string values MUST be strictly escaped as \". Never leave an unescaped double quote (") inside a string value.\n5. NEVER ESCAPE SINGLE QUOTES: Under RFC 8259 strict JSON rules, escaping single quotes (\') is strictly prohibited and invalid. Single quotes (') MUST remain raw and unescaped.\n6. ESCAPE NEWLINES & BACKSLASHES: Encode newlines as \\n, tabs as \\t, and literal backslashes as \\\\ strictly according to standard JSON specification.\n7. Keep edits minimal and surgical. Do not replace unchanged parts of the file.\n\nMY REQUEST:\n${userReq}\n\nCURRENT HTML CODE:\n\`\`\`html\n${currentCode}\n\`\`\`\n\n${(await getKnowledgebaseContentParts(true)).extraText}`;
+${kbData.extraText}
 
-            await navigator.clipboard.writeText(deterministicPrompt);
+ARCHITECTURE & IMPLEMENTATION INSTRUCTIONS:
+1. PREAMBLE & AUTOMATIC PLANNING:
+   - Provide a brief conversational summary before the patch with an estimated complexity (Low / Medium / High).
+   - State the app version number and a 1-sentence note of what changed.
+2. TOKEN BUDGET & MULTI-STEP UPDATES (AUTOMATIC STEPPING):
+   - Keep LLM output token limits in mind to prevent truncated code.
+   - If the request is complex or touches multiple large subsystems, decompose into focused sequential steps (e.g. "Update 1 of 3: Layout & Styles").
+   - Output ONLY the patches for the CURRENT step. Instruct the user to reply "continue" or "next" to receive the subsequent step.
+3. MODULAR SCRIPT ARCHITECTURE:
+   - Organize and maintain JavaScript within dedicated, named script blocks:
+     <script id="block-state"> /* Global state & init */ <\/script>
+     <script id="block-logic"> /* Core mechanics & rules */ <\/script>
+     <script id="block-ui"> /* DOM listeners & rendering */ <\/script>
+   - If micro-anchors are ambiguous, replace the entire targeted <script id="..."> or <style> block.
+4. SINGLE CODE BLOCK ENCLOSURE (CRITICAL FOR ONE-CLICK COPY):
+   - Bundle ALL <patch> blocks for this update together inside ONE single \`\`\`xml ... \`\`\` code fence.
+   - NEVER output multiple separate code fences or interleave explanatory text between <patch> blocks.
+   - This allows the user to click the "Copy" button once in ChatGPT/Claude/AI Studio and apply the full update in a single click.
+5. ZERO ESCAPING FRICTION (RAW CDATA):
+   - Enclose your modifications in modular <patch> blocks using raw CDATA:
+\`\`\`xml
+<patches>
+  <patch>
+    <search><![CDATA[exact original code block 1]]></search>
+    <replace><![CDATA[exact new code block 1]]></replace>
+  </patch>
+  <patch>
+    <search><![CDATA[exact original code block 2]]></search>
+    <replace><![CDATA[exact new code block 2]]></replace>
+  </patch>
+</patches>
+\`\`\`
+6. CRITICAL RULES:
+   - Exact 1:1 literal match in <search> (indentation, newlines, and whitespace must match character-for-character).
+   - Raw code inside CDATA (never escape quotes, regex, or backslashes).
+   - Never use ellipses (...), comments as placeholders, or partial truncations inside the patch.
+   - Include 2-3 lines of unchanged surrounding anchor context before and after the edit to guarantee uniqueness.
+
+${bridgeInfo}
+`;
+
+        try {
+            await navigator.clipboard.writeText(cdataPrompt);
             const btn = document.getElementById('download-context-btn');
             const originalText = btn.textContent;
-            btn.textContent = "Copied to Clipboard!";
+            btn.textContent = "Copied XML/CDATA Prompt! 📋";
             btn.style.backgroundColor = "#28a745";
             setTimeout(() => {
                 btn.textContent = originalText;
@@ -3497,10 +3528,10 @@ ${(await getKnowledgebaseContentParts(true)).extraText}
             console.warn("Clipboard API failed, falling back to download", err);
             const btn = document.getElementById('download-context-btn');
             btn.textContent = "Downloading...";
-            const blob = new Blob([deterministicPrompt || promptText], { type: 'text/plain' });
+            const blob = new Blob([cdataPrompt], { type: 'text/plain' });
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
-            a.download = 'hongdou-ai-context.txt';
+            a.download = 'hongdou-cdata-prompt.txt';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -3513,94 +3544,6 @@ ${(await getKnowledgebaseContentParts(true)).extraText}
             }, 2000);
         }
     }
-
-    const structuredOutputPromptCode = `{
-  "type": "object",
-  "properties": {
-    "title": {
-      "type": "string",
-      "description": "Short summary of changes"
-    },
-    "explanation": {
-      "type": "string",
-      "description": "Brief explanation of what you changed"
-    },
-    "patches": {
-      "type": "array",
-      "description": "List of search and replace code patches",
-      "items": {
-        "type": "object",
-        "properties": {
-          "search": {
-            "type": "string",
-            "description": "Exact literal code block from the current file to match"
-          },
-          "replace": {
-            "type": "string",
-            "description": "New replacement code"
-          }
-        },
-        "required": [
-          "search",
-          "replace"
-        ],
-        "propertyOrdering": [
-          "search",
-          "replace"
-        ]
-      }
-    }
-  },
-  "required": [
-    "title",
-    "explanation",
-    "patches"
-  ],
-  "propertyOrdering": [
-    "title",
-    "explanation",
-    "patches"
-  ]
-}`;
-
-    function toggleContextDropdown(event) {
-        if (event) event.stopPropagation();
-        const menu = document.getElementById('context-dropdown-menu');
-        if (menu) {
-            menu.style.display = (menu.style.display === 'none' || menu.style.display === '') ? 'block' : 'none';
-        }
-    }
-
-    async function copyStructuredOutputPrompt(event) {
-        if (event) event.stopPropagation();
-        const menu = document.getElementById('context-dropdown-menu');
-        if (menu) menu.style.display = 'none';
-
-        try {
-            await navigator.clipboard.writeText(structuredOutputPromptCode);
-            const mainBtn = document.getElementById('download-context-btn');
-            if (mainBtn) {
-                const origText = mainBtn.textContent;
-                mainBtn.textContent = "Copied Schema!";
-                mainBtn.style.backgroundColor = "#28a745";
-                setTimeout(() => {
-                    mainBtn.textContent = origText;
-                    mainBtn.style.backgroundColor = "var(--spotlight-1)";
-                }, 2000);
-            }
-        } catch (err) {
-            console.warn("Clipboard API failed for structured output", err);
-            alert("Failed to copy to clipboard.");
-        }
-    }
-
-    document.addEventListener('click', (e) => {
-        const menu = document.getElementById('context-dropdown-menu');
-        const group = document.getElementById('ai-context-group');
-        if (menu && menu.style.display !== 'none' && group && !group.contains(e.target)) {
-            menu.style.display = 'none';
-        }
-    });
 
     let isUpgraderAiMode = false;
 
@@ -3621,18 +3564,10 @@ ${(await getKnowledgebaseContentParts(true)).extraText}
         if (isUpgraderAiMode) {
             const label = document.getElementById('upgrader-label');
             if(label) label.textContent = "Gemini Upgrader";
-            // UI: AI Mode
             inputArea.placeholder = "Describe the change you want (e.g., 'Make the background blue')...";
             contextBtn.textContent = "Get API Key";
-            contextBtn.style.backgroundColor = "#8e44ad"; // Purple for Gemini
-            contextBtn.style.borderTopRightRadius = "5px";
-            contextBtn.style.borderBottomRightRadius = "5px";
+            contextBtn.style.backgroundColor = "#8e44ad";
             contextBtn.onclick = () => window.open('https://aistudio.google.com/app/apikey', '_blank');
-
-            const arrowBtn = document.getElementById('context-dropdown-arrow-btn');
-            if (arrowBtn) arrowBtn.style.display = 'none';
-            const menu = document.getElementById('context-dropdown-menu');
-            if (menu) menu.style.display = 'none';
 
             if (aiToolGroup) aiToolGroup.style.display = 'none';
             apiKeyInput.style.display = 'none';
@@ -3651,16 +3586,10 @@ ${(await getKnowledgebaseContentParts(true)).extraText}
         } else {
             const label = document.getElementById('upgrader-label');
             if(label) label.textContent = "Manual Upgrader";
-            // UI: Manual Mode
-            inputArea.placeholder = "1. Type instruction here.\n2. Click 'Get AI Context'.\n3. Copy AI Response JSON.\n4. Click 'Upgrade'.";
+            inputArea.placeholder = "1. Type instruction here.\n2. Click 'Get AI Context'.\n3. Copy AI Response (XML/CDATA).\n4. Click 'Upgrade'.";
             contextBtn.textContent = "Get AI Context";
             contextBtn.style.backgroundColor = "var(--spotlight-1)";
-            contextBtn.style.borderTopRightRadius = "0";
-            contextBtn.style.borderBottomRightRadius = "0";
             contextBtn.onclick = downloadAiContext;
-
-            const arrowBtn = document.getElementById('context-dropdown-arrow-btn');
-            if (arrowBtn) arrowBtn.style.display = 'flex';
 
             if (aiToolGroup) aiToolGroup.style.display = 'flex';
             apiKeyInput.style.display = 'none';
@@ -3767,101 +3696,40 @@ ${(await getKnowledgebaseContentParts(true)).extraText}
             loader.style.display = 'block';
         }
 
-        // Random duration simulation (30-45s) constraint logic
-        // We will let the API call run, but we ensure the UI *looks* busy.
-        // Since we want the result when it arrives, we won't artificially delay success if it's fast,
-        // but standard Gemini calls for code can take 10-20s.
-
-        const promptText = `I need you to act as an "App Patcher" for a specific HTML application.
-I will provide the current HTML code. You must generate a JSON object containing "patches" to upgrade the code based on my request.
-
-RESPONSE FORMAT:
-Please provide the response inside a Markdown JSON code block (e.g., \`\`\`json ... \`\`\`).
-
-IMPORTANT SYNTAX RULES:
-1. The output must be VALID JSON.
-2. Because HTML contains many double quotes (e.g., class="container"), you MUST escape existing double quotes inside the "search" and "replace" strings.
-- INCORRECT: "search": "<div class="container">"
-- CORRECT:   "search": "<div class=\\\"container\\\">"
-
-JSON STRUCTURE:
-{
-"title": "Short summary of changes",
-"explanation": "Brief explanation of what you changed",
-"patches": [
-{
-  "search": "The EXACT string in the original code to be replaced",
-  "replace": "The NEW code to replace it with"
-}
-]
-}
-
-${(function(){
-    const bridgeToggle = document.getElementById('firebase-bridge-toggle');
-    if (bridgeToggle && bridgeToggle.checked) {
-        return `DATA STORAGE BRIDGE (Realtime Database & Persistence):
-This app runs in a sandbox. DO NOT use localStorage or initialize Firebase. Use the built-in Parent Bridge for Realtime Sync:
-1. SAVE (Write): window.parent.postMessage({ action: 'SAVE_DATA', key: 'score', value: 100 }, '*');
-2. LOAD (Read Once): window.parent.postMessage({ action: 'LOAD_DATA', key: 'score', reqId: 'r1' }, '*');
-3. SUBSCRIBE (Realtime Listen): window.parent.postMessage({ action: 'SUBSCRIBE_DATA', key: 'score' }, '*');
-4. UNSUBSCRIBE: window.parent.postMessage({ action: 'UNSUBSCRIBE_DATA', key: 'score' }, '*');
-
-LISTENER (Handle Responses):
-window.addEventListener('message', (e) => {
-   if(e.data.action === 'DATA_LOADED') console.log('Loaded:', e.data.value);
-   if(e.data.action === 'DATA_UPDATED') {
-       console.log('Realtime Update:', e.data.value);
-       // Update UI immediately here to reflect changes from other users/tabs
-   }
-});`;
-    } else {
-        return `DATA STORAGE:
-DO NOT initialize Firebase, and DO NOT use any Parent Bridge or postMessage for data sync. Please use localStorage or IndexedDB for data persistence. If you see existing postMessage code for DATA_LOADED or SAVE_DATA that isn't needed, please remove it.`;
-    }
-})()}
-
-DESIGN SYSTEM (Use these classes):
-- Wrapper: <div class="container">
-- Headings: <h1>, <h2>
-- Buttons: <button class="button">
-- Feedback: <div class="feedback correct"> or <div class="feedback incorrect">
-
-CURRENT HTML CODE:
-${currentCode}
-
-MY REQUEST:
-${instruction}
-
-${getGlobalProjectContextStr()}
-`;
-
         try {
             const kbData = await getKnowledgebaseContentParts(false);
-            const aiPatcherPrompt = `I need you to act as a Deterministic Code Patcher for this HTML file.\n\nOUTPUT REQUIREMENTS:\nRespond ONLY with a single valid JSON object adhering to the schema with surgical patches.\n\nCRITICAL RULES FOR SURGICAL PATCHES:\n1. ANCHOR LINES: Always include 2-3 lines of unchanged code directly BEFORE and AFTER the target edit in your "search" block.\n2. 1:1 LITERAL MATCH: The "search" string must match the exact lines from the file character-for-character including exact indentation and line breaks.\n3. NEVER summarize or omit lines using ellipses (e.g., '// ... existing code ...').\n4. ESCAPE INTERNAL DOUBLE QUOTES: All internal double quotes inside "search" and "replace" strings MUST be strictly escaped as \".\n5. NEVER ESCAPE SINGLE QUOTES: Single quotes (') MUST remain raw and unescaped.\n\nMY REQUEST:\n${instruction}\n\nCURRENT HTML CODE:\n${currentCode}\n\n${getGlobalProjectContextStr()}\n${kbData.extraText}`;
+            const aiPatcherPrompt = `Update this single-file HTML application.
+
+USER REQUEST:
+${instruction}
+
+CURRENT CODE:
+\`\`\`html
+${currentCode}
+\`\`\`
+
+${getGlobalProjectContextStr()}
+${kbData.extraText}
+
+OUTPUT FORMAT:
+Provide a 1-sentence preamble, then bundle ALL modifications into ONE single \`\`\`xml ... \`\`\` code fence using raw CDATA:
+\`\`\`xml
+<patches>
+  <patch>
+    <search><![CDATA[exact original code snippet with 2-3 surrounding lines]]></search>
+    <replace><![CDATA[exact new replacement code]]></replace>
+  </patch>
+</patches>
+\`\`\`
+
+RULES:
+- Match literal whitespace, newlines, and indentation in <search>.
+- Use raw code inside CDATA without escaping quotes or backslashes.
+- Never use ellipses (...) or truncated code.`;
 
             const contentParts = [{ text: aiPatcherPrompt }, ...kbData.parts];
 
             const genConfig = {
-                responseMimeType: "application/json",
-                responseSchema: {
-                    type: "OBJECT",
-                    properties: {
-                        title: { type: "STRING" },
-                        explanation: { type: "STRING" },
-                        patches: {
-                            type: "ARRAY",
-                            items: {
-                                type: "OBJECT",
-                                properties: {
-                                    search: { type: "STRING" },
-                                    replace: { type: "STRING" }
-                                },
-                                required: ["search", "replace"]
-                            }
-                        }
-                    },
-                    required: ["patches"]
-                },
                 maxOutputTokens: 65536
             };
             const thinkingCfg = getFlashThinkingConfig(selectedGeminiModel);
@@ -3919,10 +3787,7 @@ ${getGlobalProjectContextStr()}
 
             // Apply patches using the existing manual logic's core (we simulate the input value)
             document.getElementById('manual-input').value = rawText;
-            applyManualUpgrade(); // Handles atomic dry-run verification, patching, versioning, and success alerts
-
-            // Clear input after success so they can type new instruction
-            document.getElementById('manual-input').value = '';
+            await applyManualUpgrade(); // Handles atomic dry-run verification, patching, versioning, and success alerts
             document.getElementById('manual-input').placeholder = "Upgrade complete! Type next instruction...";
 
         } catch (err) {

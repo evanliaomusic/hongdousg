@@ -9104,7 +9104,12 @@ fishMaterial.onBeforeCompile = (shader) => {
 
     let skillsRepo = {};
     let skillsMeta = {
-        starred: ['skill_creator_and_optimizer.md'],
+        starred: [
+            'skill_creator_and_optimizer.md',
+            'editorial_ui_and_ux_laws.md',
+            'classroom_accessibility_udl.md',
+            'single_file_architecture.md'
+        ],
         categories: {
             'skill_creator_and_optimizer.md': 'Meta-Skill',
             'single_file_architecture.md': 'Architecture',
@@ -9227,7 +9232,12 @@ fishMaterial.onBeforeCompile = (shader) => {
             const fm = parseSkillFrontmatter(content);
             skillsMeta.categories[fname] = fm.category || 'General';
         });
-        skillsMeta.starred = ['skill_creator_and_optimizer.md'];
+        skillsMeta.starred = [
+            'skill_creator_and_optimizer.md',
+            'editorial_ui_and_ux_laws.md',
+            'classroom_accessibility_udl.md',
+            'single_file_architecture.md'
+        ];
         skillsMeta.active = [];
         skillsMeta.activeInitialized = false;
         skillsMeta.streamlinedContent = '';
@@ -9271,6 +9281,14 @@ fishMaterial.onBeforeCompile = (shader) => {
         seedStarterSkillsIfEmpty();
         if (!Array.isArray(skillsMeta.seededStarters)) skillsMeta.seededStarters = [];
         if (!skillsMeta.categories) skillsMeta.categories = {};
+        if (!skillsMeta.hasLocalUserChanges) {
+            skillsMeta.starred = [
+                'skill_creator_and_optimizer.md',
+                'editorial_ui_and_ux_laws.md',
+                'classroom_accessibility_udl.md',
+                'single_file_architecture.md'
+            ];
+        }
         if (skillsRepo['welcome_guide.md'] && /Evan's Skills Repository/i.test(skillsRepo['welcome_guide.md'].content || '')) {
             skillsRepo['welcome_guide.md'].content = STARTER_SKILLS['welcome_guide.md'].trim() + '\n';
         }

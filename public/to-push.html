@@ -320,12 +320,13 @@
         .color-scheme-sub { font-size: 10px; color: #94a3b8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .color-scheme-bar { display: flex; height: 18px; width: 100%; border-radius: 6px; overflow: hidden; border: 1px solid rgba(255,255,255,0.16); }
         .color-scheme-bar span { height: 100%; display: block; }
-        .design-manual-toggle-btn { height: 26px; padding: 0 11px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.06); color: #cbd5e1; font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.15s ease-out; white-space: nowrap; }
-        .design-manual-toggle-btn:hover { background: rgba(255,255,255,0.12); color: #ffffff; }
-        .design-manual-toggle-btn:active { transform: scale(0.95); }
-        .design-manual-toggle-btn.active { background: var(--primary-color); border-color: var(--primary-color); color: #ffffff; box-shadow: 0 0 0 1px rgba(74, 125, 255, 0.4); }
-        .design-manual-section { display: none; }
-        .design-manual-section.open { display: flex; }
+        .design-mode-switch { display: inline-flex; align-items: center; padding: 2px; border-radius: 999px; background: rgba(0,0,0,0.28); border: 1px solid rgba(255,255,255,0.14); gap: 2px; flex-shrink: 0; }
+        .design-mode-pill { height: 24px; padding: 0 10px; border-radius: 999px; border: none; background: transparent; color: #94a3b8; font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.15s ease-out; white-space: nowrap; }
+        .design-mode-pill:hover { color: #f8fafc; }
+        .design-mode-pill:active { transform: scale(0.95); }
+        .design-mode-pill.active { background: var(--primary-color); color: #ffffff; box-shadow: 0 1px 4px rgba(0,0,0,0.3); }
+        .design-view-panel { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+        .design-view-panel.hidden { display: none; }
         .font-scheme-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; max-height: 260px; overflow-y: auto; padding-right: 2px; min-width: 0; }
         .font-scheme-card { display: flex; flex-direction: column; gap: 4px; padding: 10px 11px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.04); color: #f8fafc; cursor: pointer; text-align: left; transition: all 0.15s ease-out; min-width: 0; }
         .font-scheme-card:hover { background: rgba(255,255,255,0.09); border-color: rgba(255,255,255,0.3); }
@@ -840,66 +841,69 @@
             <div id="design-pane-color" class="design-tab-pane active">
                 <div class="design-section">
                     <div class="design-section-title" style="flex-wrap: wrap; gap: 8px;">
-                        <span>Curated Color Schemes</span>
-                        <div style="display: inline-flex; align-items: center; gap: 10px;">
+                        <span id="design-color-section-title">Curated Color Schemes</span>
+                        <div style="display: inline-flex; align-items: center; gap: 10px; flex-wrap: wrap;">
                             <label style="display: inline-flex; align-items: center; gap: 5px; margin: 0; font-size: 11px; text-transform: none; letter-spacing: 0; color: #cbd5e1; cursor: pointer;">
                                 <input type="checkbox" id="design-auto-ink" checked style="width: auto; margin: 0;" onchange="applyDesignSystem(true)">
                                 Auto-Contrast Text
                             </label>
-                            <button type="button" id="design-color-manual-btn" class="design-manual-toggle-btn" onclick="toggleDesignColorManualMode()">Manual Mode</button>
-                        </div>
-                    </div>
-                    <div id="design-mood-pills" class="design-mood-pills"></div>
-                    <div id="design-color-grid" class="color-scheme-grid"></div>
-                </div>
-
-                <div id="design-color-manual-section" class="design-section design-manual-section">
-                    <div class="design-section-title" style="flex-wrap: wrap; gap: 6px;">
-                        <span>Manual 60-30-10 Color Rule</span>
-                        <div style="display: inline-flex; align-items: center; gap: 8px;">
-                            <span id="design-ratio-label" style="font-size: 10px; color: #38bdf8;">Live Ratio</span>
-                            <button type="button" onclick="swapDesignBaseAndMain()" title="Swap 60% Base and 30% Main colors" style="height: 22px; padding: 0 8px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.06); color: #e2e8f0; font-size: 10px; font-weight: 600; cursor: pointer; transition: all 0.15s ease-out;">Swap 60 / 30</button>
-                        </div>
-                    </div>
-                    <div class="design-ratio-bar" title="60% Base / 30% Main / 10% Contrast">
-                        <div id="design-bar-base" class="design-ratio-seg" style="width: 60%; background: #f8fafc;"></div>
-                        <div id="design-bar-main" class="design-ratio-seg" style="width: 30%; background: #ffffff;"></div>
-                        <div id="design-bar-contrast" class="design-ratio-seg" style="width: 10%; background: #4a7dff;"></div>
-                    </div>
-
-                    <div class="design-color-row">
-                        <div class="design-color-meta">
-                            <strong>Base Color (60%)</strong>
-                            <span>Page canvas &amp; dominant background</span>
-                        </div>
-                        <div class="design-color-inputs">
-                            <span id="design-ink-base" class="design-ink-badge">Dark Ink</span>
-                            <input type="color" id="design-color-base" class="design-color-picker" value="#f8fafc" oninput="onDesignColorInput('base', this.value)">
-                            <input type="text" id="design-hex-base" class="design-hex-input" value="#F8FAFC" maxlength="7" onchange="onDesignHexInput('base', this.value)">
+                            <div class="design-mode-switch" role="group" aria-label="Color Mode">
+                                <button type="button" id="design-color-curated-btn" class="design-mode-pill active" onclick="setDesignColorManualMode(false)">Templates</button>
+                                <button type="button" id="design-color-manual-btn" class="design-mode-pill" onclick="setDesignColorManualMode(true)">Manual Mode</button>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="design-color-row">
-                        <div class="design-color-meta">
-                            <strong>Main Color (30%)</strong>
-                            <span>Cards, containers, headers &amp; panels</span>
-                        </div>
-                        <div class="design-color-inputs">
-                            <span id="design-ink-main" class="design-ink-badge">Dark Ink</span>
-                            <input type="color" id="design-color-main" class="design-color-picker" value="#ffffff" oninput="onDesignColorInput('main', this.value)">
-                            <input type="text" id="design-hex-main" class="design-hex-input" value="#FFFFFF" maxlength="7" onchange="onDesignHexInput('main', this.value)">
-                        </div>
+                    <div id="design-color-curated-view" class="design-view-panel">
+                        <div id="design-mood-pills" class="design-mood-pills"></div>
+                        <div id="design-color-grid" class="color-scheme-grid"></div>
                     </div>
 
-                    <div class="design-color-row">
-                        <div class="design-color-meta">
-                            <strong>Contrast Accent (10%)</strong>
-                            <span>Buttons, highlights, links &amp; focus</span>
+                    <div id="design-color-manual-view" class="design-view-panel hidden">
+                        <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+                            <span id="design-ratio-label" style="font-size: 11px; font-weight: 700; color: #38bdf8;">Live Ratio</span>
+                            <button type="button" onclick="swapDesignBaseAndMain()" title="Swap 60% Base and 30% Main colors" style="height: 24px; padding: 0 10px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.06); color: #e2e8f0; font-size: 10.5px; font-weight: 600; cursor: pointer; transition: all 0.15s ease-out;">Swap 60 / 30</button>
                         </div>
-                        <div class="design-color-inputs">
-                            <span id="design-ink-contrast" class="design-ink-badge">Light Ink</span>
-                            <input type="color" id="design-color-contrast" class="design-color-picker" value="#4a7dff" oninput="onDesignColorInput('contrast', this.value)">
-                            <input type="text" id="design-hex-contrast" class="design-hex-input" value="#4A7DFF" maxlength="7" onchange="onDesignHexInput('contrast', this.value)">
+                        <div class="design-ratio-bar" title="60% Base / 30% Main / 10% Contrast">
+                            <div id="design-bar-base" class="design-ratio-seg" style="width: 60%; background: #f8fafc;"></div>
+                            <div id="design-bar-main" class="design-ratio-seg" style="width: 30%; background: #ffffff;"></div>
+                            <div id="design-bar-contrast" class="design-ratio-seg" style="width: 10%; background: #4a7dff;"></div>
+                        </div>
+
+                        <div class="design-color-row">
+                            <div class="design-color-meta">
+                                <strong>Base Color (60%)</strong>
+                                <span>Page canvas &amp; dominant background</span>
+                            </div>
+                            <div class="design-color-inputs">
+                                <span id="design-ink-base" class="design-ink-badge">Dark Ink</span>
+                                <input type="color" id="design-color-base" class="design-color-picker" value="#f8fafc" oninput="onDesignColorInput('base', this.value)">
+                                <input type="text" id="design-hex-base" class="design-hex-input" value="#F8FAFC" maxlength="7" onchange="onDesignHexInput('base', this.value)">
+                            </div>
+                        </div>
+
+                        <div class="design-color-row">
+                            <div class="design-color-meta">
+                                <strong>Main Color (30%)</strong>
+                                <span>Cards, containers, headers &amp; panels</span>
+                            </div>
+                            <div class="design-color-inputs">
+                                <span id="design-ink-main" class="design-ink-badge">Dark Ink</span>
+                                <input type="color" id="design-color-main" class="design-color-picker" value="#ffffff" oninput="onDesignColorInput('main', this.value)">
+                                <input type="text" id="design-hex-main" class="design-hex-input" value="#FFFFFF" maxlength="7" onchange="onDesignHexInput('main', this.value)">
+                            </div>
+                        </div>
+
+                        <div class="design-color-row">
+                            <div class="design-color-meta">
+                                <strong>Contrast Accent (10%)</strong>
+                                <span>Buttons, highlights, links &amp; focus</span>
+                            </div>
+                            <div class="design-color-inputs">
+                                <span id="design-ink-contrast" class="design-ink-badge">Light Ink</span>
+                                <input type="color" id="design-color-contrast" class="design-color-picker" value="#4a7dff" oninput="onDesignColorInput('contrast', this.value)">
+                                <input type="text" id="design-hex-contrast" class="design-hex-input" value="#4A7DFF" maxlength="7" onchange="onDesignHexInput('contrast', this.value)">
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -909,14 +913,55 @@
             <div id="design-pane-font" class="design-tab-pane">
                 <div class="design-section">
                     <div class="design-section-title" style="flex-wrap: wrap; gap: 8px;">
-                        <span>Curated Font Pairings</span>
-                        <div style="display: inline-flex; align-items: center; gap: 10px;">
+                        <span id="design-font-section-title">Curated Font Pairings</span>
+                        <div style="display: inline-flex; align-items: center; gap: 10px; flex-wrap: wrap;">
                             <span id="design-font-count-badge" style="font-size: 10px; color: #38bdf8;">3 Font Roles</span>
-                            <button type="button" id="design-font-manual-btn" class="design-manual-toggle-btn" onclick="toggleDesignFontManualMode()">Manual Mode</button>
+                            <div class="design-mode-switch" role="group" aria-label="Font Mode">
+                                <button type="button" id="design-font-curated-btn" class="design-mode-pill active" onclick="setDesignFontManualMode(false)">Templates</button>
+                                <button type="button" id="design-font-manual-btn" class="design-mode-pill" onclick="setDesignFontManualMode(true)">Manual Mode</button>
+                            </div>
                         </div>
                     </div>
-                    <div id="design-font-mood-pills" class="design-mood-pills"></div>
-                    <div id="design-font-grid" class="font-scheme-grid"></div>
+
+                    <div id="design-font-curated-view" class="design-view-panel">
+                        <div id="design-font-mood-pills" class="design-mood-pills"></div>
+                        <div id="design-font-grid" class="font-scheme-grid"></div>
+                    </div>
+
+                    <div id="design-font-manual-view" class="design-view-panel hidden">
+                        <div class="design-font-row">
+                            <div class="design-font-top">
+                                <div class="design-color-meta">
+                                    <strong>Display / Headings (Font 1)</strong>
+                                    <span>Titles, headings &amp; hero labels</span>
+                                </div>
+                                <select id="design-font-display" class="design-font-select" onchange="onDesignFontChange('fontDisplay', this.value)"></select>
+                            </div>
+                            <div id="design-font-preview-display" class="design-font-preview">Aa Bb - Quantum Learning Studio</div>
+                        </div>
+
+                        <div class="design-font-row">
+                            <div class="design-font-top">
+                                <div class="design-color-meta">
+                                    <strong>Body / Reading (Font 2)</strong>
+                                    <span>Paragraphs, options &amp; inputs</span>
+                                </div>
+                                <select id="design-font-body" class="design-font-select" onchange="onDesignFontChange('fontBody', this.value)"></select>
+                            </div>
+                            <div id="design-font-preview-body" class="design-font-preview">Clear reading copy for mixed-readiness learners 123</div>
+                        </div>
+
+                        <div class="design-font-row">
+                            <div class="design-font-top">
+                                <div class="design-color-meta">
+                                    <strong>UI / Badges &amp; Mono (Font 3)</strong>
+                                    <span>Buttons, pills, counters &amp; tags</span>
+                                </div>
+                                <select id="design-font-accent" class="design-font-select" onchange="onDesignFontChange('fontAccent', this.value)"></select>
+                            </div>
+                            <div id="design-font-preview-accent" class="design-font-preview">STEP 03 · 94.2% · 1,420 XP</div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="design-section">
@@ -936,44 +981,6 @@
                                 <span id="design-specimen-pill" class="design-specimen-pill">Primary Action</span>
                             </div>
                         </div>
-                    </div>
-                </div>
-
-                <div id="design-font-manual-section" class="design-section design-manual-section">
-                    <div class="design-section-title">
-                        <span>Manual 3-Font Roles</span>
-                    </div>
-                    <div class="design-font-row">
-                        <div class="design-font-top">
-                            <div class="design-color-meta">
-                                <strong>Display / Headings (Font 1)</strong>
-                                <span>Titles, headings &amp; hero labels</span>
-                            </div>
-                            <select id="design-font-display" class="design-font-select" onchange="onDesignFontChange('fontDisplay', this.value)"></select>
-                        </div>
-                        <div id="design-font-preview-display" class="design-font-preview">Aa Bb - Quantum Learning Studio</div>
-                    </div>
-
-                    <div class="design-font-row">
-                        <div class="design-font-top">
-                            <div class="design-color-meta">
-                                <strong>Body / Reading (Font 2)</strong>
-                                <span>Paragraphs, options &amp; inputs</span>
-                            </div>
-                            <select id="design-font-body" class="design-font-select" onchange="onDesignFontChange('fontBody', this.value)"></select>
-                        </div>
-                        <div id="design-font-preview-body" class="design-font-preview">Clear reading copy for mixed-readiness learners 123</div>
-                    </div>
-
-                    <div class="design-font-row">
-                        <div class="design-font-top">
-                            <div class="design-color-meta">
-                                <strong>UI / Badges &amp; Mono (Font 3)</strong>
-                                <span>Buttons, pills, counters &amp; tags</span>
-                            </div>
-                            <select id="design-font-accent" class="design-font-select" onchange="onDesignFontChange('fontAccent', this.value)"></select>
-                        </div>
-                        <div id="design-font-preview-accent" class="design-font-preview">STEP 03 · 94.2% · 1,420 XP</div>
                     </div>
                 </div>
             </div>
@@ -5604,19 +5611,32 @@ If this update establishes a new reusable design rule or pattern, you may also i
         FONT_SCHEME_CATALOG.map(f => [f.id, { display: f.display, body: f.body, accent: f.accent }])
     );
 
+    const ALL_STUDIO_FONTS = [
+        'Plus Jakarta Sans', 'Inter', 'Newsreader', 'Fraunces', 'Playfair Display', 'Lora',
+        'Space Grotesk', 'Outfit', 'Syne', 'DM Sans', 'Source Sans 3', 'Work Sans',
+        'Nunito Sans', 'Nunito', 'Fredoka', 'Quicksand', 'Lexend', 'Atkinson Hyperlegible',
+        'Montserrat', 'JetBrains Mono', 'IBM Plex Mono', 'Space Mono', 'Fira Code',
+        'Roboto Mono', 'DM Mono', 'System UI'
+    ];
+
+    const buildRoleFontList = (preferred) => [
+        ...preferred,
+        ...ALL_STUDIO_FONTS.filter(f => !preferred.includes(f))
+    ];
+
     const FONT_CHOICES = {
-        display: [
+        display: buildRoleFontList([
             'Plus Jakarta Sans', 'Newsreader', 'Nunito Sans', 'Outfit', 'Space Grotesk', 'Fraunces', 'Fredoka',
             'Lexend', 'Playfair Display', 'Syne', 'Montserrat', 'System UI'
-        ],
-        body: [
+        ]),
+        body: buildRoleFontList([
             'Inter', 'Plus Jakarta Sans', 'DM Sans', 'Source Sans 3', 'Nunito', 'Nunito Sans',
             'Atkinson Hyperlegible', 'Lora', 'Work Sans', 'Outfit', 'System UI'
-        ],
-        accent: [
+        ]),
+        accent: buildRoleFontList([
             'JetBrains Mono', 'Quicksand', 'IBM Plex Mono', 'Space Mono', 'Fira Code',
             'Roboto Mono', 'DM Mono', 'Plus Jakarta Sans', 'Inter', 'System UI'
-        ]
+        ])
     };
 
     const FONT_WEIGHTS_MAP = {
@@ -5784,14 +5804,22 @@ If this update establishes a new reusable design rule or pattern, you may also i
         saveDesignPreferences();
     }
 
-    function toggleDesignColorManualMode() {
-        designState.manualColorMode = !designState.manualColorMode;
+    function setDesignColorManualMode(enabled) {
+        designState.manualColorMode = !!enabled;
         renderDesignControls();
     }
 
-    function toggleDesignFontManualMode() {
-        designState.manualFontMode = !designState.manualFontMode;
+    function setDesignFontManualMode(enabled) {
+        designState.manualFontMode = !!enabled;
         renderDesignControls();
+    }
+
+    function toggleDesignColorManualMode() {
+        setDesignColorManualMode(!designState.manualColorMode);
+    }
+
+    function toggleDesignFontManualMode() {
+        setDesignFontManualMode(!designState.manualFontMode);
     }
 
     function applySavedDesignToHtml(html) {
@@ -5931,7 +5959,7 @@ If this update establishes a new reusable design rule or pattern, you may also i
         ];
         map.forEach(({ id, list }) => {
             const el = document.getElementById(id);
-            if (!el || el.options.length === list.length) return;
+            if (!el || el.dataset.populated === '1') return;
             el.innerHTML = '';
             list.forEach(name => {
                 const opt = document.createElement('option');
@@ -5939,7 +5967,20 @@ If this update establishes a new reusable design rule or pattern, you may also i
                 opt.textContent = name;
                 el.appendChild(opt);
             });
+            el.dataset.populated = '1';
         });
+    }
+
+    function setFontSelectValue(el, fontName) {
+        if (!el || !fontName) return;
+        const hasOpt = Array.from(el.options).some(opt => opt.value === fontName);
+        if (!hasOpt) {
+            const opt = document.createElement('option');
+            opt.value = fontName;
+            opt.textContent = fontName;
+            el.appendChild(opt);
+        }
+        el.value = fontName;
     }
 
     function renderDesignControls() {
@@ -5969,15 +6010,29 @@ If this update establishes a new reusable design rule or pattern, you may also i
         renderFontSchemeGrid();
         renderDesignFontSpecimen();
 
+        const isManualColor = !!designState.manualColorMode;
+        const colorTitle = document.getElementById('design-color-section-title');
+        const colorCuratedBtn = document.getElementById('design-color-curated-btn');
         const colorManualBtn = document.getElementById('design-color-manual-btn');
-        const colorManualSec = document.getElementById('design-color-manual-section');
-        if (colorManualBtn) colorManualBtn.classList.toggle('active', !!designState.manualColorMode);
-        if (colorManualSec) colorManualSec.classList.toggle('open', !!designState.manualColorMode);
+        const colorCuratedView = document.getElementById('design-color-curated-view');
+        const colorManualView = document.getElementById('design-color-manual-view');
+        if (colorTitle) colorTitle.textContent = isManualColor ? 'Manual 60-30-10 Color Rule' : 'Curated Color Schemes';
+        if (colorCuratedBtn) colorCuratedBtn.classList.toggle('active', !isManualColor);
+        if (colorManualBtn) colorManualBtn.classList.toggle('active', isManualColor);
+        if (colorCuratedView) colorCuratedView.classList.toggle('hidden', isManualColor);
+        if (colorManualView) colorManualView.classList.toggle('hidden', !isManualColor);
 
+        const isManualFont = !!designState.manualFontMode;
+        const fontTitle = document.getElementById('design-font-section-title');
+        const fontCuratedBtn = document.getElementById('design-font-curated-btn');
         const fontManualBtn = document.getElementById('design-font-manual-btn');
-        const fontManualSec = document.getElementById('design-font-manual-section');
-        if (fontManualBtn) fontManualBtn.classList.toggle('active', !!designState.manualFontMode);
-        if (fontManualSec) fontManualSec.classList.toggle('open', !!designState.manualFontMode);
+        const fontCuratedView = document.getElementById('design-font-curated-view');
+        const fontManualView = document.getElementById('design-font-manual-view');
+        if (fontTitle) fontTitle.textContent = isManualFont ? 'Manual 3-Font Roles' : 'Curated Font Pairings';
+        if (fontCuratedBtn) fontCuratedBtn.classList.toggle('active', !isManualFont);
+        if (fontManualBtn) fontManualBtn.classList.toggle('active', isManualFont);
+        if (fontCuratedView) fontCuratedView.classList.toggle('hidden', isManualFont);
+        if (fontManualView) fontManualView.classList.toggle('hidden', !isManualFont);
 
         const ratioLbl = document.getElementById('design-ratio-label');
         if (ratioLbl) {
@@ -5989,9 +6044,9 @@ If this update establishes a new reusable design rule or pattern, you may also i
         const fDispEl = document.getElementById('design-font-display');
         const fBodyEl = document.getElementById('design-font-body');
         const fAccEl = document.getElementById('design-font-accent');
-        if (fDispEl) fDispEl.value = designState.fontDisplay;
-        if (fBodyEl) fBodyEl.value = designState.fontBody;
-        if (fAccEl) fAccEl.value = designState.fontAccent;
+        setFontSelectValue(fDispEl, designState.fontDisplay);
+        setFontSelectValue(fBodyEl, designState.fontBody);
+        setFontSelectValue(fAccEl, designState.fontAccent);
 
         const pDisp = document.getElementById('design-font-preview-display');
         const pBody = document.getElementById('design-font-preview-body');
@@ -6095,7 +6150,6 @@ body {
         var(--hd-base) !important;
     background-attachment: fixed !important;
     color: var(--hd-text-on-base) !important;
-    font-family: var(--hd-font-body) !important;
 }
 .container, .card, .panel, header, nav, #slide-window {
     background: ${hexToRgba(main, 0.64)} !important;
@@ -6124,8 +6178,6 @@ section, article, .quiz-question, fieldset label {
 ${btnTarget} {
     background: var(--hd-contrast) !important;
     color: var(--hd-text-on-contrast) !important;
-    font-family: var(--hd-font-accent) !important;
-    font-weight: 600 !important;
     border: 1px solid ${hexToRgba('#ffffff', 0.25)} !important;
     border-radius: 10px !important;
     box-shadow: 0 0 24px ${hexToRgba(contrast, 0.42)} !important;
@@ -6151,7 +6203,6 @@ ${btnActiveTarget} { transform: scale(0.98) !important; }
 input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), select, textarea {
     background: ${hexToRgba(surfaceHigh, 0.78)} !important;
     color: var(--hd-text-on-main) !important;
-    font-family: var(--hd-font-body) !important;
     border: 1px solid ${glassRing} !important;
     border-radius: 10px !important;
     backdrop-filter: blur(12px) !important;
@@ -6179,7 +6230,6 @@ body {
     background-image: radial-gradient(${isBaseDark ? 'rgba(255,255,255,0.045)' : 'rgba(15,23,42,0.06)'} 1px, transparent 1px) !important;
     background-size: 16px 16px !important;
     color: var(--hd-text-on-base) !important;
-    font-family: var(--hd-font-body) !important;
 }
 .container, .card, .panel, header, nav, #slide-window {
     background: linear-gradient(180deg, ${plateTop} 0%, ${plateBottom} 100%) !important;
@@ -6206,9 +6256,6 @@ section, article, .quiz-question, fieldset label {
 ${btnTarget} {
     background: linear-gradient(180deg, ${mixHex(contrast, '#ffffff', 0.16)} 0%, ${contrast} 100%) !important;
     color: var(--hd-text-on-contrast) !important;
-    font-family: var(--hd-font-accent) !important;
-    font-weight: 700 !important;
-    letter-spacing: 0.04em !important;
     border: 1px solid rgba(0, 0, 0, 0.28) !important;
     border-bottom: 3px solid rgba(0, 0, 0, 0.45) !important;
     border-radius: 6px !important;
@@ -6238,7 +6285,6 @@ ${btnActiveTarget} {
 input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), select, textarea {
     background: ${deepestWell} !important;
     color: var(--hd-text-on-main) !important;
-    font-family: var(--hd-font-accent) !important;
     border: 1px solid ${isBaseDark ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.16)'} !important;
     border-radius: 6px !important;
     box-shadow: inset 0 2px 6px ${wellShadow} !important;
@@ -6257,7 +6303,6 @@ input[type="range"] { accent-color: var(--hd-contrast) !important; }
 body {
     background: var(--hd-base) !important;
     color: var(--hd-text-on-base) !important;
-    font-family: var(--hd-font-body) !important;
 }
 .container, .card, .panel, header, nav, #slide-window {
     background: var(--hd-main) !important;
@@ -6285,17 +6330,12 @@ section, article, .quiz-question, fieldset label {
     box-shadow: 1px 1px 0 ${inkOutline} !important;
 }
 #slide-window::before { background: transparent !important; }
-h1, h2, h3, h4 { letter-spacing: -0.02em; text-transform: uppercase; font-weight: 700 !important; }
 ${btnTarget} {
     background: var(--hd-contrast) !important;
     color: var(--hd-text-on-contrast) !important;
-    font-family: var(--hd-font-accent) !important;
     border: 3px solid ${inkOutline} !important;
     border-radius: 4px !important;
     box-shadow: 5px 5px 0 ${inkOutline} !important;
-    font-weight: 700 !important;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
     transition: transform 0.08s ease, box-shadow 0.08s ease !important;
 }
 ${btnHoverTarget} {
@@ -6320,8 +6360,6 @@ ${btnActiveTarget} {
 input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), select, textarea {
     background: var(--hd-main) !important;
     color: var(--hd-text-on-main) !important;
-    font-family: var(--hd-font-accent) !important;
-    font-weight: 600 !important;
     border: 2.5px solid ${inkOutline} !important;
     border-radius: 4px !important;
     box-shadow: 3px 3px 0 ${inkOutline} !important;
@@ -6349,7 +6387,6 @@ input[type="range"] { accent-color: ${inkOutline} !important; }
 body {
     background: var(--hd-base) !important;
     color: var(--hd-text-on-base) !important;
-    font-family: var(--hd-font-body) !important;
 }
 .container, .card, .panel, header, nav, #slide-window {
     background: var(--hd-main) !important;
@@ -6379,8 +6416,6 @@ section, article, .quiz-question, fieldset label {
 ${btnTarget} {
     background: var(--hd-contrast) !important;
     color: var(--hd-text-on-contrast) !important;
-    font-family: var(--hd-font-accent) !important;
-    font-weight: 700 !important;
     border: none !important;
     border-radius: 999px !important;
     box-shadow: 0 16px 28px -6px ${hexToRgba(contrast, 0.42)}, inset 2px 2px 4px rgba(255,255,255,0.75), inset -3px -3px 6px rgba(0,0,0,0.22) !important;
@@ -6407,7 +6442,6 @@ ${btnActiveTarget} {
 input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), select, textarea {
     background: ${clayGroove} !important;
     color: var(--hd-text-on-main) !important;
-    font-family: var(--hd-font-body) !important;
     border: none !important;
     border-radius: 16px !important;
     box-shadow: inset 3px 3px 6px ${grooveDark}, inset -3px -3px 6px ${topLight} !important;
@@ -6431,7 +6465,6 @@ input[type="range"] { accent-color: var(--hd-contrast) !important; }
 body {
     background: var(--hd-base) !important;
     color: var(--hd-text-on-base) !important;
-    font-family: var(--hd-font-body) !important;
     line-height: 1.7;
 }
 .container, .card, .panel, header, nav, #slide-window {
@@ -6455,12 +6488,9 @@ section, article, .quiz-question, fieldset label {
     border-color: ${hexToRgba(contrast, 0.45)} !important;
 }
 #slide-window::before { background: transparent !important; }
-h1, h2, h3, h4 { font-weight: 500 !important; letter-spacing: -0.015em !important; }
 ${btnTarget} {
     background: var(--hd-contrast) !important;
     color: var(--hd-text-on-contrast) !important;
-    font-family: var(--hd-font-accent) !important;
-    font-weight: 500 !important;
     border: 1px solid var(--hd-contrast) !important;
     border-radius: 6px !important;
     box-shadow: 0 1px 2px ${whisperShadow} !important;
@@ -6490,7 +6520,6 @@ ${btnActiveTarget} { transform: none !important; opacity: 0.92; }
 input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), select, textarea {
     background: var(--hd-main) !important;
     color: var(--hd-text-on-main) !important;
-    font-family: var(--hd-font-body) !important;
     border: 1px solid ${hairline} !important;
     border-radius: 6px !important;
     box-shadow: 0 1px 2px ${whisperShadow} !important;
@@ -6525,7 +6554,6 @@ body {
         var(--hd-base) !important;
     background-attachment: fixed !important;
     color: var(--hd-text-on-base) !important;
-    font-family: var(--hd-font-body) !important;
 }
 .container, .card, .panel, header, nav, #slide-window {
     background: linear-gradient(135deg, ${hexToRgba(main, 0.56)}, ${hexToRgba(capsuleDeep, 0.48)}) !important;
@@ -6554,8 +6582,6 @@ section, article, .quiz-question, fieldset label {
 ${btnTarget} {
     background: linear-gradient(135deg, ${ctaTop}, ${ctaBottom}) !important;
     color: var(--hd-text-on-contrast) !important;
-    font-family: var(--hd-font-accent) !important;
-    font-weight: 700 !important;
     border: 1px solid rgba(255, 255, 255, 0.52) !important;
     border-radius: 999px !important;
     box-shadow: 0 0 28px ${hexToRgba(contrast, 0.45)}, inset 0 1px 1px rgba(255, 255, 255, 0.65) !important;
@@ -6580,7 +6606,6 @@ ${btnActiveTarget} { transform: scale(0.97) !important; }
 input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), select, textarea {
     background: ${hexToRgba(capsuleDeep, 0.78)} !important;
     color: var(--hd-text-on-main) !important;
-    font-family: var(--hd-font-body) !important;
     border: 1px solid ${rimSoft} !important;
     border-radius: 20px !important;
     box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.45), inset 1px 1px 0px 0px ${rimSoft} !important;
@@ -6634,9 +6659,9 @@ ${btnTarget} {
     --hd-font-accent: ${fontAccentStack};
 }
 ${aestheticCss}
-body, p, li, td, label, input, select, textarea { font-family: var(--hd-font-body); }
+body, p, li, td, label, input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), select, textarea { font-family: var(--hd-font-body) !important; }
 h1, h2, h3, h4, .app-title { color: inherit; font-family: var(--hd-font-display) !important; letter-spacing: -0.02em; }
-button, .button, .badge, .tag, .pill, .chip, .timer, .counter, .score, .slide-counter, code, pre, th { font-family: var(--hd-font-accent); }
+button, .button, .badge, .tag, .pill, .chip, .timer, .counter, .score, .slide-counter, code, pre, th { font-family: var(--hd-font-accent) !important; }
 a { color: var(--hd-contrast); }
 .nav-button:not(.correct):not(.incorrect):not(.active) { background: ${hexToRgba(main, 0.75)} !important; color: var(--hd-text-on-main) !important; border-color: ${borderSoft} !important; font-family: var(--hd-font-accent) !important; }
 .nav-button.active:not(.correct):not(.incorrect) { background: var(--hd-contrast) !important; color: var(--hd-text-on-contrast) !important; border-color: var(--hd-contrast) !important; }

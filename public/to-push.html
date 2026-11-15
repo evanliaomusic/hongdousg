@@ -299,6 +299,27 @@
         .design-font-top { display: grid; grid-template-columns: 1fr minmax(140px, 185px); align-items: center; gap: 10px; min-width: 0; }
         .design-font-select { padding: 6px 8px !important; font-size: 12px !important; background: rgba(15, 23, 42, 0.72) !important; }
         .design-font-preview { font-size: 13px; color: #e2e8f0; background: rgba(0,0,0,0.24); border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 5px 9px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .design-tabs-bar { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; padding: 10px 20px; border-bottom: 1px solid var(--border-color); background: rgba(0,0,0,0.24); flex-shrink: 0; }
+        .design-tab-btn { height: 36px; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; background: rgba(255,255,255,0.04); color: #94a3b8; font-size: 12.5px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.15s ease-out; min-width: 0; }
+        .design-tab-btn:hover { background: rgba(255,255,255,0.09); color: #f8fafc; border-color: rgba(255,255,255,0.22); }
+        .design-tab-btn:active { transform: scale(0.95); }
+        .design-tab-btn.active { background: rgba(74, 125, 255, 0.22); color: #f8fafc; border-color: var(--primary-color); box-shadow: 0 0 0 1px rgba(74, 125, 255, 0.45); }
+        .design-tab-pane { display: none; flex-direction: column; gap: 16px; min-width: 0; }
+        .design-tab-pane.active { display: flex; }
+        .design-mood-pills { display: flex; flex-wrap: wrap; gap: 6px; min-width: 0; }
+        .design-mood-pill { height: 28px; padding: 0 10px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.14); background: rgba(255,255,255,0.04); color: #cbd5e1; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.15s ease-out; white-space: nowrap; }
+        .design-mood-pill:hover { background: rgba(255,255,255,0.1); color: #fff; }
+        .design-mood-pill:active { transform: scale(0.95); }
+        .design-mood-pill.active { background: var(--primary-color); border-color: var(--primary-color); color: #fff; }
+        .color-scheme-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; max-height: 310px; overflow-y: auto; padding-right: 2px; min-width: 0; }
+        .color-scheme-card { display: flex; flex-direction: column; gap: 6px; padding: 9px 10px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.04); color: #f8fafc; cursor: pointer; text-align: left; transition: all 0.15s ease-out; min-width: 0; }
+        .color-scheme-card:hover { background: rgba(255,255,255,0.09); border-color: rgba(255,255,255,0.3); }
+        .color-scheme-card:active { transform: scale(0.97); }
+        .color-scheme-card.active { border-color: var(--primary-color); background: rgba(74, 125, 255, 0.18); box-shadow: 0 0 0 1px var(--primary-color); }
+        .color-scheme-title { font-size: 12px; font-weight: 700; color: #f8fafc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .color-scheme-sub { font-size: 10px; color: #94a3b8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .color-scheme-bar { display: flex; height: 18px; width: 100%; border-radius: 6px; overflow: hidden; border: 1px solid rgba(255,255,255,0.16); }
+        .color-scheme-bar span { height: 100%; display: block; }
 
         #right-panel {
             position: fixed !important; top: 0; left: 0; width: 100vw; height: 100vh;
@@ -611,12 +632,12 @@
     <hr style="width: 100%; border: none; border-top: 1px solid var(--border-color); opacity: 0.5;">
     <label style="font-size: 11px; text-transform: uppercase; color: var(--text-color); opacity: 0.6; letter-spacing: 1px; margin-bottom: 5px; display: block;">App Panels</label>
     <div class="window-toggles">
-        <button class="toggle-button" id="toggle-code" onclick="togglePanel('middle-panel')" data-translate-key="codeToggle">Code</button>
+        <button class="toggle-button" id="toggle-versions" onclick="togglePanel('versions-panel')">Assets</button>
         <button class="toggle-button" id="toggle-design" onclick="togglePanel('design-panel')">Design</button>
         <button class="toggle-button" id="toggle-skills" onclick="togglePanel('skills-panel')">Skills</button>
-        <button id="toggle-manual" style="display: none;"></button>
-        <button class="toggle-button" id="toggle-versions" onclick="togglePanel('versions-panel')">Assets</button>
+        <button class="toggle-button" id="toggle-code" onclick="togglePanel('middle-panel')" data-translate-key="codeToggle">Code</button>
         <button class="toggle-button" id="toggle-credits" onclick="togglePanel('credits-panel')" data-translate-key="creditsTab">Credits</button>
+        <button id="toggle-manual" style="display: none;"></button>
     </div>
     <hr style="width: 100%; border: none; border-top: 1px solid var(--border-color); opacity: 0.5; margin: 15px 0;">
     <div style="display: flex; flex-direction: column; gap: 8px; width: 100%;">
@@ -778,189 +799,193 @@
         <div class="panel-header">
             <h3>🎨 Design Studio</h3>
             <div class="panel-header-actions">
+                <label style="display: inline-flex; align-items: center; gap: 5px; margin: 0; font-size: 11px; color: #cbd5e1; cursor: pointer;" title="Automatically apply your saved Design Studio theme when resetting or creating a new app">
+                    <input type="checkbox" id="design-apply-new-apps" checked style="width: auto; margin: 0;" onchange="toggleDesignApplyNewApps(this.checked)">
+                    Auto-apply
+                </label>
                 <button class="action-button" id="design-reset-btn" style="background-color: #475569; padding: 6px 10px; font-size: 12px;" onclick="resetDesignSystem()">Clear Style</button>
                 <button class="icon-button" onclick="togglePanel('design-panel')" style="color: #ff5555; font-weight: bold;">✕</button>
             </div>
         </div>
+        <div class="design-tabs-bar" role="tablist" aria-label="Design Studio Sections">
+            <button type="button" class="design-tab-btn active" id="design-tab-btn-color" data-design-tab="color" onclick="switchDesignTab('color')">🎨 Color</button>
+            <button type="button" class="design-tab-btn" id="design-tab-btn-font" data-design-tab="font" onclick="switchDesignTab('font')">🔤 Font</button>
+            <button type="button" class="design-tab-btn" id="design-tab-btn-feel" data-design-tab="feel" onclick="switchDesignTab('feel')">✨ Feel</button>
+        </div>
         <div id="design-body">
-            <div class="design-section">
-                <div class="design-section-title" style="flex-wrap: wrap; gap: 8px;">
-                    <span>Curated 3-Color Pairings</span>
-                    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-                        <label style="display: inline-flex; align-items: center; gap: 5px; margin: 0; font-size: 11px; text-transform: none; letter-spacing: 0; color: #cbd5e1; cursor: pointer;" title="Automatically apply your saved Design Studio theme when resetting or creating a new app">
-                            <input type="checkbox" id="design-apply-new-apps" checked style="width: auto; margin: 0;" onchange="toggleDesignApplyNewApps(this.checked)">
-                            Apply to new apps
-                        </label>
+            <!-- TAB 1: COLOR PANEL -->
+            <div id="design-pane-color" class="design-tab-pane active">
+                <div class="design-section">
+                    <div class="design-section-title" style="flex-wrap: wrap; gap: 8px;">
+                        <span>Curated 60-30-10 Color Schemes</span>
                         <label style="display: inline-flex; align-items: center; gap: 5px; margin: 0; font-size: 11px; text-transform: none; letter-spacing: 0; color: #cbd5e1; cursor: pointer;">
                             <input type="checkbox" id="design-auto-ink" checked style="width: auto; margin: 0;" onchange="applyDesignSystem(true)">
                             Auto-Contrast Text
                         </label>
                     </div>
-                </div>
-                <select id="design-palette-preset" onchange="applyDesignPreset(this.value)">
-                    <option value="custom">Custom Colors (Manual)</option>
-                    <option value="aether-glass">Aether Glass (Midnight Cyan)</option>
-                    <option value="resonance-hardware">Resonance Hardware (Matte Amber)</option>
-                    <option value="bytecraft-brutal">Bytecraft Brutal (Cream &amp; Yellow)</option>
-                    <option value="soundcolor-clay">SoundColor Clay (Lilac &amp; Coral)</option>
-                    <option value="scriptorium-minimal">Scriptorium Minimal (Alabaster &amp; Forest)</option>
-                    <option value="aetheris-liquid">Aetheris Liquid (Obsidian &amp; Electric Cyan)</option>
-                    <option value="spring-paper">Spring Paper (Clean Studio)</option>
-                    <option value="classroom-chalkboard">Classroom Chalkboard (High Contrast)</option>
-                    <option value="sg-red-cream">Singapore Red &amp; Cream</option>
-                    <option value="warm-dyslexia">Warm Dyslexia Cream (Low Glare)</option>
-                    <option value="cyber-arcade">Cyber Arcade (Dark Mode)</option>
-                    <option value="matcha-studio">Matcha Studio (Calm Focus)</option>
-                    <option value="neopop-tangerine">Neo-Pop Tangerine (Energetic)</option>
-                </select>
-            </div>
-
-            <div class="design-section">
-                <div class="design-section-title">
-                    <span>60-30-10 Color Rule</span>
-                    <span id="design-ratio-label" style="font-size: 10px; color: #38bdf8;">Live Ratio</span>
-                </div>
-                <div class="design-ratio-bar" title="60% Base / 30% Main / 10% Contrast">
-                    <div id="design-bar-base" class="design-ratio-seg" style="width: 60%; background: #f8fafc;"></div>
-                    <div id="design-bar-main" class="design-ratio-seg" style="width: 30%; background: #ffffff;"></div>
-                    <div id="design-bar-contrast" class="design-ratio-seg" style="width: 10%; background: #4a7dff;"></div>
+                    <div id="design-mood-pills" class="design-mood-pills"></div>
+                    <div id="design-color-grid" class="color-scheme-grid"></div>
+                    <select id="design-palette-preset" onchange="applyDesignPreset(this.value)">
+                        <option value="custom">Custom Colors (Manual)</option>
+                    </select>
                 </div>
 
-                <div class="design-color-row">
-                    <div class="design-color-meta">
-                        <strong>Base Color (60%)</strong>
-                        <span>Page canvas &amp; dominant background</span>
+                <div class="design-section">
+                    <div class="design-section-title" style="flex-wrap: wrap; gap: 6px;">
+                        <span>60-30-10 Color Rule</span>
+                        <div style="display: inline-flex; align-items: center; gap: 8px;">
+                            <span id="design-ratio-label" style="font-size: 10px; color: #38bdf8;">Live Ratio</span>
+                            <button type="button" onclick="swapDesignBaseAndMain()" title="Swap 60% Base and 30% Main colors" style="height: 22px; padding: 0 8px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.06); color: #e2e8f0; font-size: 10px; font-weight: 600; cursor: pointer; transition: all 0.15s ease-out;">⇄ Swap 60↔30</button>
+                        </div>
                     </div>
-                    <div class="design-color-inputs">
-                        <span id="design-ink-base" class="design-ink-badge">Dark Ink</span>
-                        <input type="color" id="design-color-base" class="design-color-picker" value="#f8fafc" oninput="onDesignColorInput('base', this.value)">
-                        <input type="text" id="design-hex-base" class="design-hex-input" value="#F8FAFC" maxlength="7" onchange="onDesignHexInput('base', this.value)">
+                    <div class="design-ratio-bar" title="60% Base / 30% Main / 10% Contrast">
+                        <div id="design-bar-base" class="design-ratio-seg" style="width: 60%; background: #f8fafc;"></div>
+                        <div id="design-bar-main" class="design-ratio-seg" style="width: 30%; background: #ffffff;"></div>
+                        <div id="design-bar-contrast" class="design-ratio-seg" style="width: 10%; background: #4a7dff;"></div>
                     </div>
-                </div>
 
-                <div class="design-color-row">
-                    <div class="design-color-meta">
-                        <strong>Main Color (30%)</strong>
-                        <span>Cards, containers, headers &amp; panels</span>
+                    <div class="design-color-row">
+                        <div class="design-color-meta">
+                            <strong>Base Color (60%)</strong>
+                            <span>Page canvas &amp; dominant background</span>
+                        </div>
+                        <div class="design-color-inputs">
+                            <span id="design-ink-base" class="design-ink-badge">Dark Ink</span>
+                            <input type="color" id="design-color-base" class="design-color-picker" value="#f8fafc" oninput="onDesignColorInput('base', this.value)">
+                            <input type="text" id="design-hex-base" class="design-hex-input" value="#F8FAFC" maxlength="7" onchange="onDesignHexInput('base', this.value)">
+                        </div>
                     </div>
-                    <div class="design-color-inputs">
-                        <span id="design-ink-main" class="design-ink-badge">Dark Ink</span>
-                        <input type="color" id="design-color-main" class="design-color-picker" value="#ffffff" oninput="onDesignColorInput('main', this.value)">
-                        <input type="text" id="design-hex-main" class="design-hex-input" value="#FFFFFF" maxlength="7" onchange="onDesignHexInput('main', this.value)">
-                    </div>
-                </div>
 
-                <div class="design-color-row">
-                    <div class="design-color-meta">
-                        <strong>Contrast Accent (10%)</strong>
-                        <span>Buttons, highlights, links &amp; focus</span>
+                    <div class="design-color-row">
+                        <div class="design-color-meta">
+                            <strong>Main Color (30%)</strong>
+                            <span>Cards, containers, headers &amp; panels</span>
+                        </div>
+                        <div class="design-color-inputs">
+                            <span id="design-ink-main" class="design-ink-badge">Dark Ink</span>
+                            <input type="color" id="design-color-main" class="design-color-picker" value="#ffffff" oninput="onDesignColorInput('main', this.value)">
+                            <input type="text" id="design-hex-main" class="design-hex-input" value="#FFFFFF" maxlength="7" onchange="onDesignHexInput('main', this.value)">
+                        </div>
                     </div>
-                    <div class="design-color-inputs">
-                        <span id="design-ink-contrast" class="design-ink-badge">Light Ink</span>
-                        <input type="color" id="design-color-contrast" class="design-color-picker" value="#4a7dff" oninput="onDesignColorInput('contrast', this.value)">
-                        <input type="text" id="design-hex-contrast" class="design-hex-input" value="#4A7DFF" maxlength="7" onchange="onDesignHexInput('contrast', this.value)">
+
+                    <div class="design-color-row">
+                        <div class="design-color-meta">
+                            <strong>Contrast Accent (10%)</strong>
+                            <span>Buttons, highlights, links &amp; focus</span>
+                        </div>
+                        <div class="design-color-inputs">
+                            <span id="design-ink-contrast" class="design-ink-badge">Light Ink</span>
+                            <input type="color" id="design-color-contrast" class="design-color-picker" value="#4a7dff" oninput="onDesignColorInput('contrast', this.value)">
+                            <input type="text" id="design-hex-contrast" class="design-hex-input" value="#4A7DFF" maxlength="7" onchange="onDesignHexInput('contrast', this.value)">
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="design-section">
-                <div class="design-section-title" style="flex-wrap: wrap; gap: 8px;">
-                    <span>3-Font Typography Studio</span>
-                    <span id="design-font-count-badge" style="font-size: 10px; color: #38bdf8;">3 Font Roles Active</span>
-                </div>
-                <select id="design-font-preset" onchange="applyFontPreset(this.value)">
-                    <option value="custom">Custom Fonts (Manual)</option>
-                    <option value="aether-glass">Aether Glass (Plus Jakarta Sans / Inter / JetBrains Mono)</option>
-                    <option value="resonance-hardware">Resonance Hardware (Space Grotesk / Plus Jakarta Sans / JetBrains Mono)</option>
-                    <option value="bytecraft-brutal">Bytecraft Brutal (Space Grotesk / DM Sans / JetBrains Mono)</option>
-                    <option value="soundcolor-clay">SoundColor Clay (Nunito Sans / Plus Jakarta Sans / Quicksand)</option>
-                    <option value="scriptorium-minimal">Scriptorium Editorial (Newsreader / Plus Jakarta Sans / JetBrains Mono)</option>
-                    <option value="aetheris-liquid">Aetheris Liquid (Syne / Inter / JetBrains Mono)</option>
-                    <option value="clean-studio">Clean Studio (Outfit / DM Sans / Space Mono)</option>
-                    <option value="editorial-classroom">Editorial Classroom (Fraunces / Source Sans 3 / IBM Plex Mono)</option>
-                    <option value="playful-workshop">Playful Workshop (Fredoka / Nunito / Space Mono)</option>
-                    <option value="tech-arcade">Tech &amp; Arcade (Space Grotesk / DM Sans / Fira Code)</option>
-                    <option value="calm-dyslexia">Calm Dyslexia-Friendly (Lexend / Atkinson Hyperlegible / Roboto Mono)</option>
-                    <option value="classic-academic">Classic Academic (Playfair Display / Lora / DM Mono)</option>
-                    <option value="sharp-swiss">Sharp Swiss Minimal (Syne / Work Sans / Space Mono)</option>
-                </select>
-
-                <div class="design-font-row">
-                    <div class="design-font-top">
-                        <div class="design-color-meta">
-                            <strong>Display / Headings (Font 1)</strong>
-                            <span>Titles, headings &amp; hero labels</span>
-                        </div>
-                        <select id="design-font-display" class="design-font-select" onchange="onDesignFontChange('fontDisplay', this.value)"></select>
+            <!-- TAB 2: FONT PANEL -->
+            <div id="design-pane-font" class="design-tab-pane">
+                <div class="design-section">
+                    <div class="design-section-title" style="flex-wrap: wrap; gap: 8px;">
+                        <span>3-Font Typography Studio</span>
+                        <span id="design-font-count-badge" style="font-size: 10px; color: #38bdf8;">3 Font Roles Active</span>
                     </div>
-                    <div id="design-font-preview-display" class="design-font-preview">Aa Bb — Quantum Learning Studio</div>
-                </div>
+                    <select id="design-font-preset" onchange="applyFontPreset(this.value)">
+                        <option value="custom">Custom Fonts (Manual)</option>
+                        <option value="aether-glass">Aether Glass (Plus Jakarta Sans / Inter / JetBrains Mono)</option>
+                        <option value="resonance-hardware">Resonance Hardware (Space Grotesk / Plus Jakarta Sans / JetBrains Mono)</option>
+                        <option value="bytecraft-brutal">Bytecraft Brutal (Space Grotesk / DM Sans / JetBrains Mono)</option>
+                        <option value="soundcolor-clay">SoundColor Clay (Nunito Sans / Plus Jakarta Sans / Quicksand)</option>
+                        <option value="scriptorium-minimal">Scriptorium Editorial (Newsreader / Plus Jakarta Sans / JetBrains Mono)</option>
+                        <option value="aetheris-liquid">Aetheris Liquid (Syne / Inter / JetBrains Mono)</option>
+                        <option value="clean-studio">Clean Studio (Outfit / DM Sans / Space Mono)</option>
+                        <option value="editorial-classroom">Editorial Classroom (Fraunces / Source Sans 3 / IBM Plex Mono)</option>
+                        <option value="playful-workshop">Playful Workshop (Fredoka / Nunito / Space Mono)</option>
+                        <option value="tech-arcade">Tech &amp; Arcade (Space Grotesk / DM Sans / Fira Code)</option>
+                        <option value="calm-dyslexia">Calm Dyslexia-Friendly (Lexend / Atkinson Hyperlegible / Roboto Mono)</option>
+                        <option value="classic-academic">Classic Academic (Playfair Display / Lora / DM Mono)</option>
+                        <option value="sharp-swiss">Sharp Swiss Minimal (Syne / Work Sans / Space Mono)</option>
+                    </select>
 
-                <div class="design-font-row">
-                    <div class="design-font-top">
-                        <div class="design-color-meta">
-                            <strong>Body / Reading (Font 2)</strong>
-                            <span>Paragraphs, options &amp; inputs</span>
+                    <div class="design-font-row">
+                        <div class="design-font-top">
+                            <div class="design-color-meta">
+                                <strong>Display / Headings (Font 1)</strong>
+                                <span>Titles, headings &amp; hero labels</span>
+                            </div>
+                            <select id="design-font-display" class="design-font-select" onchange="onDesignFontChange('fontDisplay', this.value)"></select>
                         </div>
-                        <select id="design-font-body" class="design-font-select" onchange="onDesignFontChange('fontBody', this.value)"></select>
+                        <div id="design-font-preview-display" class="design-font-preview">Aa Bb — Quantum Learning Studio</div>
                     </div>
-                    <div id="design-font-preview-body" class="design-font-preview">Clear reading copy for mixed-readiness learners 123</div>
-                </div>
 
-                <div class="design-font-row">
-                    <div class="design-font-top">
-                        <div class="design-color-meta">
-                            <strong>UI / Badges &amp; Mono (Font 3)</strong>
-                            <span>Buttons, pills, counters &amp; tags</span>
+                    <div class="design-font-row">
+                        <div class="design-font-top">
+                            <div class="design-color-meta">
+                                <strong>Body / Reading (Font 2)</strong>
+                                <span>Paragraphs, options &amp; inputs</span>
+                            </div>
+                            <select id="design-font-body" class="design-font-select" onchange="onDesignFontChange('fontBody', this.value)"></select>
                         </div>
-                        <select id="design-font-accent" class="design-font-select" onchange="onDesignFontChange('fontAccent', this.value)"></select>
+                        <div id="design-font-preview-body" class="design-font-preview">Clear reading copy for mixed-readiness learners 123</div>
                     </div>
-                    <div id="design-font-preview-accent" class="design-font-preview">STEP 03 • 94.2% • 1,420 XP</div>
+
+                    <div class="design-font-row">
+                        <div class="design-font-top">
+                            <div class="design-color-meta">
+                                <strong>UI / Badges &amp; Mono (Font 3)</strong>
+                                <span>Buttons, pills, counters &amp; tags</span>
+                            </div>
+                            <select id="design-font-accent" class="design-font-select" onchange="onDesignFontChange('fontAccent', this.value)"></select>
+                        </div>
+                        <div id="design-font-preview-accent" class="design-font-preview">STEP 03 • 94.2% • 1,420 XP</div>
+                    </div>
                 </div>
             </div>
 
-            <div class="design-section">
-                <div class="design-section-title" style="flex-wrap: wrap; gap: 8px;">
-                    <span>Design Aesthetic</span>
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <label style="display: inline-flex; align-items: center; gap: 4px; margin: 0; font-size: 10.5px; text-transform: none; letter-spacing: 0; color: #cbd5e1; cursor: pointer;" title="Apply the style's signature 3-color palette and 3-font pairing when clicking an aesthetic card">
-                            <input type="checkbox" id="design-link-style-defaults" checked style="width: auto; margin: 0;" onchange="toggleDesignLinkDefaults(this.checked)">
-                            Sync Style Colors &amp; Fonts
-                        </label>
-                        <span id="design-active-aesthetic-label" style="font-size: 10px; color: #a78bfa;">None</span>
+            <!-- TAB 3: GENERAL FEEL / AESTHETIC PANEL -->
+            <div id="design-pane-feel" class="design-tab-pane">
+                <div class="design-section">
+                    <div class="design-section-title" style="flex-wrap: wrap; gap: 8px;">
+                        <span>General Feel &amp; Surface Style</span>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <label style="display: inline-flex; align-items: center; gap: 4px; margin: 0; font-size: 10.5px; text-transform: none; letter-spacing: 0; color: #cbd5e1; cursor: pointer;" title="Apply the style's signature 3-color palette and 3-font pairing when clicking an aesthetic card">
+                                <input type="checkbox" id="design-link-style-defaults" checked style="width: auto; margin: 0;" onchange="toggleDesignLinkDefaults(this.checked)">
+                                Sync Style Colors &amp; Fonts
+                            </label>
+                            <span id="design-active-aesthetic-label" style="font-size: 10px; color: #a78bfa;">None</span>
+                        </div>
                     </div>
-                </div>
-                <div class="aesthetic-grid" id="aesthetic-grid">
-                    <button type="button" class="aesthetic-card" data-aesthetic="glassmorphism" onclick="selectDesignAesthetic('glassmorphism')">
-                        <div class="aesthetic-card-head"><span>Glassmorphism</span><span>🪟</span></div>
-                        <div class="aesthetic-card-desc">Aether frosted depth, specular rings &amp; cyan ambient glow.</div>
-                        <div class="aesthetic-preview-bar" style="background: rgba(27,31,47,0.72); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.18); box-shadow: 0 0 12px rgba(56,189,248,0.28); color: #dfe1f8;">Aether Glass <span style="color: #38bdf8;">24px</span></div>
-                    </button>
-                    <button type="button" class="aesthetic-card" data-aesthetic="skeuomorphism" onclick="selectDesignAesthetic('skeuomorphism')">
-                        <div class="aesthetic-card-head"><span>Skeuomorphism</span><span>🎛️</span></div>
-                        <div class="aesthetic-card-desc">Machined chassis bevels, recessed wells &amp; tactile amber keys.</div>
-                        <div class="aesthetic-preview-bar" style="background: linear-gradient(180deg, #37393d, #1e2024); border: 1px solid rgba(255,255,255,0.14); border-bottom: 3px solid #0c0e12; color: #e2e2e7; box-shadow: inset 0 1px 0 rgba(255,255,255,0.18);">R-808 Plate <span style="color: #ff8a00;">LED</span></div>
-                    </button>
-                    <button type="button" class="aesthetic-card" data-aesthetic="neobrutalism" onclick="selectDesignAesthetic('neobrutalism')">
-                        <div class="aesthetic-card-head"><span>Neo-Brutalism</span><span>⚡</span></div>
-                        <div class="aesthetic-card-desc">Thick 3px ink outlines, 0px blur extrusion &amp; mechanical press.</div>
-                        <div class="aesthetic-preview-bar" style="background: #ffe600; border: 2.5px solid #121212; border-radius: 2px; box-shadow: 3px 3px 0 #121212; color: #121212;">BYTECRAFT <span>0px</span></div>
-                    </button>
-                    <button type="button" class="aesthetic-card" data-aesthetic="claymorphism" onclick="selectDesignAesthetic('claymorphism')">
-                        <div class="aesthetic-card-head"><span>Claymorphism</span><span>🫧</span></div>
-                        <div class="aesthetic-card-desc">Sculpted pastel clay pebbles, soft inset grooves &amp; coral pills.</div>
-                        <div class="aesthetic-preview-bar" style="background: #fbf8ff; border-radius: 999px; color: #1a1b22; box-shadow: 0 4px 10px rgba(255,111,89,0.22), inset 2px 2px 4px rgba(255,255,255,0.95), inset -2px -2px 5px rgba(255,111,89,0.2);">SoundColor <span style="color: #ff6f59;">Clay</span></div>
-                    </button>
-                    <button type="button" class="aesthetic-card" data-aesthetic="minimalism" onclick="selectDesignAesthetic('minimalism')">
-                        <div class="aesthetic-card-head"><span>Minimalism</span><span>📐</span></div>
-                        <div class="aesthetic-card-desc">Alabaster folio, editorial serif poise &amp; 1px hairline calm.</div>
-                        <div class="aesthetic-preview-bar" style="background: #ffffff; border: 1px solid #c1c8c3; border-radius: 4px; color: #1e3a2f; box-shadow: 0 1px 2px rgba(28,27,26,0.04);">Scriptorium <span>1px</span></div>
-                    </button>
-                    <button type="button" class="aesthetic-card" data-aesthetic="liquidglass" onclick="selectDesignAesthetic('liquidglass')">
-                        <div class="aesthetic-card-head"><span>Liquid Glass</span><span>💧</span></div>
-                        <div class="aesthetic-card-desc">Luminous specular capsules, rim refraction &amp; electric cyan pills.</div>
-                        <div class="aesthetic-preview-bar" style="background: linear-gradient(135deg, rgba(29,31,42,0.88), rgba(17,19,29,0.78)); border: 1px solid rgba(255,255,255,0.28); border-radius: 999px; color: #e9feff; box-shadow: inset 1px 1px 0 rgba(255,255,255,0.35), 0 0 14px rgba(0,245,255,0.32);">Aetheris <span style="color: #00f5ff;">28px</span></div>
-                    </button>
+                    <div class="aesthetic-grid" id="aesthetic-grid">
+                        <button type="button" class="aesthetic-card" data-aesthetic="glassmorphism" onclick="selectDesignAesthetic('glassmorphism')">
+                            <div class="aesthetic-card-head"><span>Glassmorphism</span><span>🪟</span></div>
+                            <div class="aesthetic-card-desc">Aether frosted depth, specular rings &amp; cyan ambient glow.</div>
+                            <div class="aesthetic-preview-bar" style="background: rgba(27,31,47,0.72); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.18); box-shadow: 0 0 12px rgba(56,189,248,0.28); color: #dfe1f8;">Aether Glass <span style="color: #38bdf8;">24px</span></div>
+                        </button>
+                        <button type="button" class="aesthetic-card" data-aesthetic="skeuomorphism" onclick="selectDesignAesthetic('skeuomorphism')">
+                            <div class="aesthetic-card-head"><span>Skeuomorphism</span><span>🎛️</span></div>
+                            <div class="aesthetic-card-desc">Machined chassis bevels, recessed wells &amp; tactile amber keys.</div>
+                            <div class="aesthetic-preview-bar" style="background: linear-gradient(180deg, #37393d, #1e2024); border: 1px solid rgba(255,255,255,0.14); border-bottom: 3px solid #0c0e12; color: #e2e2e7; box-shadow: inset 0 1px 0 rgba(255,255,255,0.18);">R-808 Plate <span style="color: #ff8a00;">LED</span></div>
+                        </button>
+                        <button type="button" class="aesthetic-card" data-aesthetic="neobrutalism" onclick="selectDesignAesthetic('neobrutalism')">
+                            <div class="aesthetic-card-head"><span>Neo-Brutalism</span><span>⚡</span></div>
+                            <div class="aesthetic-card-desc">Thick 3px ink outlines, 0px blur extrusion &amp; mechanical press.</div>
+                            <div class="aesthetic-preview-bar" style="background: #ffe600; border: 2.5px solid #121212; border-radius: 2px; box-shadow: 3px 3px 0 #121212; color: #121212;">BYTECRAFT <span>0px</span></div>
+                        </button>
+                        <button type="button" class="aesthetic-card" data-aesthetic="claymorphism" onclick="selectDesignAesthetic('claymorphism')">
+                            <div class="aesthetic-card-head"><span>Claymorphism</span><span>🫧</span></div>
+                            <div class="aesthetic-card-desc">Sculpted pastel clay pebbles, soft inset grooves &amp; coral pills.</div>
+                            <div class="aesthetic-preview-bar" style="background: #fbf8ff; border-radius: 999px; color: #1a1b22; box-shadow: 0 4px 10px rgba(255,111,89,0.22), inset 2px 2px 4px rgba(255,255,255,0.95), inset -2px -2px 5px rgba(255,111,89,0.2);">SoundColor <span style="color: #ff6f59;">Clay</span></div>
+                        </button>
+                        <button type="button" class="aesthetic-card" data-aesthetic="minimalism" onclick="selectDesignAesthetic('minimalism')">
+                            <div class="aesthetic-card-head"><span>Minimalism</span><span>📐</span></div>
+                            <div class="aesthetic-card-desc">Alabaster folio, editorial serif poise &amp; 1px hairline calm.</div>
+                            <div class="aesthetic-preview-bar" style="background: #ffffff; border: 1px solid #c1c8c3; border-radius: 4px; color: #1e3a2f; box-shadow: 0 1px 2px rgba(28,27,26,0.04);">Scriptorium <span>1px</span></div>
+                        </button>
+                        <button type="button" class="aesthetic-card" data-aesthetic="liquidglass" onclick="selectDesignAesthetic('liquidglass')">
+                            <div class="aesthetic-card-head"><span>Liquid Glass</span><span>💧</span></div>
+                            <div class="aesthetic-card-desc">Luminous specular capsules, rim refraction &amp; electric cyan pills.</div>
+                            <div class="aesthetic-preview-bar" style="background: linear-gradient(135deg, rgba(29,31,42,0.88), rgba(17,19,29,0.78)); border: 1px solid rgba(255,255,255,0.28); border-radius: 999px; color: #e9feff; box-shadow: inset 1px 1px 0 rgba(255,255,255,0.35), 0 0 14px rgba(0,245,255,0.32);">Aetheris <span style="color: #00f5ff;">28px</span></div>
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -5449,21 +5474,60 @@ If this update establishes a new reusable design rule or pattern, you may also i
     }
 </script>
 <script id="block-design-engine">
-    const DESIGN_PRESETS = {
-        'aether-glass':         { base: '#0f1223', main: '#1b1f2f', contrast: '#38bdf8' },
-        'resonance-hardware':   { base: '#111317', main: '#282a2e', contrast: '#ff8a00' },
-        'bytecraft-brutal':     { base: '#fcf9f8', main: '#ffffff', contrast: '#ffe600' },
-        'soundcolor-clay':      { base: '#fbf8ff', main: '#ffffff', contrast: '#ff6f59' },
-        'scriptorium-minimal':  { base: '#fdf8f6', main: '#ffffff', contrast: '#1e3a2f' },
-        'aetheris-liquid':      { base: '#11131d', main: '#1d1f2a', contrast: '#00f5ff' },
-        'spring-paper':         { base: '#f8fafc', main: '#ffffff', contrast: '#4a7dff' },
-        'classroom-chalkboard': { base: '#1b2a23', main: '#24382f', contrast: '#fbbf24' },
-        'sg-red-cream':         { base: '#fffbf5', main: '#ffffff', contrast: '#ef3340' },
-        'warm-dyslexia':        { base: '#fdf6e3', main: '#f5ebd1', contrast: '#2563eb' },
-        'cyber-arcade':         { base: '#0f172a', main: '#1e293b', contrast: '#22d3ee' },
-        'matcha-studio':        { base: '#f1f5ee', main: '#ffffff', contrast: '#3f7d4c' },
-        'neopop-tangerine':     { base: '#fffdf0', main: '#ffe8a3', contrast: '#ff4d00' }
-    };
+    const DESIGN_MOODS = [
+        { id: 'all', label: 'All' },
+        { id: 'editorial', label: 'Warm & Editorial' },
+        { id: 'dark', label: 'Dark & Moody' },
+        { id: 'electric', label: 'Bold & Electric' },
+        { id: 'utility', label: 'Clean & Crisp' }
+    ];
+
+    const DESIGN_SCHEME_CATALOG = [
+        // Warm & Editorial
+        { id: 'vintage-heritage',     title: 'Vintage Heritage',          mood: 'editorial', colors: 'Clotted Cream · Spruce Velvet · Heirloom Tomato', base: '#eee2cb', main: '#1b4532', contrast: '#ee4129' },
+        { id: 'calm-botanical-desk',  title: 'Calm Botanical Desk',       mood: 'editorial', colors: 'Oat Milk · Forest Green · Tomato Red',            base: '#eee5d4', main: '#1d4a35', contrast: '#f2462e' },
+        { id: 'fizzy-botanical',      title: 'Fizzy Botanical',           mood: 'editorial', colors: 'Butter Cream · Forest Green · Hot Pink',          base: '#f4ead5', main: '#1e3b2f', contrast: '#ff3ea5' },
+        { id: 'velvet-espresso',      title: 'Velvet Espresso',           mood: 'editorial', colors: 'Ivory Silk · Mulberry Wine · Chartreuse Pop',     base: '#f0eadf', main: '#4e1d2e', contrast: '#d4f51c' },
+        { id: 'desert-expedition',    title: 'Rugged Outdoor',            mood: 'editorial', colors: 'Desert Sand · Olive Drab · Signal Yellow',        base: '#d8c3a0', main: '#585e3c', contrast: '#ffd21f' },
+        { id: 'scriptorium-minimal',  title: 'Alabaster & Forest',        mood: 'editorial', colors: 'Alabaster Paper · Crisp White · Deep Forest',     base: '#fdf8f6', main: '#ffffff', contrast: '#1e3a2f' },
+        { id: 'soundcolor-clay',      title: 'Soft Coral Clay',           mood: 'editorial', colors: 'Lilac Whisper · Pure Cloud · Coral Ember',        base: '#fbf8ff', main: '#ffffff', contrast: '#ff6f59' },
+        { id: 'sg-red-cream',         title: 'Warm Heritage Red',         mood: 'editorial', colors: 'Warm Cream · Pure White · Crimson Signal',        base: '#fffbf5', main: '#ffffff', contrast: '#ef3340' },
+
+        // Dark & Moody
+        { id: 'twilight-amber',       title: 'Twilight Amber',            mood: 'dark',      colors: 'Eclipse Plum · Pebble Silk · Amber Flare',        base: '#2b1c33', main: '#d9d3cc', contrast: '#ff8c12' },
+        { id: 'tactical-storm',       title: 'Tactical Industrial',       mood: 'dark',      colors: 'Storm Grey · Matte Black · Safety Orange',        base: '#5a6068', main: '#1c1d20', contrast: '#ff5f00' },
+        { id: 'nocturne-sunflower',   title: 'Nocturne Gold',             mood: 'dark',      colors: 'Midnight Navy · Powder Blue · Sunflower Yellow',  base: '#131d38', main: '#adc7e9', contrast: '#ffc20d' },
+        { id: 'midnight-saas',        title: 'Executive Dark SaaS',       mood: 'dark',      colors: 'Midnight Black · Electric Blue · Sunset Orange',  base: '#0e1117', main: '#2f6bff', contrast: '#ff7a1a' },
+        { id: 'molten-hardware',      title: 'Molten Hardware',           mood: 'dark',      colors: 'Raven Black · Pewter Grey · Molten Orange',       base: '#19191b', main: '#8c8e92', contrast: '#ff5410' },
+        { id: 'rich-velvet-noir',     title: 'Rich Velvet Noir',          mood: 'dark',      colors: 'Garnet Noir · Oyster Pearl · Royal Cobalt',       base: '#3b1219', main: '#e9e3d8', contrast: '#2443ff' },
+        { id: 'aether-glass',         title: 'Midnight Cyan Frost',       mood: 'dark',      colors: 'Deep Indigo · Smoked Slate · Cyan Glow',          base: '#0f1223', main: '#1b1f2f', contrast: '#38bdf8' },
+        { id: 'resonance-hardware',   title: 'Analog Studio Amber',       mood: 'dark',      colors: 'Carbon Matte · Chassis Grey · Warm Amber',        base: '#111317', main: '#282a2e', contrast: '#ff8a00' },
+        { id: 'aetheris-liquid',      title: 'Obsidian Neon Glow',        mood: 'dark',      colors: 'Obsidian Ink · Graphite Glass · Electric Cyan',   base: '#11131d', main: '#1d1f2a', contrast: '#00f5ff' },
+
+        // Bold & Electric
+        { id: 'electric-lavender',    title: 'Electric Lavender',         mood: 'electric',  colors: 'Periwinkle Bloom · Midnight Fig · Wasabi Volt',   base: '#8e7fe3', main: '#1e1830', contrast: '#c6ff24' },
+        { id: 'sweet-pastel-mint',    title: 'Sweet Pastel Pop',          mood: 'electric',  colors: 'Blush Pink · Charcoal Ink · Fresh Mint',          base: '#f3c3c8', main: '#2a2a2f', contrast: '#22e3a2' },
+        { id: 'cobalt-festival',      title: 'Festival Poster',           mood: 'electric',  colors: 'Cobalt Blue · Snow White · Acid Lime',            base: '#2a38f5', main: '#f6f4ee', contrast: '#d6ff3d' },
+        { id: 'sunny-coastal',        title: 'Sunny Coastal',             mood: 'electric',  colors: 'Pacific Blue · Ecru Sand · Candy Pink',           base: '#1e6bb0', main: '#e6dac2', contrast: '#ff3fa0' },
+        { id: 'cyber-synth-lime',     title: 'Electric Synth',            mood: 'electric',  colors: 'Violet Lacquer · Midnight Onyx · Cyber Lime',     base: '#5a2d9c', main: '#17151c', contrast: '#c5ff1f' },
+        { id: 'bytecraft-brutal',     title: 'High-Contrast Zine',        mood: 'electric',  colors: 'Newsprint Cream · Pure White · Signal Yellow',    base: '#fcf9f8', main: '#ffffff', contrast: '#ffe600' },
+        { id: 'cyber-arcade',         title: 'Neon Arcade Slate',         mood: 'electric',  colors: 'Midnight Slate · Deep Steel · Neon Cyan',         base: '#0f172a', main: '#1e293b', contrast: '#22d3ee' },
+        { id: 'neopop-tangerine',     title: 'Energetic Tangerine Pop',   mood: 'electric',  colors: 'Butter Light · Warm Apricot · Tangerine Pop',     base: '#fffdf0', main: '#ffe8a3', contrast: '#ff4d00' },
+
+        // Clean & Crisp
+        { id: 'alpine-aero',          title: 'Alpine Aero',               mood: 'utility',   colors: 'Polar White · Glacier Blue · Racing Red',         base: '#f1f3f4', main: '#9cc6ed', contrast: '#e4002b' },
+        { id: 'fresh-studio-mint',    title: 'Fresh Mint Studio',         mood: 'utility',   colors: 'Glacier Mint · Oxford Navy · Vermilion Spark',    base: '#cfe6dc', main: '#1f2a44', contrast: '#ff3b1f' },
+        { id: 'spring-paper',         title: 'Clean Daylight Studio',     mood: 'utility',   colors: 'Ice Canvas · Pure White · Cobalt Focus',          base: '#f8fafc', main: '#ffffff', contrast: '#4a7dff' },
+        { id: 'classroom-chalkboard', title: 'Classroom Chalkboard',      mood: 'utility',   colors: 'Chalk Green · Slate Board · Warm Chalk Gold',     base: '#1b2a23', main: '#24382f', contrast: '#fbbf24' },
+        { id: 'warm-dyslexia',        title: 'Low-Glare Dyslexia Cream',  mood: 'utility',   colors: 'Warm Parchment · Soft Sand · Clear Cobalt',       base: '#fdf6e3', main: '#f5ebd1', contrast: '#2563eb' },
+        { id: 'matcha-studio',        title: 'Calm Matcha Focus',         mood: 'utility',   colors: 'Sage Mist · Pure White · Matcha Leaf',            base: '#f1f5ee', main: '#ffffff', contrast: '#3f7d4c' }
+    ];
+
+    const DESIGN_PRESETS = Object.fromEntries(
+        DESIGN_SCHEME_CATALOG.map(s => [s.id, { base: s.base, main: s.main, contrast: s.contrast }])
+    );
+
+    let activeDesignMood = 'all';
 
     const FONT_PRESETS = {
         'aether-glass':        { display: 'Plus Jakarta Sans', body: 'Inter',                 accent: 'JetBrains Mono' },
@@ -5555,6 +5619,26 @@ If this update establishes a new reusable design rule or pattern, you may also i
     let designCodeSyncTimer = null;
     let designUndoCaptured = false;
     window._isApplyingDesign = false;
+    let activeDesignTab = localStorage.getItem('hongdouDesignActiveTab') || 'color';
+
+    function switchDesignTab(tabName) {
+        activeDesignTab = ['color', 'font', 'feel'].includes(tabName) ? tabName : 'color';
+        try { localStorage.setItem('hongdouDesignActiveTab', activeDesignTab); } catch (e) {}
+        ['color', 'font', 'feel'].forEach(t => {
+            const btn = document.getElementById(`design-tab-btn-${t}`);
+            const pane = document.getElementById(`design-pane-${t}`);
+            if (btn) btn.classList.toggle('active', t === activeDesignTab);
+            if (pane) pane.classList.toggle('active', t === activeDesignTab);
+        });
+    }
+
+    function swapDesignBaseAndMain() {
+        const prevBase = designState.base;
+        designState.base = designState.main;
+        designState.main = prevBase;
+        designState.preset = 'custom';
+        applyDesignSystem(true);
+    }
 
     function applySavedDesignStateObj(saved) {
         if (!saved || typeof saved !== 'object') return;
@@ -5802,8 +5886,17 @@ If this update establishes a new reusable design rule or pattern, you may also i
         setPair('main', designState.main);
         setPair('contrast', designState.contrast);
 
+        populateColorSchemeDropdown();
+        renderColorSchemeGrid();
         const presetEl = document.getElementById('design-palette-preset');
-        if (presetEl) presetEl.value = designState.preset;
+        if (presetEl) presetEl.value = DESIGN_PRESETS[designState.preset] ? designState.preset : 'custom';
+
+        const ratioLbl = document.getElementById('design-ratio-label');
+        if (ratioLbl) {
+            const activeScheme = DESIGN_SCHEME_CATALOG.find(s => s.id === designState.preset);
+            ratioLbl.textContent = activeScheme ? activeScheme.title : 'Custom 60-30-10';
+        }
+        switchDesignTab(activeDesignTab);
 
         const fontPresetEl = document.getElementById('design-font-preset');
         if (fontPresetEl) fontPresetEl.value = designState.fontPreset || 'custom';
@@ -5895,9 +5988,14 @@ If this update establishes a new reusable design rule or pattern, you may also i
         const btnHoverTarget = `button${btnExcl}:hover, .button${btnExcl}:hover`;
         const btnActiveTarget = `button${btnExcl}:active, .button${btnExcl}:active`;
 
+        const oppositePolarity = isBaseDark !== isMainDark;
+        const subSurface = oppositePolarity
+            ? mixHex(main, isMainDark ? '#000000' : '#ffffff', 0.14)
+            : mixHex(base, main, 0.52);
+
         let aestheticCss = '';
         if (aesthetic === 'glassmorphism') {
-            const surfaceLow = mixHex(base, main, 0.55);
+            const surfaceLow = oppositePolarity ? mixHex(main, isMainDark ? '#000000' : '#ffffff', 0.18) : mixHex(base, main, 0.55);
             const surfaceHigh = mixHex(main, contrast, 0.10);
             const ambientHalo = mixHex(main, contrast, 0.35);
             const primarySoftInk = isMainDark ? mixHex('#ffffff', contrast, 0.42) : mixHex('#0f172a', contrast, 0.55);
@@ -5983,8 +6081,8 @@ input[type="range"] { accent-color: var(--hd-contrast) !important; }
 .highlight, .subtitle, label strong { color: ${primarySoftInk}; }`;
         } else if (aesthetic === 'skeuomorphism') {
             const plateTop = mixHex(main, '#ffffff', isMainDark ? 0.08 : 0.25);
-            const plateBottom = mixHex(main, base, 0.35);
-            const wellBg = mixHex(base, main, 0.28);
+            const plateBottom = oppositePolarity ? mixHex(main, '#000000', 0.14) : mixHex(main, base, 0.35);
+            const wellBg = subSurface;
             const deepestWell = mixHex(base, '#000000', isBaseDark ? 0.28 : 0.06);
             const specularLip = isMainDark ? 'rgba(255, 255, 255, 0.14)' : 'rgba(255, 255, 255, 0.92)';
             const bottomBevel = isMainDark ? 'rgba(0, 0, 0, 0.72)' : 'rgba(15, 23, 42, 0.28)';
@@ -6069,7 +6167,7 @@ input[type="range"] { accent-color: var(--hd-contrast) !important; }
 .highlight, .subtitle, label strong { color: ${ledText}; }`;
         } else if (aesthetic === 'neobrutalism') {
             const inkOutline = isBaseDark ? '#f8fafc' : '#121212';
-            const innerTint = mixHex(base, main, 0.55);
+            const innerTint = subSurface;
             aestheticCss = `
 body {
     background: var(--hd-base) !important;
@@ -6155,7 +6253,7 @@ input[type="range"] { accent-color: ${inkOutline} !important; }
     box-shadow: 4px 4px 0 ${inkOutline} !important;
 }`;
         } else if (aesthetic === 'claymorphism') {
-            const clayPebble = mixHex(base, main, 0.55);
+            const clayPebble = subSurface;
             const clayGroove = mixHex(base, contrast, 0.08);
             const clayShade = mixHex(base, contrast, 0.25);
             const topLight = isMainDark ? 'rgba(255, 255, 255, 0.18)' : 'rgba(255, 255, 255, 0.95)';
@@ -6241,7 +6339,7 @@ input[type="range"] { accent-color: var(--hd-contrast) !important; }
 }`;
         } else if (aesthetic === 'minimalism') {
             const hairline = isMainDark ? 'rgba(255, 255, 255, 0.14)' : 'rgba(114, 121, 116, 0.28)';
-            const tonalBand = mixHex(base, main, 0.42);
+            const tonalBand = subSurface;
             const whisperShadow = isBaseDark ? 'rgba(0, 0, 0, 0.22)' : 'rgba(28, 27, 26, 0.04)';
             const contrastHover = mixHex(contrast, isMainDark ? '#ffffff' : '#000000', 0.16);
             aestheticCss = `
@@ -6459,6 +6557,7 @@ a { color: var(--hd-contrast); }
 .nav-button.active:not(.correct):not(.incorrect) { background: var(--hd-contrast) !important; color: var(--hd-text-on-contrast) !important; border-color: var(--hd-contrast) !important; }
 .nav-button.correct { background: #28a745 !important; color: #ffffff !important; border-color: #28a745 !important; font-family: var(--hd-font-accent) !important; }
 .nav-button.incorrect { background: #dc3545 !important; color: #ffffff !important; border-color: #dc3545 !important; font-family: var(--hd-font-accent) !important; }
+input::placeholder, textarea::placeholder { color: var(--hd-muted-on-main); opacity: 0.8; }
 .feedback.correct { background-color: rgba(40, 167, 69, 0.2) !important; color: ${feedbackCorrectText} !important; }
 .feedback.incorrect { background-color: rgba(220, 53, 69, 0.2) !important; color: ${feedbackWrongText} !important; }`;
     }
@@ -6589,6 +6688,75 @@ a { color: var(--hd-contrast); }
         designState[key] = normalized;
         designState.preset = 'custom';
         applyDesignSystem(true);
+    }
+
+    function setDesignColorMood(moodId) {
+        activeDesignMood = moodId || 'all';
+        renderColorSchemeGrid();
+    }
+
+    function populateColorSchemeDropdown() {
+        const selectEl = document.getElementById('design-palette-preset');
+        if (!selectEl || selectEl.dataset.populated === '1') return;
+        selectEl.innerHTML = '<option value="custom">Custom Colors (Manual)</option>';
+        DESIGN_MOODS.filter(m => m.id !== 'all').forEach(mood => {
+            const grp = document.createElement('optgroup');
+            grp.label = mood.label;
+            DESIGN_SCHEME_CATALOG.filter(s => s.mood === mood.id).forEach(scheme => {
+                const opt = document.createElement('option');
+                opt.value = scheme.id;
+                opt.textContent = `${scheme.title} (${scheme.colors})`;
+                grp.appendChild(opt);
+            });
+            selectEl.appendChild(grp);
+        });
+        selectEl.dataset.populated = '1';
+    }
+
+    function renderColorSchemeGrid() {
+        const pillsEl = document.getElementById('design-mood-pills');
+        const gridEl = document.getElementById('design-color-grid');
+        if (!pillsEl || !gridEl) return;
+
+        pillsEl.innerHTML = '';
+        DESIGN_MOODS.forEach(mood => {
+            const pill = document.createElement('button');
+            pill.type = 'button';
+            pill.className = 'design-mood-pill' + (activeDesignMood === mood.id ? ' active' : '');
+            pill.textContent = mood.label;
+            pill.onclick = () => setDesignColorMood(mood.id);
+            pillsEl.appendChild(pill);
+        });
+
+        const visibleSchemes = activeDesignMood === 'all'
+            ? DESIGN_SCHEME_CATALOG
+            : DESIGN_SCHEME_CATALOG.filter(s => s.mood === activeDesignMood);
+
+        gridEl.innerHTML = '';
+        visibleSchemes.forEach(scheme => {
+            const card = document.createElement('button');
+            card.type = 'button';
+            card.className = 'color-scheme-card' + (designState.preset === scheme.id ? ' active' : '');
+            card.title = `${scheme.title}\n60% Base: ${scheme.base}\n30% Main: ${scheme.main}\n10% Accent: ${scheme.contrast}`;
+            card.onclick = () => applyDesignPreset(scheme.id);
+
+            const bar = document.createElement('div');
+            bar.className = 'color-scheme-bar';
+            bar.innerHTML = `<span style="width:60%;background:${scheme.base};"></span><span style="width:30%;background:${scheme.main};"></span><span style="width:10%;background:${scheme.contrast};"></span>`;
+
+            const title = document.createElement('div');
+            title.className = 'color-scheme-title';
+            title.textContent = scheme.title;
+
+            const sub = document.createElement('div');
+            sub.className = 'color-scheme-sub';
+            sub.textContent = scheme.colors;
+
+            card.appendChild(bar);
+            card.appendChild(title);
+            card.appendChild(sub);
+            gridEl.appendChild(card);
+        });
     }
 
     function applyDesignPreset(presetKey) {

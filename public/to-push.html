@@ -12,6 +12,7 @@
         :root {
             --background-start: #0f0c29; --background-mid: #302b63; --background-end: #24243e;
             --spotlight-1: #7b4397; --spotlight-2: #dc2430; --panel-bg: rgba(20, 20, 35, 0.6);
+            --panel-blur: blur(15px);
             --border-color: rgba(255, 255, 255, 0.15); --text-color: #e0e0e0; --primary-color: #4a7dff;
             --danger-color: #dc3545;
         }
@@ -32,10 +33,10 @@
 
         @keyframes gradientAnimation { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
-        #sidebar-toggle-btn { position: fixed; top: 15px; left: 15px; z-index: 25; background: var(--panel-bg); color: var(--text-color); border: 1px solid var(--border-color); border-radius: 5px; padding: 8px 12px; cursor: pointer; backdrop-filter: blur(5px); transition: all 0.3s; opacity: 0.3; }
+        #sidebar-toggle-btn { position: fixed; top: 15px; left: 15px; z-index: 25; background: var(--panel-bg); color: var(--text-color); border: 1px solid var(--border-color); border-radius: 5px; padding: 8px 12px; cursor: pointer; backdrop-filter: var(--panel-blur); -webkit-backdrop-filter: var(--panel-blur); transition: all 0.3s; opacity: 0.3; }
         #sidebar-toggle-btn:hover { background: var(--primary-color); border-color: var(--primary-color); opacity: 1; }
 
-        #app-sidebar { position: fixed; top: 0; left: 0; height: 100vh; width: 260px; background: rgba(20, 20, 35, 0.95); backdrop-filter: blur(20px); border-right: 1px solid var(--border-color); z-index: 24; padding: 50px 15px 15px 15px; box-sizing: border-box; display: flex; flex-direction: column; gap: 15px; transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1); transform: translateX(0); box-shadow: 5px 0 25px rgba(0,0,0,0.3); overflow-y: auto; }
+        #app-sidebar { position: fixed; top: 0; left: 0; height: 100vh; width: 260px; background: var(--panel-bg); backdrop-filter: var(--panel-blur); -webkit-backdrop-filter: var(--panel-blur); border-right: 1px solid var(--border-color); z-index: 24; padding: 50px 15px 15px 15px; box-sizing: border-box; display: flex; flex-direction: column; gap: 15px; transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1); transform: translateX(0); box-shadow: 5px 0 30px rgba(0,0,0,0.5); overflow-y: auto; }
         #app-sidebar.closed { transform: translateX(-100%); }
 
         /* Adjusted Styles for Sidebar Layout */
@@ -59,7 +60,7 @@
         }
         .tabs .tab-button:hover { opacity: 1; } .tabs .tab-button.active { opacity: 1; border-bottom: 2px solid var(--primary-color); }
         .window-toggles .toggle-button {
-            font-size: 14px; padding: 8px 12px; cursor: pointer; border: 1px solid var(--border-color); background: var(--panel-bg);
+            font-size: 14px; padding: 8px 12px; cursor: pointer; border: 1px solid var(--border-color); background: rgba(255, 255, 255, 0.05);
             color: var(--text-color); border-radius: 5px; margin-left: 5px; transition: all 0.3s ease;
         }
         .window-toggles .toggle-button:hover { background: rgba(255, 255, 255, 0.2); }
@@ -80,7 +81,7 @@
         #middle-panel, #versions-panel, #credits-panel, #design-panel, #skills-panel {
             position: fixed; top: 0; right: 0; height: 100vh; width: 600px; max-width: 90vw;
             background: var(--panel-bg); border-left: 1px solid var(--border-color);
-            backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            backdrop-filter: var(--panel-blur); -webkit-backdrop-filter: var(--panel-blur);
             z-index: 100; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             transform: translateX(0);
             box-shadow: -5px 0 30px rgba(0,0,0,0.5);
@@ -89,7 +90,7 @@
             border-radius: 0;
         }
         #skills-panel {
-            width: 980px; max-width: 95vw; background: rgba(13, 17, 29, 0.96);
+            width: 980px; max-width: 95vw;
         }
         /* Hidden state for slide-outs */
         #middle-panel.hidden, #versions-panel.hidden, #credits-panel.hidden, #design-panel.hidden, #skills-panel.hidden {
@@ -131,8 +132,8 @@
         /* Skills Hub Drawer Workbench */
         .skills-hub-header {
             display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center;
-            gap: 10px; padding: 12px 16px; border-bottom: 1px solid #2e3856;
-            background: rgba(17, 22, 40, 0.9); flex-shrink: 0;
+            gap: 10px; padding: 12px 16px; border-bottom: 1px solid var(--border-color);
+            background: rgba(0, 0, 0, 0.22); flex-shrink: 0;
         }
         .skills-hub-title-wrap { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
         .skills-hub-title-wrap h3 { margin: 0; font-size: 15px; color: #818cf8; }
@@ -258,7 +259,7 @@
 
         .skills-hub-footer {
             display: flex; justify-content: space-between; align-items: center; gap: 10px;
-            padding: 10px 16px; border-top: 1px solid #2e3856; background: rgba(17, 22, 40, 0.9);
+            padding: 10px 16px; border-top: 1px solid var(--border-color); background: rgba(0, 0, 0, 0.22);
             flex-shrink: 0;
         }
         .skills-modal-overlay {
@@ -3575,6 +3576,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 codeEditor.value = initialCode;
             }
         }
+        const livePreviewEl = document.getElementById('live-preview');
+        if (livePreviewEl) {
+            livePreviewEl.addEventListener('load', () => {
+                try {
+                    const doc = livePreviewEl.contentDocument;
+                    if (!doc || !doc.body) return;
+                    const hasDesign = designState.isCustomized || /<style\s+id=["']hongdou-design-system["']/i.test(codeEditor.value);
+                    if (hasDesign && typeof applyAutoContrastToDocument === 'function') {
+                        applyAutoContrastToDocument(doc, designState.autoInk !== false);
+                    }
+                } catch (e) {}
+            });
+        }
         updatePreview();
 
         // Event listener for goal templates
@@ -5824,7 +5838,7 @@ If this update establishes a new reusable design rule or pattern, you may also i
 
     function applySavedDesignToHtml(html) {
         if (!designState.applyToNewApps || !designState.isCustomized) return html;
-        return upsertDesignStyleInHtml(html, buildDesignSystemCss(designState), buildGoogleFontsUrl(designState));
+        return upsertDesignStyleInHtml(html, buildDesignSystemCss(designState), buildGoogleFontsUrl(designState), designState.autoInk !== false);
     }
 
     const AESTHETIC_PROMPT_SPECS = {
@@ -6642,6 +6656,13 @@ ${btnTarget} {
 
         const feedbackCorrectText = isMainDark ? '#86efac' : '#155724';
         const feedbackWrongText = isMainDark ? '#fca5a5' : '#721c24';
+        const autoInkCss = autoInk ? `
+:is(.container, .card, .panel, header, nav, section, article, .quiz-question, #slide-window) :is(h1, h2, h3, h4, h5, h6, p, li, dt, dd, figcaption, blockquote, label):not(.badge):not(.pill):not(.tag):not(.chip):not(.correct):not(.incorrect):not([data-hd-custom]):not([style*="background"]) { color: inherit !important; }
+:is(${btnTarget}) :is(h1, h2, h3, h4, h5, h6, p, div, span, strong, small):not(.badge):not(.pill):not(.tag):not(.chip):not([data-hd-custom]):not([style*="background"]) { color: inherit !important; }
+h1, h2, h3, h4, h5, h6, .app-title { color: inherit !important; font-family: var(--hd-font-display) !important; letter-spacing: -0.02em; }
+input::placeholder, textarea::placeholder { color: var(--hd-muted-on-main) !important; opacity: 0.85; }` : `
+h1, h2, h3, h4, .app-title { color: inherit; font-family: var(--hd-font-display) !important; letter-spacing: -0.02em; }
+input::placeholder, textarea::placeholder { color: var(--hd-muted-on-main); opacity: 0.8; }`;
 
         return `/* hd-design: ${JSON.stringify(metaObj)} */
 :root {
@@ -6660,24 +6681,289 @@ ${btnTarget} {
 }
 ${aestheticCss}
 body, p, li, td, label, input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), select, textarea { font-family: var(--hd-font-body) !important; }
-h1, h2, h3, h4, .app-title { color: inherit; font-family: var(--hd-font-display) !important; letter-spacing: -0.02em; }
+${autoInkCss}
 button, .button, .badge, .tag, .pill, .chip, .timer, .counter, .score, .slide-counter, code, pre, th { font-family: var(--hd-font-accent) !important; }
 a { color: var(--hd-contrast); }
 .nav-button:not(.correct):not(.incorrect):not(.active) { background: ${hexToRgba(main, 0.75)} !important; color: var(--hd-text-on-main) !important; border-color: ${borderSoft} !important; font-family: var(--hd-font-accent) !important; }
 .nav-button.active:not(.correct):not(.incorrect) { background: var(--hd-contrast) !important; color: var(--hd-text-on-contrast) !important; border-color: var(--hd-contrast) !important; }
 .nav-button.correct { background: #28a745 !important; color: #ffffff !important; border-color: #28a745 !important; font-family: var(--hd-font-accent) !important; }
 .nav-button.incorrect { background: #dc3545 !important; color: #ffffff !important; border-color: #dc3545 !important; font-family: var(--hd-font-accent) !important; }
-input::placeholder, textarea::placeholder { color: var(--hd-muted-on-main); opacity: 0.8; }
 .feedback.correct { background-color: rgba(40, 167, 69, 0.2) !important; color: ${feedbackCorrectText} !important; }
 .feedback.incorrect { background-color: rgba(220, 53, 69, 0.2) !important; color: ${feedbackWrongText} !important; }`;
     }
 
-    function upsertDesignStyleInHtml(html, cssText, fontsUrl = '') {
-        const fontTag = fontsUrl ? `<link id="hongdou-design-fonts" rel="stylesheet" href="${fontsUrl}">` : '';
-        const existingFontRegex = /<link\s+id=["']hongdou-design-fonts["'][^>]*>\r?\n?/gi;
-        let out = html.replace(existingFontRegex, '');
+    function runHongDouContrastPass(doc, enabled = true) {
+        if (!doc || !doc.body) return;
+        const win = doc.defaultView || window;
+        const skipTags = new Set(['SCRIPT', 'STYLE', 'NOSCRIPT', 'META', 'LINK', 'HEAD', 'BR', 'HR', 'IMG', 'VIDEO', 'CANVAS', 'IFRAME', 'SVG']);
 
-        const tag = (fontTag ? `${fontTag}\n    ` : '') + `<style id="hongdou-design-system">\n${cssText}\n</style>`;
+        if (doc._hdContrastObserver) {
+            doc._hdContrastObserver.disconnect();
+            doc._hdContrastObserver = null;
+        }
+        if (doc._hdContrastRaf) {
+            win.cancelAnimationFrame(doc._hdContrastRaf);
+            doc._hdContrastRaf = null;
+        }
+
+        const restoreOriginalColor = (el) => {
+            if (!el.dataset || el.dataset.hdAutoInk !== '1') return;
+            const orig = el.dataset.hdOrigColor || '';
+            const prio = el.dataset.hdOrigPriority || '';
+            if (orig) {
+                el.style.setProperty('color', orig, prio);
+            } else {
+                el.style.removeProperty('color');
+            }
+            delete el.dataset.hdAutoInk;
+            delete el.dataset.hdOrigColor;
+            delete el.dataset.hdOrigPriority;
+        };
+
+        if (!enabled) {
+            doc.querySelectorAll('[data-hd-auto-ink="1"]').forEach(restoreOriginalColor);
+            return;
+        }
+
+        const parseColor = (str) => {
+            if (!str || str === 'transparent') return { r: 0, g: 0, b: 0, a: 0 };
+            const m = String(str).match(/rgba?\(\s*([\d.]+)[,\s]+([\d.]+)[,\s]+([\d.]+)(?:\s*[,/]\s*([\d.]+%?))?\s*\)/i);
+            if (m) {
+                let a = 1;
+                if (m[4] !== undefined) {
+                    a = m[4].endsWith('%') ? parseFloat(m[4]) / 100 : parseFloat(m[4]);
+                }
+                return { r: parseFloat(m[1]), g: parseFloat(m[2]), b: parseFloat(m[3]), a: isNaN(a) ? 1 : Math.max(0, Math.min(1, a)) };
+            }
+            try {
+                let ctx = doc._hdColorCtx;
+                if (!ctx) {
+                    const c = doc.createElement('canvas');
+                    c.width = 1;
+                    c.height = 1;
+                    ctx = c.getContext('2d', { willReadFrequently: true });
+                    doc._hdColorCtx = ctx;
+                }
+                ctx.clearRect(0, 0, 1, 1);
+                ctx.fillStyle = str;
+                ctx.fillRect(0, 0, 1, 1);
+                const d = ctx.getImageData(0, 0, 1, 1).data;
+                return { r: d[0], g: d[1], b: d[2], a: d[3] / 255 };
+            } catch (e) {
+                return { r: 0, g: 0, b: 0, a: 0 };
+            }
+        };
+
+        const blendOver = (fg, bg) => {
+            const a = fg.a;
+            if (a >= 0.999) return { r: fg.r, g: fg.g, b: fg.b, a: 1 };
+            if (a <= 0.001) return bg;
+            return {
+                r: fg.r * a + bg.r * (1 - a),
+                g: fg.g * a + bg.g * (1 - a),
+                b: fg.b * a + bg.b * (1 - a),
+                a: 1
+            };
+        };
+
+        const relLum = (c) => {
+            const lin = (v) => {
+                const s = v / 255;
+                return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+            };
+            return 0.2126 * lin(c.r) + 0.7152 * lin(c.g) + 0.0722 * lin(c.b);
+        };
+
+        const contrastOf = (c1, c2) => {
+            const l1 = relLum(c1);
+            const l2 = relLum(c2);
+            return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+        };
+
+        const extractGradientColor = (bgImg) => {
+            if (!bgImg || bgImg === 'none') return null;
+            const tokens = bgImg.match(/#[0-9a-f]{3,8}|rgba?\([^)]+\)|oklch\([^)]+\)/gi);
+            if (!tokens || tokens.length === 0) return null;
+            let r = 0, g = 0, b = 0, count = 0;
+            for (let i = 0; i < Math.min(3, tokens.length); i++) {
+                const parsed = parseColor(tokens[i]);
+                if (parsed.a > 0.05) {
+                    r += parsed.r; g += parsed.g; b += parsed.b; count++;
+                }
+            }
+            return count > 0 ? { r: r / count, g: g / count, b: b / count, a: 1 } : null;
+        };
+
+        const getEffectiveBackground = (el) => {
+            const chain = [];
+            let cur = el;
+            while (cur && cur.nodeType === 1) {
+                chain.push(cur);
+                cur = cur.parentElement;
+            }
+            chain.reverse();
+            const baseVar = win.getComputedStyle(doc.documentElement).getPropertyValue('--hd-base').trim();
+            let bg = baseVar ? parseColor(baseVar) : { r: 255, g: 255, b: 255, a: 1 };
+            if (bg.a < 0.99) bg = { r: 255, g: 255, b: 255, a: 1 };
+
+            for (let i = 0; i < chain.length; i++) {
+                const cs = win.getComputedStyle(chain[i]);
+                let layer = parseColor(cs.backgroundColor);
+                if (layer.a < 0.05 && cs.backgroundImage && cs.backgroundImage !== 'none') {
+                    const grad = extractGradientColor(cs.backgroundImage);
+                    if (grad) layer = grad;
+                }
+                if (layer.a > 0.01) {
+                    bg = blendOver(layer, bg);
+                }
+            }
+            return bg;
+        };
+
+        const hasDirectText = (el) => {
+            if (el.tagName === 'INPUT' || el.tagName === 'SELECT' || el.tagName === 'TEXTAREA' || el.tagName === 'OPTION') {
+                return el.type !== 'hidden' && el.type !== 'checkbox' && el.type !== 'radio' && el.type !== 'range' && el.type !== 'color';
+            }
+            for (let i = 0; i < el.childNodes.length; i++) {
+                const n = el.childNodes[i];
+                if (n.nodeType === 3 && n.nodeValue && n.nodeValue.trim().length > 0) return true;
+            }
+            return false;
+        };
+
+        const applyPass = () => {
+            doc._hdApplyingContrast = true;
+            try {
+                const all = [doc.body, ...doc.body.querySelectorAll('*')];
+                for (let i = 0; i < all.length; i++) {
+                    const el = all[i];
+                    if (!el || el.nodeType !== 1 || skipTags.has(el.tagName)) continue;
+                    if (el.closest('svg') || el.hasAttribute('data-hd-no-contrast')) continue;
+                    if (!hasDirectText(el)) {
+                        if (el.dataset && el.dataset.hdAutoInk === '1') restoreOriginalColor(el);
+                        continue;
+                    }
+
+                    const wasSet = el.dataset && el.dataset.hdAutoInk === '1';
+                    const prevOrig = wasSet ? (el.dataset.hdOrigColor || '') : (el.style.getPropertyValue('color') || '');
+                    const prevPrio = wasSet ? (el.dataset.hdOrigPriority || '') : (el.style.getPropertyPriority('color') || '');
+                    if (wasSet) {
+                        if (prevOrig) el.style.setProperty('color', prevOrig, prevPrio);
+                        else el.style.removeProperty('color');
+                    }
+
+                    const cs = win.getComputedStyle(el);
+                    if (cs.display === 'none' || cs.visibility === 'hidden' || parseFloat(cs.opacity) === 0) {
+                        if (wasSet) {
+                            delete el.dataset.hdAutoInk;
+                            delete el.dataset.hdOrigColor;
+                            delete el.dataset.hdOrigPriority;
+                        }
+                        continue;
+                    }
+
+                    const bg = getEffectiveBackground(el);
+                    const rawFg = parseColor(cs.color);
+                    const fg = rawFg.a < 0.99 ? blendOver(rawFg, bg) : rawFg;
+
+                    const fontSize = parseFloat(cs.fontSize) || 16;
+                    const fontWeight = parseInt(cs.fontWeight, 10) || 400;
+                    const minRatio = (fontSize >= 24 || (fontSize >= 18.66 && fontWeight >= 700)) ? 3.2 : 4.5;
+                    const ratio = contrastOf(fg, bg);
+
+                    if (ratio >= minRatio) {
+                        if (wasSet) {
+                            delete el.dataset.hdAutoInk;
+                            delete el.dataset.hdOrigColor;
+                            delete el.dataset.hdOrigPriority;
+                        }
+                        continue;
+                    }
+
+                    const bgIsLight = relLum(bg) > 0.36;
+                    const targetInk = bgIsLight ? { r: 15, g: 23, b: 42 } : { r: 248, g: 250, b: 252 };
+                    let fixedHex = bgIsLight ? '#0f172a' : '#f8fafc';
+                    const chroma = Math.max(fg.r, fg.g, fg.b) - Math.min(fg.r, fg.g, fg.b);
+
+                    if (chroma > 35) {
+                        for (let step = 1; step <= 10; step++) {
+                            const t = step / 10;
+                            const cand = {
+                                r: Math.round(fg.r * (1 - t) + targetInk.r * t),
+                                g: Math.round(fg.g * (1 - t) + targetInk.g * t),
+                                b: Math.round(fg.b * (1 - t) + targetInk.b * t),
+                                a: 1
+                            };
+                            if (contrastOf(cand, bg) >= minRatio) {
+                                fixedHex = `rgb(${cand.r}, ${cand.g}, ${cand.b})`;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (!wasSet) {
+                        el.dataset.hdOrigColor = prevOrig;
+                        el.dataset.hdOrigPriority = prevPrio;
+                    }
+                    el.dataset.hdAutoInk = '1';
+                    el.style.setProperty('color', fixedHex, 'important');
+                }
+            } finally {
+                doc._hdApplyingContrast = false;
+            }
+        };
+
+        applyPass();
+
+        if (typeof win.MutationObserver === 'function') {
+            const schedulePass = () => {
+                if (doc._hdApplyingContrast || doc._hdContrastRaf) return;
+                doc._hdContrastRaf = win.requestAnimationFrame(() => {
+                    doc._hdContrastRaf = null;
+                    applyPass();
+                });
+            };
+            const obs = new win.MutationObserver((mutations) => {
+                if (doc._hdApplyingContrast) return;
+                for (let i = 0; i < mutations.length; i++) {
+                    const m = mutations[i];
+                    if (m.type === 'attributes' && m.attributeName === 'data-hd-auto-ink') continue;
+                    schedulePass();
+                    break;
+                }
+            });
+            obs.observe(doc.body, {
+                childList: true,
+                subtree: true,
+                attributes: true,
+                attributeFilter: ['class', 'style']
+            });
+            doc._hdContrastObserver = obs;
+        }
+    }
+
+    function applyAutoContrastToDocument(doc, enabled = true) {
+        try {
+            runHongDouContrastPass(doc, enabled);
+        } catch (e) {
+            console.warn('Auto-contrast check warning:', e);
+        }
+    }
+
+    function buildAutoContrastScriptTag() {
+        const fnBody = runHongDouContrastPass.toString();
+        const runner = `(function(){\n  ${fnBody}\n  function init(){\n    if (document._hdContrastObserver) return;\n    runHongDouContrastPass(document, true);\n  }\n  if (document.readyState === 'loading') {\n    document.addEventListener('DOMContentLoaded', init);\n  } else {\n    init();\n  }\n})();`;
+        return `<script id="hongdou-design-contrast">\n${runner}\n<` + `/script>`;
+    }
+
+    function upsertDesignStyleInHtml(html, cssText, fontsUrl = '', autoInk = true) {
+        const fontTag = fontsUrl ? `<link id="hongdou-design-fonts" rel="stylesheet" href="${fontsUrl}">` : '';
+        let out = html
+            .replace(/[ \t]*<link\s+id=["']hongdou-design-fonts["'][^>]*>\r?\n?/gi, '')
+            .replace(/[ \t]*<script\s+id=["']hongdou-design-contrast["'][^>]*>[\s\S]*?<\/script>\r?\n?/gi, '');
+
+        const contrastTag = autoInk ? `\n    ${buildAutoContrastScriptTag()}` : '';
+        const tag = (fontTag ? `${fontTag}\n    ` : '') + `<style id="hongdou-design-system">\n${cssText}\n</style>${contrastTag}`;
         const existingRegex = /<style\s+id=["']hongdou-design-system["'][^>]*>[\s\S]*?<\/style>/i;
         if (existingRegex.test(out)) {
             return out.replace(existingRegex, () => tag);
@@ -6694,7 +6980,8 @@ input::placeholder, textarea::placeholder { color: var(--hd-muted-on-main); opac
     function removeDesignStyleFromHtml(html) {
         return html
             .replace(/[ \t]*<link\s+id=["']hongdou-design-fonts["'][^>]*>\r?\n?/gi, '')
-            .replace(/[ \t]*<style\s+id=["']hongdou-design-system["'][^>]*>[\s\S]*?<\/style>\r?\n?/gi, '');
+            .replace(/[ \t]*<style\s+id=["']hongdou-design-system["'][^>]*>[\s\S]*?<\/style>\r?\n?/gi, '')
+            .replace(/[ \t]*<script\s+id=["']hongdou-design-contrast["'][^>]*>[\s\S]*?<\/script>\r?\n?/gi, '');
     }
 
     function injectDesignLivePreview(cssText, fontsUrl = '') {
@@ -6725,6 +7012,7 @@ input::placeholder, textarea::placeholder { color: var(--hd-muted-on-main); opac
                 doc.head.appendChild(styleEl);
             }
             styleEl.textContent = cssText;
+            applyAutoContrastToDocument(doc, designState.autoInk !== false);
             return true;
         } catch (e) {
             return false;
@@ -6739,7 +7027,7 @@ input::placeholder, textarea::placeholder { color: var(--hd-muted-on-main); opac
             }
             const cssText = buildDesignSystemCss(designState);
             const fontsUrl = buildGoogleFontsUrl(designState);
-            const updatedHtml = upsertDesignStyleInHtml(codeEditor.value, cssText, fontsUrl);
+            const updatedHtml = upsertDesignStyleInHtml(codeEditor.value, cssText, fontsUrl, designState.autoInk !== false);
             if (updatedHtml !== codeEditor.value) {
                 codeEditor.value = updatedHtml;
                 if (currentlySelectedVersionId) {

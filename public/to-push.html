@@ -320,6 +320,29 @@
         .color-scheme-sub { font-size: 10px; color: #94a3b8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .color-scheme-bar { display: flex; height: 18px; width: 100%; border-radius: 6px; overflow: hidden; border: 1px solid rgba(255,255,255,0.16); }
         .color-scheme-bar span { height: 100%; display: block; }
+        .design-manual-toggle-btn { height: 26px; padding: 0 11px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.06); color: #cbd5e1; font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.15s ease-out; white-space: nowrap; }
+        .design-manual-toggle-btn:hover { background: rgba(255,255,255,0.12); color: #ffffff; }
+        .design-manual-toggle-btn:active { transform: scale(0.95); }
+        .design-manual-toggle-btn.active { background: var(--primary-color); border-color: var(--primary-color); color: #ffffff; box-shadow: 0 0 0 1px rgba(74, 125, 255, 0.4); }
+        .design-manual-section { display: none; }
+        .design-manual-section.open { display: flex; }
+        .font-scheme-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; max-height: 260px; overflow-y: auto; padding-right: 2px; min-width: 0; }
+        .font-scheme-card { display: flex; flex-direction: column; gap: 4px; padding: 10px 11px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.04); color: #f8fafc; cursor: pointer; text-align: left; transition: all 0.15s ease-out; min-width: 0; }
+        .font-scheme-card:hover { background: rgba(255,255,255,0.09); border-color: rgba(255,255,255,0.3); }
+        .font-scheme-card:active { transform: scale(0.97); }
+        .font-scheme-card.active { border-color: var(--primary-color); background: rgba(74, 125, 255, 0.18); box-shadow: 0 0 0 1px var(--primary-color); }
+        .font-scheme-sample { font-size: 15px; font-weight: 700; color: #f8fafc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.25; }
+        .font-scheme-title { font-size: 11px; font-weight: 600; color: #cbd5e1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .font-scheme-sub { font-size: 10px; color: #94a3b8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .design-specimen-canvas { border-radius: 10px; padding: 14px; border: 1px solid rgba(255,255,255,0.14); transition: background-color 0.2s ease; }
+        .design-specimen-surface { border-radius: 8px; padding: 14px 16px; border: 1px solid rgba(15,23,42,0.12); display: flex; flex-direction: column; gap: 6px; transition: background-color 0.2s ease, color 0.2s ease; }
+        .design-specimen-kicker { font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; }
+        .design-specimen-title { font-size: 21px; font-weight: 700; line-height: 1.18; letter-spacing: -0.02em; margin: 0; }
+        .design-specimen-header { font-size: 15px; font-weight: 700; line-height: 1.25; margin: 2px 0 0 0; }
+        .design-specimen-subheader { font-size: 12.5px; font-weight: 600; line-height: 1.35; opacity: 0.85; margin: 0; }
+        .design-specimen-body { font-size: 12px; line-height: 1.45; opacity: 0.88; margin: 2px 0 4px 0; }
+        .design-specimen-actions { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; padding-top: 4px; }
+        .design-specimen-pill { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; letter-spacing: 0.03em; }
 
         #right-panel {
             position: fixed !important; top: 0; left: 0; width: 100vw; height: 100vh;
@@ -560,7 +583,7 @@
     <div class="header-left">
         <div class="app-title">
             <div style="display: flex; align-items: center;">红豆SG | HongDouSG <span id="sidebar-sync-status" title="Sync Status: Offline"></span></div>
-            <div class="subtitle">A 🇸🇬 Singaporean App Creator</div>
+            <div class="subtitle">A Singaporean App Creator</div>
         </div>
         <!-- Tabs Removed -->
         <div style="margin-top: 15px; display: flex; flex-direction: column; gap: 8px; width: 100%;">
@@ -622,9 +645,9 @@
                 <button type="button" id="skills-clear-btn" onclick="clearStreamlinedSkills()" title="Clear active streamlined skills">✕</button>
             </div>
             <div id="skills-toolbar-widget">
-                <button type="button" class="skills-mini-btn" style="background: #4f46e5;" onclick="openSkillsHub()" title="Open unified Skills Hub (Manage, Star, Edit, and Curate Prompt Cards)">Skills Hub ⚡</button>
-                <button type="button" class="skills-mini-btn" style="background: #0284c7;" onclick="offerSkills()" title="Copy all skills with screening prompt so AI picks relevant skills">Offer 📤</button>
-                <button type="button" class="skills-mini-btn" style="background: #d97706;" onclick="streamlineSkills()" title="Read AI's selected skill names from clipboard and bundle them">Streamline ⚡</button>
+                <button type="button" class="skills-mini-btn" style="background: #4f46e5;" onclick="openSkillsHub()" title="Open unified Skills Hub (Manage, Star, Edit, and Curate Prompt Cards)">Skills Hub</button>
+                <button type="button" class="skills-mini-btn" style="background: #0284c7;" onclick="offerSkills()" title="Copy all skills with screening prompt so AI picks relevant skills">Offer</button>
+                <button type="button" class="skills-mini-btn" style="background: #d97706;" onclick="streamlineSkills()" title="Read AI's selected skill names from clipboard and bundle them">Streamline</button>
             </div>
 
         </div>
@@ -661,7 +684,7 @@
                 <h3 data-translate-key="chatHeader">Chat with AI</h3>
                 <div>
                     <button class="icon-button" title="App Creation Settings" onclick="toggleAppSettings()">&#9881;</button>
-                    <button class="icon-button" title="Clear Chat" onclick="clearChat()">&#128465;</button>
+                    <button class="icon-button" title="Clear Chat" onclick="clearChat()">Clear</button>
                 </div>
             </div>
             <div id="app-settings-dropdown">
@@ -716,8 +739,8 @@
                     <button id="new-folder-button" class="action-button" style="padding: 6px 12px; font-size: 13px; background-color: var(--primary-color);" data-translate-key="newFolderButton">New Folder</button>
                 </div>
                 <div class="panel-header-actions" id="local-asset-actions" style="display: none;">
-                    <button id="select-local-folder-btn" class="action-button" style="padding: 6px 12px; font-size: 13px; background-color: var(--primary-color);" onclick="selectLocalFolder()">📁 Choose Folder</button>
-                    <button id="refresh-local-folder-btn" class="action-button" style="padding: 6px 10px; font-size: 13px; background-color: #17a2b8;" onclick="refreshLocalFolder()" title="Refresh folder files">↻</button>
+                    <button id="select-local-folder-btn" class="action-button" style="padding: 6px 12px; font-size: 13px; background-color: var(--primary-color);" onclick="selectLocalFolder()">Choose Folder</button>
+                    <button id="refresh-local-folder-btn" class="action-button" style="padding: 6px 10px; font-size: 13px; background-color: #17a2b8;" onclick="refreshLocalFolder()" title="Refresh folder files">Refresh</button>
                     <button id="new-local-folder-btn" class="action-button" style="padding: 6px 12px; font-size: 13px; background-color: #6c757d;" onclick="createLocalSubfolder()">+ Folder</button>
                 </div>
             </div>
@@ -770,7 +793,7 @@
 
         <div class="settings-item" style="border-top: 1px solid var(--border-color); padding-top: 15px; margin-top: 15px;">
             <div style="display: flex; justify-content: space-between; align-items: center;">
-                <label style="color: #e67e22; margin:0;">⚡ Real-time Sync</label>
+                <label style="color: #e67e22; margin:0;">Real-time Sync</label>
                 <span id="sync-status" style="font-size: 10px; padding: 2px 6px; border-radius: 4px; background: #333; color: #aaa;">Offline</span>
             </div>
             <div style="font-size: 11px; margin: 8px 0; opacity: 0.8; line-height: 1.4;">
@@ -797,7 +820,7 @@
     </div>
     <div id="design-panel" class="panel hidden" style="padding: 0;">
         <div class="panel-header">
-            <h3>🎨 Design Studio</h3>
+            <h3>Design Studio</h3>
             <div class="panel-header-actions">
                 <label style="display: inline-flex; align-items: center; gap: 5px; margin: 0; font-size: 11px; color: #cbd5e1; cursor: pointer;" title="Automatically apply your saved Design Studio theme when resetting or creating a new app">
                     <input type="checkbox" id="design-apply-new-apps" checked style="width: auto; margin: 0;" onchange="toggleDesignApplyNewApps(this.checked)">
@@ -808,34 +831,34 @@
             </div>
         </div>
         <div class="design-tabs-bar" role="tablist" aria-label="Design Studio Sections">
-            <button type="button" class="design-tab-btn active" id="design-tab-btn-color" data-design-tab="color" onclick="switchDesignTab('color')">🎨 Color</button>
-            <button type="button" class="design-tab-btn" id="design-tab-btn-font" data-design-tab="font" onclick="switchDesignTab('font')">🔤 Font</button>
-            <button type="button" class="design-tab-btn" id="design-tab-btn-feel" data-design-tab="feel" onclick="switchDesignTab('feel')">✨ Feel</button>
+            <button type="button" class="design-tab-btn active" id="design-tab-btn-color" data-design-tab="color" onclick="switchDesignTab('color')">Color</button>
+            <button type="button" class="design-tab-btn" id="design-tab-btn-font" data-design-tab="font" onclick="switchDesignTab('font')">Font</button>
+            <button type="button" class="design-tab-btn" id="design-tab-btn-feel" data-design-tab="feel" onclick="switchDesignTab('feel')">Feel</button>
         </div>
         <div id="design-body">
             <!-- TAB 1: COLOR PANEL -->
             <div id="design-pane-color" class="design-tab-pane active">
                 <div class="design-section">
                     <div class="design-section-title" style="flex-wrap: wrap; gap: 8px;">
-                        <span>Curated 60-30-10 Color Schemes</span>
-                        <label style="display: inline-flex; align-items: center; gap: 5px; margin: 0; font-size: 11px; text-transform: none; letter-spacing: 0; color: #cbd5e1; cursor: pointer;">
-                            <input type="checkbox" id="design-auto-ink" checked style="width: auto; margin: 0;" onchange="applyDesignSystem(true)">
-                            Auto-Contrast Text
-                        </label>
+                        <span>Curated Color Schemes</span>
+                        <div style="display: inline-flex; align-items: center; gap: 10px;">
+                            <label style="display: inline-flex; align-items: center; gap: 5px; margin: 0; font-size: 11px; text-transform: none; letter-spacing: 0; color: #cbd5e1; cursor: pointer;">
+                                <input type="checkbox" id="design-auto-ink" checked style="width: auto; margin: 0;" onchange="applyDesignSystem(true)">
+                                Auto-Contrast Text
+                            </label>
+                            <button type="button" id="design-color-manual-btn" class="design-manual-toggle-btn" onclick="toggleDesignColorManualMode()">Manual Mode</button>
+                        </div>
                     </div>
                     <div id="design-mood-pills" class="design-mood-pills"></div>
                     <div id="design-color-grid" class="color-scheme-grid"></div>
-                    <select id="design-palette-preset" onchange="applyDesignPreset(this.value)">
-                        <option value="custom">Custom Colors (Manual)</option>
-                    </select>
                 </div>
 
-                <div class="design-section">
+                <div id="design-color-manual-section" class="design-section design-manual-section">
                     <div class="design-section-title" style="flex-wrap: wrap; gap: 6px;">
-                        <span>60-30-10 Color Rule</span>
+                        <span>Manual 60-30-10 Color Rule</span>
                         <div style="display: inline-flex; align-items: center; gap: 8px;">
                             <span id="design-ratio-label" style="font-size: 10px; color: #38bdf8;">Live Ratio</span>
-                            <button type="button" onclick="swapDesignBaseAndMain()" title="Swap 60% Base and 30% Main colors" style="height: 22px; padding: 0 8px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.06); color: #e2e8f0; font-size: 10px; font-weight: 600; cursor: pointer; transition: all 0.15s ease-out;">⇄ Swap 60↔30</button>
+                            <button type="button" onclick="swapDesignBaseAndMain()" title="Swap 60% Base and 30% Main colors" style="height: 22px; padding: 0 8px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.06); color: #e2e8f0; font-size: 10px; font-weight: 600; cursor: pointer; transition: all 0.15s ease-out;">Swap 60 / 30</button>
                         </div>
                     </div>
                     <div class="design-ratio-bar" title="60% Base / 30% Main / 10% Contrast">
@@ -886,26 +909,40 @@
             <div id="design-pane-font" class="design-tab-pane">
                 <div class="design-section">
                     <div class="design-section-title" style="flex-wrap: wrap; gap: 8px;">
-                        <span>3-Font Typography Studio</span>
-                        <span id="design-font-count-badge" style="font-size: 10px; color: #38bdf8;">3 Font Roles Active</span>
+                        <span>Curated Font Pairings</span>
+                        <div style="display: inline-flex; align-items: center; gap: 10px;">
+                            <span id="design-font-count-badge" style="font-size: 10px; color: #38bdf8;">3 Font Roles</span>
+                            <button type="button" id="design-font-manual-btn" class="design-manual-toggle-btn" onclick="toggleDesignFontManualMode()">Manual Mode</button>
+                        </div>
                     </div>
-                    <select id="design-font-preset" onchange="applyFontPreset(this.value)">
-                        <option value="custom">Custom Fonts (Manual)</option>
-                        <option value="aether-glass">Aether Glass (Plus Jakarta Sans / Inter / JetBrains Mono)</option>
-                        <option value="resonance-hardware">Resonance Hardware (Space Grotesk / Plus Jakarta Sans / JetBrains Mono)</option>
-                        <option value="bytecraft-brutal">Bytecraft Brutal (Space Grotesk / DM Sans / JetBrains Mono)</option>
-                        <option value="soundcolor-clay">SoundColor Clay (Nunito Sans / Plus Jakarta Sans / Quicksand)</option>
-                        <option value="scriptorium-minimal">Scriptorium Editorial (Newsreader / Plus Jakarta Sans / JetBrains Mono)</option>
-                        <option value="aetheris-liquid">Aetheris Liquid (Syne / Inter / JetBrains Mono)</option>
-                        <option value="clean-studio">Clean Studio (Outfit / DM Sans / Space Mono)</option>
-                        <option value="editorial-classroom">Editorial Classroom (Fraunces / Source Sans 3 / IBM Plex Mono)</option>
-                        <option value="playful-workshop">Playful Workshop (Fredoka / Nunito / Space Mono)</option>
-                        <option value="tech-arcade">Tech &amp; Arcade (Space Grotesk / DM Sans / Fira Code)</option>
-                        <option value="calm-dyslexia">Calm Dyslexia-Friendly (Lexend / Atkinson Hyperlegible / Roboto Mono)</option>
-                        <option value="classic-academic">Classic Academic (Playfair Display / Lora / DM Mono)</option>
-                        <option value="sharp-swiss">Sharp Swiss Minimal (Syne / Work Sans / Space Mono)</option>
-                    </select>
+                    <div id="design-font-mood-pills" class="design-mood-pills"></div>
+                    <div id="design-font-grid" class="font-scheme-grid"></div>
+                </div>
 
+                <div class="design-section">
+                    <div class="design-section-title">
+                        <span>Live Typography Sample</span>
+                        <span id="design-specimen-scheme-label" style="font-size: 10px; color: #38bdf8;">Matched to Color Tab</span>
+                    </div>
+                    <div id="design-font-specimen-canvas" class="design-specimen-canvas">
+                        <div id="design-font-specimen-surface" class="design-specimen-surface">
+                            <div id="design-specimen-kicker" class="design-specimen-kicker">UNIT 01 · STUDIO OVERVIEW</div>
+                            <div id="design-specimen-title" class="design-specimen-title">Title: Designing Clear Learning Spaces</div>
+                            <div id="design-specimen-header" class="design-specimen-header">Header: Visual Hierarchy &amp; Rhythm</div>
+                            <div id="design-specimen-subheader" class="design-specimen-subheader">Subheader: Balanced typography calibrated to your active palette</div>
+                            <div id="design-specimen-body" class="design-specimen-body">Body text appears here so you can evaluate reading comfort, letter spacing, and contrast against your chosen 60-30-10 color scheme.</div>
+                            <div class="design-specimen-actions">
+                                <span id="design-specimen-meta" style="font-size: 11px; opacity: 0.78;">STEP 03 · 94.2%</span>
+                                <span id="design-specimen-pill" class="design-specimen-pill">Primary Action</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="design-font-manual-section" class="design-section design-manual-section">
+                    <div class="design-section-title">
+                        <span>Manual 3-Font Roles</span>
+                    </div>
                     <div class="design-font-row">
                         <div class="design-font-top">
                             <div class="design-color-meta">
@@ -914,7 +951,7 @@
                             </div>
                             <select id="design-font-display" class="design-font-select" onchange="onDesignFontChange('fontDisplay', this.value)"></select>
                         </div>
-                        <div id="design-font-preview-display" class="design-font-preview">Aa Bb — Quantum Learning Studio</div>
+                        <div id="design-font-preview-display" class="design-font-preview">Aa Bb - Quantum Learning Studio</div>
                     </div>
 
                     <div class="design-font-row">
@@ -936,7 +973,7 @@
                             </div>
                             <select id="design-font-accent" class="design-font-select" onchange="onDesignFontChange('fontAccent', this.value)"></select>
                         </div>
-                        <div id="design-font-preview-accent" class="design-font-preview">STEP 03 • 94.2% • 1,420 XP</div>
+                        <div id="design-font-preview-accent" class="design-font-preview">STEP 03 · 94.2% · 1,420 XP</div>
                     </div>
                 </div>
             </div>
@@ -948,7 +985,7 @@
                         <span>General Feel &amp; Surface Style</span>
                         <div style="display: flex; align-items: center; gap: 10px;">
                             <label style="display: inline-flex; align-items: center; gap: 4px; margin: 0; font-size: 10.5px; text-transform: none; letter-spacing: 0; color: #cbd5e1; cursor: pointer;" title="Apply the style's signature 3-color palette and 3-font pairing when clicking an aesthetic card">
-                                <input type="checkbox" id="design-link-style-defaults" checked style="width: auto; margin: 0;" onchange="toggleDesignLinkDefaults(this.checked)">
+                                <input type="checkbox" id="design-link-style-defaults" style="width: auto; margin: 0;" onchange="toggleDesignLinkDefaults(this.checked)">
                                 Sync Style Colors &amp; Fonts
                             </label>
                             <span id="design-active-aesthetic-label" style="font-size: 10px; color: #a78bfa;">None</span>
@@ -956,32 +993,32 @@
                     </div>
                     <div class="aesthetic-grid" id="aesthetic-grid">
                         <button type="button" class="aesthetic-card" data-aesthetic="glassmorphism" onclick="selectDesignAesthetic('glassmorphism')">
-                            <div class="aesthetic-card-head"><span>Glassmorphism</span><span>🪟</span></div>
+                            <div class="aesthetic-card-head"><span>Glassmorphism</span><span>01</span></div>
                             <div class="aesthetic-card-desc">Aether frosted depth, specular rings &amp; cyan ambient glow.</div>
                             <div class="aesthetic-preview-bar" style="background: rgba(27,31,47,0.72); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.18); box-shadow: 0 0 12px rgba(56,189,248,0.28); color: #dfe1f8;">Aether Glass <span style="color: #38bdf8;">24px</span></div>
                         </button>
                         <button type="button" class="aesthetic-card" data-aesthetic="skeuomorphism" onclick="selectDesignAesthetic('skeuomorphism')">
-                            <div class="aesthetic-card-head"><span>Skeuomorphism</span><span>🎛️</span></div>
+                            <div class="aesthetic-card-head"><span>Skeuomorphism</span><span>02</span></div>
                             <div class="aesthetic-card-desc">Machined chassis bevels, recessed wells &amp; tactile amber keys.</div>
                             <div class="aesthetic-preview-bar" style="background: linear-gradient(180deg, #37393d, #1e2024); border: 1px solid rgba(255,255,255,0.14); border-bottom: 3px solid #0c0e12; color: #e2e2e7; box-shadow: inset 0 1px 0 rgba(255,255,255,0.18);">R-808 Plate <span style="color: #ff8a00;">LED</span></div>
                         </button>
                         <button type="button" class="aesthetic-card" data-aesthetic="neobrutalism" onclick="selectDesignAesthetic('neobrutalism')">
-                            <div class="aesthetic-card-head"><span>Neo-Brutalism</span><span>⚡</span></div>
+                            <div class="aesthetic-card-head"><span>Neo-Brutalism</span><span>03</span></div>
                             <div class="aesthetic-card-desc">Thick 3px ink outlines, 0px blur extrusion &amp; mechanical press.</div>
                             <div class="aesthetic-preview-bar" style="background: #ffe600; border: 2.5px solid #121212; border-radius: 2px; box-shadow: 3px 3px 0 #121212; color: #121212;">BYTECRAFT <span>0px</span></div>
                         </button>
                         <button type="button" class="aesthetic-card" data-aesthetic="claymorphism" onclick="selectDesignAesthetic('claymorphism')">
-                            <div class="aesthetic-card-head"><span>Claymorphism</span><span>🫧</span></div>
+                            <div class="aesthetic-card-head"><span>Claymorphism</span><span>04</span></div>
                             <div class="aesthetic-card-desc">Sculpted pastel clay pebbles, soft inset grooves &amp; coral pills.</div>
                             <div class="aesthetic-preview-bar" style="background: #fbf8ff; border-radius: 999px; color: #1a1b22; box-shadow: 0 4px 10px rgba(255,111,89,0.22), inset 2px 2px 4px rgba(255,255,255,0.95), inset -2px -2px 5px rgba(255,111,89,0.2);">SoundColor <span style="color: #ff6f59;">Clay</span></div>
                         </button>
                         <button type="button" class="aesthetic-card" data-aesthetic="minimalism" onclick="selectDesignAesthetic('minimalism')">
-                            <div class="aesthetic-card-head"><span>Minimalism</span><span>📐</span></div>
+                            <div class="aesthetic-card-head"><span>Minimalism</span><span>05</span></div>
                             <div class="aesthetic-card-desc">Alabaster folio, editorial serif poise &amp; 1px hairline calm.</div>
                             <div class="aesthetic-preview-bar" style="background: #ffffff; border: 1px solid #c1c8c3; border-radius: 4px; color: #1e3a2f; box-shadow: 0 1px 2px rgba(28,27,26,0.04);">Scriptorium <span>1px</span></div>
                         </button>
                         <button type="button" class="aesthetic-card" data-aesthetic="liquidglass" onclick="selectDesignAesthetic('liquidglass')">
-                            <div class="aesthetic-card-head"><span>Liquid Glass</span><span>💧</span></div>
+                            <div class="aesthetic-card-head"><span>Liquid Glass</span><span>06</span></div>
                             <div class="aesthetic-card-desc">Luminous specular capsules, rim refraction &amp; electric cyan pills.</div>
                             <div class="aesthetic-preview-bar" style="background: linear-gradient(135deg, rgba(29,31,42,0.88), rgba(17,19,29,0.78)); border: 1px solid rgba(255,255,255,0.28); border-radius: 999px; color: #e9feff; box-shadow: inset 1px 1px 0 rgba(255,255,255,0.35), 0 0 14px rgba(0,245,255,0.32);">Aetheris <span style="color: #00f5ff;">28px</span></div>
                         </button>
@@ -997,26 +1034,26 @@
     <div id="skills-panel" class="panel hidden" style="padding: 0;">
         <div class="skills-hub-header">
             <div class="skills-hub-title-wrap">
-                <h3>⚡ Skills Hub &amp; Prompt Cards</h3>
+                <h3>Skills Hub &amp; Prompt Cards</h3>
                 <span>Curate your skills library, edit rules, star defaults, and manage active prompt context cards</span>
             </div>
             <div class="skills-hub-actions">
-                <button type="button" class="skills-btn" style="background: #334155;" onclick="triggerSkillMdImport()" title="Import .md skill files from disk">📥 Import .md</button>
+                <button type="button" class="skills-btn" style="background: #334155;" onclick="triggerSkillMdImport()" title="Import .md skill files from disk">Import .md</button>
                 <input type="file" id="skills-import-input" accept=".md,.txt" multiple style="display: none;" onchange="handleSkillMdImport(event)">
-                <button type="button" class="skills-btn" style="background: #334155;" onclick="exportSkillsArchive()" title="Export skills repository as a ZIP bundle">📤 Export</button>
-                <button type="button" class="skills-btn" id="skills-local-sync-btn" style="background: #334155;" onclick="syncSkillsWithLocalFolder(true)" title="Sync skills with /skills folder when Local Folder is active">📁 Local /skills</button>
+                <button type="button" class="skills-btn" style="background: #334155;" onclick="exportSkillsArchive()" title="Export skills repository as a ZIP bundle">Export</button>
+                <button type="button" class="skills-btn" id="skills-local-sync-btn" style="background: #334155;" onclick="syncSkillsWithLocalFolder(true)" title="Sync skills with /skills folder when Local Folder is active">Local /skills</button>
                 <div class="skills-dropdown-wrap" id="skills-sync-dropdown-wrap">
-                    <button type="button" class="skills-btn" style="background: #4338ca; border-color: #6366f1;" onclick="toggleSkillsSyncMenu(event)" title="Generate an AI Skills Architect prompt to review, refactor, or expand skills">📋 AI Sync Repo ▾</button>
+                    <button type="button" class="skills-btn" style="background: #4338ca; border-color: #6366f1;" onclick="toggleSkillsSyncMenu(event)" title="Generate an AI Skills Architect prompt to review, refactor, or expand skills">AI Sync Repo ▾</button>
                     <div class="skills-dropdown-menu" id="skills-ai-sync-menu">
-                        <button type="button" class="skills-dropdown-item" onclick="generateAiSyncPrompt('whole')">🌐 Update Whole Repository (All Skills)</button>
-                        <button type="button" class="skills-dropdown-item" onclick="generateAiSyncPrompt('active')">🗂️ Update Active Skills Only</button>
+                        <button type="button" class="skills-dropdown-item" onclick="generateAiSyncPrompt('whole')">Update Whole Repository (All Skills)</button>
+                        <button type="button" class="skills-dropdown-item" onclick="generateAiSyncPrompt('active')">Update Active Skills Only</button>
                     </div>
                 </div>
-                <button type="button" class="skills-btn" style="background: #059669; border-color: #10b981;" onclick="intakeSkillPatchFromClipboard()" title="Parse and apply a skills patch directly from clipboard">📥 Intake Patch</button>
-                <button type="button" class="skills-btn" style="background: #334155;" onclick="openSkillBackupsModal()" title="View and restore skill edit or delete backups">🕰️ Backups</button>
+                <button type="button" class="skills-btn" style="background: #059669; border-color: #10b981;" onclick="intakeSkillPatchFromClipboard()" title="Parse and apply a skills patch directly from clipboard">Intake Patch</button>
+                <button type="button" class="skills-btn" style="background: #334155;" onclick="openSkillBackupsModal()" title="View and restore skill edit or delete backups">Backups</button>
                 <button type="button" class="skills-btn" style="background: #4f46e5; border-color: #6366f1;" onclick="createSkillFile()" title="Create a new skill markdown file">+ New Skill</button>
-                <button type="button" class="skills-btn" style="background: #334155;" onclick="resetActiveSkillsToStarred()" title="Reset active cards to starred defaults">⭐ Reset Starred</button>
-                <button type="button" class="skills-btn" style="background: #7f1d1d; color: #fca5a5; border-color: #991b1b;" onclick="clearAllActiveSkillsInHub()" title="Clear all skills from active prompt context">🗑️ Clear Active</button>
+                <button type="button" class="skills-btn" style="background: #334155;" onclick="resetActiveSkillsToStarred()" title="Reset active cards to starred defaults">Reset Starred</button>
+                <button type="button" class="skills-btn" style="background: #7f1d1d; color: #fca5a5; border-color: #991b1b;" onclick="clearAllActiveSkillsInHub()" title="Clear all skills from active prompt context">Clear Active</button>
                 <button type="button" class="icon-button" onclick="togglePanel('skills-panel')" style="color: #ff5555; font-weight: bold; font-size: 18px; padding: 4px 8px;">✕</button>
             </div>
         </div>
@@ -1024,13 +1061,13 @@
         <div class="skills-workbench">
             <div class="skills-col">
                 <div class="skills-col-header">
-                    <strong style="font-size: 13px; color: #38bdf8;">📚 Skills Library <span id="skills-lib-count" style="font-size: 11px; color: #64748b; font-weight: normal;">(0 total)</span></strong>
+                    <strong style="font-size: 13px; color: #38bdf8;">Skills Library <span id="skills-lib-count" style="font-size: 11px; color: #64748b; font-weight: normal;">(0 total)</span></strong>
                 </div>
                 <div class="skills-filter-row">
                     <select id="skills-cat-filter" onchange="renderSkillsLibrary()">
-                        <option value="">📂 All Categories</option>
+                        <option value="">All Categories</option>
                     </select>
-                    <input type="text" id="skills-search-filter" placeholder="🔍 Filter skills..." oninput="renderSkillsLibrary()">
+                    <input type="text" id="skills-search-filter" placeholder="Filter skills..." oninput="renderSkillsLibrary()">
                 </div>
                 <div class="skills-scroll-box" id="skills-library-list"></div>
                 <button type="button" class="skills-btn" style="background: #0369a1; border-color: #0284c7; justify-content: center; height: 32px;" onclick="addAllVisibleSkillsToActive()">+ Add All Visible to Prompt</button>
@@ -1038,16 +1075,16 @@
 
             <div class="skills-col">
                 <div class="skills-tabs-bar">
-                    <button type="button" class="skills-tab-btn active" id="skills-tab-btn-cards" onclick="switchSkillsHubTab('cards')">🗂️ Active Cards (0)</button>
-                    <button type="button" class="skills-tab-btn" id="skills-tab-btn-editor" onclick="switchSkillsHubTab('editor')">📝 Skill Editor</button>
+                    <button type="button" class="skills-tab-btn active" id="skills-tab-btn-cards" onclick="switchSkillsHubTab('cards')">Active Cards (0)</button>
+                    <button type="button" class="skills-tab-btn" id="skills-tab-btn-editor" onclick="switchSkillsHubTab('editor')">Skill Editor</button>
                 </div>
 
                 <div class="skills-tab-pane active" id="skills-pane-cards">
                     <div class="skills-col-header" style="flex-wrap: wrap;">
-                        <strong id="skills-active-count-title" style="font-size: 12.5px; color: #a78bfa;">🚀 Active Prompt Cards (0 Sending)</strong>
+                        <strong id="skills-active-count-title" style="font-size: 12.5px; color: #a78bfa;">Active Prompt Cards (0 Sending)</strong>
                         <div style="display: flex; gap: 6px;">
-                            <button type="button" class="skills-btn" style="background: #6366f1; border-color: #818cf8;" onclick="generateAiSyncPrompt('active')">⚡ AI Evolve Active</button>
-                            <button type="button" class="skills-btn" style="background: #3b82f6; border-color: #60a5fa;" onclick="copyActiveSkillsBundleText()">📋 Copy App Bundle</button>
+                            <button type="button" class="skills-btn" style="background: #6366f1; border-color: #818cf8;" onclick="generateAiSyncPrompt('active')">AI Evolve Active</button>
+                            <button type="button" class="skills-btn" style="background: #3b82f6; border-color: #60a5fa;" onclick="copyActiveSkillsBundleText()">Copy App Bundle</button>
                         </div>
                     </div>
                     <div class="skills-scroll-box" id="skills-active-cards-list"></div>
@@ -1057,10 +1094,10 @@
                     <div class="skills-col-header" style="flex-wrap: wrap;">
                         <strong id="skills-editor-filename" style="font-size: 12.5px; color: #f8fafc;">Select a skill to edit</strong>
                         <div style="display: flex; gap: 5px;">
-                            <button type="button" class="skills-btn" id="skills-editor-star-btn" onclick="toggleEditorSkillStar()">☆ Star</button>
-                            <button type="button" class="skills-btn" id="skills-editor-rename-btn" onclick="renameEditorSkill()">✏️ Rename</button>
-                            <button type="button" class="skills-btn" id="skills-editor-delete-btn" style="background: #7f1d1d; border-color: #991b1b;" onclick="deleteEditorSkill()">🗑️ Delete</button>
-                            <button type="button" class="skills-btn" id="skills-editor-save-btn" style="background: #059669; border-color: #10b981;" onclick="saveEditorSkill()">💾 Save (Ctrl+S)</button>
+                            <button type="button" class="skills-btn" id="skills-editor-star-btn" onclick="toggleEditorSkillStar()">Star</button>
+                            <button type="button" class="skills-btn" id="skills-editor-rename-btn" onclick="renameEditorSkill()">Rename</button>
+                            <button type="button" class="skills-btn" id="skills-editor-delete-btn" style="background: #7f1d1d; border-color: #991b1b;" onclick="deleteEditorSkill()">Delete</button>
+                            <button type="button" class="skills-btn" id="skills-editor-save-btn" style="background: #059669; border-color: #10b981;" onclick="saveEditorSkill()">Save (Ctrl+S)</button>
                         </div>
                     </div>
                     <textarea id="skills-full-editor" spellcheck="false" placeholder="Select a skill from the library or Active Cards to edit its markdown rules..."></textarea>
@@ -1072,7 +1109,7 @@
             <span id="skills-hub-status" style="font-size: 11px; color: #94a3b8;">Ready</span>
             <div style="display: flex; gap: 8px;">
                 <button type="button" class="skills-btn" style="background: #334155; height: 32px;" onclick="togglePanel('skills-panel')">Close</button>
-                <button type="button" class="skills-btn" style="background: #059669; border-color: #10b981; height: 32px; padding: 0 16px;" onclick="applySkillsHubAndClose()">Apply to Prompt 🚀</button>
+                <button type="button" class="skills-btn" style="background: #059669; border-color: #10b981; height: 32px; padding: 0 16px;" onclick="applySkillsHubAndClose()">Apply to Prompt</button>
             </div>
         </div>
     </div>
@@ -1080,7 +1117,7 @@
 
 <div id="skill-structural-modal" class="skills-modal-overlay">
     <div class="skills-modal-card">
-        <div style="font-size: 15px; font-weight: 700; color: #f59e0b;">⚠️ Structural Skill Changes Proposed by AI</div>
+        <div style="font-size: 15px; font-weight: 700; color: #f59e0b;">Structural Skill Changes Proposed by AI</div>
         <div style="font-size: 11.5px; color: #94a3b8; line-height: 1.45;">
             The AI recommended adding or removing skills to keep your knowledge base lean and focused. Review below before applying:
         </div>
@@ -1108,7 +1145,7 @@
 <div id="skill-backups-modal" class="skills-modal-overlay">
     <div class="skills-modal-card">
         <div style="display: flex; justify-content: space-between; align-items: center;">
-            <div style="font-size: 15px; font-weight: 700; color: #38bdf8;">🕰️ Skill Backups &amp; Restore</div>
+            <div style="font-size: 15px; font-weight: 700; color: #38bdf8;">Skill Backups &amp; Restore</div>
             <button type="button" class="icon-button" onclick="closeSkillBackupsModal()" style="color: #ff5555; font-weight: bold; font-size: 16px; padding: 4px 8px;">✕</button>
         </div>
         <div style="font-size: 11.5px; color: #94a3b8; line-height: 1.45;">
@@ -1128,8 +1165,8 @@
         <div id="gemini-keys-container" style="max-height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px;"></div>
         <div style="display:flex; gap:10px; margin-bottom: 10px;">
             <button id="gemini-keys-add" class="action-button" style="flex: 1; background: #555;">+ Add Key</button>
-            <button id="gemini-keys-import" class="action-button" style="flex: 1; background: #17a2b8;">📤 Import</button>
-            <button id="gemini-keys-export" class="action-button" style="flex: 1; background: #28a745;">📥 Export</button>
+            <button id="gemini-keys-import" class="action-button" style="flex: 1; background: #17a2b8;">Import</button>
+            <button id="gemini-keys-export" class="action-button" style="flex: 1; background: #28a745;">Export</button>
             <input type="file" id="gemini-keys-file" accept=".json" style="display: none;">
         </div>
         <div style="display:flex; gap:10px;">
@@ -2486,6 +2523,16 @@ document.addEventListener('DOMContentLoaded', function() {
         versionData = data ? JSON.parse(data) : [];
         renderVersionsTree();
     }
+    function getAssetIconSvg(kind) {
+        const icons = {
+            folder: '<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6z"/></svg>',
+            file: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>',
+            html: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>',
+            image: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>',
+            binary: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>'
+        };
+        return icons[kind] || icons.file;
+    }
     function findItem(id, items = versionData) {
         const arr = Array.isArray(items) ? items : Object.values(items || {});
         for (const item of arr) {
@@ -2814,7 +2861,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (activeFolderId) {
             const upBtn = document.createElement('div');
             upBtn.className = 'asset-thumbnail up-button';
-            upBtn.innerHTML = '<div class="icon">&#128193;</div><div class="name">.. (Up)</div>';
+            upBtn.innerHTML = `<div class="icon">${getAssetIconSvg('folder')}</div><div class="name">.. (Up)</div>`;
             upBtn.onclick = () => {
                 const parent = findParent(activeFolderId);
                 activeFolderId = parent ? parent.id : null;
@@ -2867,9 +2914,9 @@ document.addEventListener('DOMContentLoaded', function() {
             const iconDiv = document.createElement('div');
             iconDiv.className = 'icon';
             if (item.type === 'folder') {
-                iconDiv.innerHTML = '&#128193;';
+                iconDiv.innerHTML = getAssetIconSvg('folder');
             } else if (item.type === 'version') {
-                iconDiv.innerHTML = '&#128196;';
+                iconDiv.innerHTML = getAssetIconSvg('file');
             } else if (item.type === 'asset') {
                 if (item.mimeType && item.mimeType.startsWith('image/')) {
                     const img = document.createElement('img');
@@ -2880,7 +2927,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     img.style.borderRadius = '4px';
                     iconDiv.appendChild(img);
                 } else {
-                    iconDiv.innerHTML = '&#128444;&#65039;';
+                    iconDiv.innerHTML = getAssetIconSvg('image');
                 }
             }
 
@@ -4111,7 +4158,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (skillRes.applied) {
                 inputEl.value = '';
                 broadcastChange(200);
-                alert(`Skills Evolved! ⚡\n\n${skillRes.message}`);
+                alert(`Skills Evolved!\n\n${skillRes.message}`);
             }
             return !!skillRes.applied;
         }
@@ -4219,7 +4266,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 await createNewVersion(finalCode, versionTitle, isNewApp, true);
                 playPatchTelemetry(operations, versionTitle, previousStateTemp, finalCode);
                 if (skillAppliedMsg && typeof setSkillsHubStatus === 'function') {
-                    setSkillsHubStatus('Code & Skills updated ✓');
+                    setSkillsHubStatus('Code & Skills updated');
                 }
             } else {
                 await createNewVersion(finalCode, versionTitle, isNewApp, false);
@@ -4428,7 +4475,7 @@ ${getDesignSystemPromptNote()}
             await navigator.clipboard.writeText(cdataPrompt);
             const btn = document.getElementById('download-context-btn');
             const originalText = btn.textContent;
-            btn.textContent = "Copied XML/CDATA Prompt! 📋";
+            btn.textContent = "Copied XML/CDATA Prompt!";
             btn.style.backgroundColor = "#28a745";
             setTimeout(() => {
                 btn.textContent = originalText;
@@ -4962,7 +5009,7 @@ If this update establishes a new reusable design rule or pattern, you may also i
         const container = document.getElementById('versions-list-container');
         container.innerHTML = `
             <div style="grid-column: 1 / -1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; text-align: center; gap: 14px;">
-                <div style="font-size: 46px;">📁</div>
+                <div style="color: #94a3b8;">${getAssetIconSvg('folder').replace('width="30" height="30"', 'width="46" height="46"')}</div>
                 <h4 style="margin: 0; color: #fff;">Open a Local Computer Folder</h4>
                 <p style="margin: 0; font-size: 13px; color: #aaa; max-width: 360px; line-height: 1.5;">
                     Select a folder on your computer to view, manage, and use local images, scripts, and media directly in your project.
@@ -5262,7 +5309,7 @@ If this update establishes a new reusable design rule or pattern, you may also i
 
             const fullPath = [localRootHandle.name, ...localDirStack.map(s => s.name)].join(' / ');
             const pathEl = document.getElementById('local-folder-path');
-            if (pathEl) pathEl.textContent = '📁 ' + fullPath;
+            if (pathEl) pathEl.textContent = fullPath;
             const countEl = document.getElementById('local-folder-count');
             if (countEl) countEl.textContent = `${entries.length} items`;
 
@@ -5271,7 +5318,7 @@ If this update establishes a new reusable design rule or pattern, you may also i
             if (localDirStack.length > 0) {
                 const upBtn = document.createElement('div');
                 upBtn.className = 'asset-thumbnail up-button';
-                upBtn.innerHTML = '<div class="icon">&#128193;</div><div class="name">.. (Up)</div>';
+                upBtn.innerHTML = `<div class="icon">${getAssetIconSvg('folder')}</div><div class="name">.. (Up)</div>`;
                 upBtn.onclick = async () => {
                     localDirStack.pop();
                     localCurrentHandle = localDirStack.length > 0 ? localDirStack[localDirStack.length - 1].handle : localRootHandle;
@@ -5290,7 +5337,7 @@ If this update establishes a new reusable design rule or pattern, you may also i
 
                     const iconDiv = document.createElement('div');
                     iconDiv.className = 'icon';
-                    iconDiv.innerHTML = '&#128196;';
+                    iconDiv.innerHTML = getAssetIconSvg('file');
 
                     const nameDiv = document.createElement('div');
                     nameDiv.className = 'name';
@@ -5398,7 +5445,7 @@ If this update establishes a new reusable design rule or pattern, you may also i
                 actionsDiv.appendChild(delBtn);
 
                 if (entry.kind === 'directory') {
-                    iconDiv.innerHTML = '&#128193;';
+                    iconDiv.innerHTML = getAssetIconSvg('folder');
                     thumb.onclick = async () => {
                         localDirStack.push({ name: entry.name, handle: entry });
                         localCurrentHandle = entry;
@@ -5422,14 +5469,14 @@ If this update establishes a new reusable design rule or pattern, you may also i
                             img.style.borderRadius = '4px';
                             iconDiv.appendChild(img);
                         } catch (e) {
-                            iconDiv.innerHTML = '&#128444;&#65039;';
+                            iconDiv.innerHTML = getAssetIconSvg('image');
                         }
                     } else if (isHtml) {
-                        iconDiv.innerHTML = '&#127760;';
+                        iconDiv.innerHTML = getAssetIconSvg('html');
                     } else if (isCode) {
-                        iconDiv.innerHTML = '&#128196;';
+                        iconDiv.innerHTML = getAssetIconSvg('file');
                     } else {
-                        iconDiv.innerHTML = '&#128190;';
+                        iconDiv.innerHTML = getAssetIconSvg('binary');
                     }
 
                     thumb.onclick = async () => {
@@ -5528,22 +5575,34 @@ If this update establishes a new reusable design rule or pattern, you may also i
     );
 
     let activeDesignMood = 'all';
+    let activeFontMood = 'all';
 
-    const FONT_PRESETS = {
-        'aether-glass':        { display: 'Plus Jakarta Sans', body: 'Inter',                 accent: 'JetBrains Mono' },
-        'resonance-hardware':  { display: 'Space Grotesk',     body: 'Plus Jakarta Sans',     accent: 'JetBrains Mono' },
-        'bytecraft-brutal':    { display: 'Space Grotesk',     body: 'DM Sans',               accent: 'JetBrains Mono' },
-        'soundcolor-clay':     { display: 'Nunito Sans',       body: 'Plus Jakarta Sans',     accent: 'Quicksand' },
-        'scriptorium-minimal': { display: 'Newsreader',        body: 'Plus Jakarta Sans',     accent: 'JetBrains Mono' },
-        'aetheris-liquid':     { display: 'Syne',              body: 'Inter',                 accent: 'JetBrains Mono' },
-        'clean-studio':        { display: 'Outfit',            body: 'DM Sans',               accent: 'Space Mono' },
-        'editorial-classroom': { display: 'Fraunces',          body: 'Source Sans 3',         accent: 'IBM Plex Mono' },
-        'playful-workshop':    { display: 'Fredoka',           body: 'Nunito',                accent: 'Space Mono' },
-        'tech-arcade':         { display: 'Space Grotesk',     body: 'DM Sans',               accent: 'Fira Code' },
-        'calm-dyslexia':       { display: 'Lexend',            body: 'Atkinson Hyperlegible', accent: 'Roboto Mono' },
-        'classic-academic':    { display: 'Playfair Display',  body: 'Lora',                  accent: 'DM Mono' },
-        'sharp-swiss':         { display: 'Syne',              body: 'Work Sans',             accent: 'Space Mono' }
-    };
+    const FONT_SCHEME_CATALOG = [
+        // Warm & Editorial
+        { id: 'scriptorium-minimal', title: 'Scriptorium Editorial', mood: 'editorial', display: 'Newsreader',       body: 'Plus Jakarta Sans',     accent: 'JetBrains Mono' },
+        { id: 'editorial-classroom', title: 'Editorial Classroom',   mood: 'editorial', display: 'Fraunces',         body: 'Source Sans 3',         accent: 'IBM Plex Mono' },
+        { id: 'classic-academic',    title: 'Classic Academic',      mood: 'editorial', display: 'Playfair Display', body: 'Lora',                  accent: 'DM Mono' },
+        { id: 'soundcolor-clay',     title: 'Soft Rounded Clay',     mood: 'editorial', display: 'Nunito Sans',      body: 'Plus Jakarta Sans',     accent: 'Quicksand' },
+
+        // Dark & Moody
+        { id: 'aether-glass',        title: 'Aether Glass',          mood: 'dark',      display: 'Plus Jakarta Sans', body: 'Inter',                accent: 'JetBrains Mono' },
+        { id: 'resonance-hardware',  title: 'Resonance Hardware',    mood: 'dark',      display: 'Space Grotesk',    body: 'Plus Jakarta Sans',     accent: 'JetBrains Mono' },
+        { id: 'aetheris-liquid',     title: 'Aetheris Liquid',       mood: 'dark',      display: 'Syne',             body: 'Inter',                 accent: 'JetBrains Mono' },
+
+        // Bold & Electric
+        { id: 'bytecraft-brutal',    title: 'Bytecraft Zine',        mood: 'electric',  display: 'Space Grotesk',    body: 'DM Sans',               accent: 'JetBrains Mono' },
+        { id: 'tech-arcade',         title: 'Tech & Arcade',         mood: 'electric',  display: 'Space Grotesk',    body: 'DM Sans',               accent: 'Fira Code' },
+        { id: 'playful-workshop',    title: 'Playful Workshop',      mood: 'electric',  display: 'Fredoka',          body: 'Nunito',                accent: 'Space Mono' },
+        { id: 'sharp-swiss',         title: 'Sharp Swiss Minimal',   mood: 'electric',  display: 'Syne',             body: 'Work Sans',             accent: 'Space Mono' },
+
+        // Clean & Crisp
+        { id: 'clean-studio',        title: 'Clean Studio',          mood: 'utility',   display: 'Outfit',           body: 'DM Sans',               accent: 'Space Mono' },
+        { id: 'calm-dyslexia',       title: 'Calm Dyslexia',         mood: 'utility',   display: 'Lexend',           body: 'Atkinson Hyperlegible', accent: 'Roboto Mono' }
+    ];
+
+    const FONT_PRESETS = Object.fromEntries(
+        FONT_SCHEME_CATALOG.map(f => [f.id, { display: f.display, body: f.body, accent: f.accent }])
+    );
 
     const FONT_CHOICES = {
         display: [
@@ -5612,7 +5671,10 @@ If this update establishes a new reusable design rule or pattern, you may also i
         aesthetic: 'none',
         autoInk: true,
         applyToNewApps: true,
-        linkStyleDefaults: true,
+        linkStyleDefaults: false,
+        linkStyleDefaultsExplicit: false,
+        manualColorMode: false,
+        manualFontMode: false,
         isCustomized: false
     };
 
@@ -5653,7 +5715,12 @@ If this update establishes a new reusable design rule or pattern, you may also i
         if (saved.preset) designState.preset = saved.preset;
         if (typeof saved.autoInk === 'boolean') designState.autoInk = saved.autoInk;
         if (typeof saved.applyToNewApps === 'boolean') designState.applyToNewApps = saved.applyToNewApps;
-        if (typeof saved.linkStyleDefaults === 'boolean') designState.linkStyleDefaults = saved.linkStyleDefaults;
+        if (typeof saved.linkStyleDefaultsExplicit === 'boolean') {
+            designState.linkStyleDefaultsExplicit = saved.linkStyleDefaultsExplicit;
+            if (saved.linkStyleDefaultsExplicit && typeof saved.linkStyleDefaults === 'boolean') {
+                designState.linkStyleDefaults = saved.linkStyleDefaults;
+            }
+        }
         if (typeof saved.isCustomized === 'boolean') designState.isCustomized = saved.isCustomized;
     }
 
@@ -5698,6 +5765,7 @@ If this update establishes a new reusable design rule or pattern, you may also i
             autoInk: designState.autoInk,
             applyToNewApps: designState.applyToNewApps,
             linkStyleDefaults: designState.linkStyleDefaults,
+            linkStyleDefaultsExplicit: designState.linkStyleDefaultsExplicit,
             isCustomized: designState.isCustomized,
             updatedAt: Date.now()
         };
@@ -5712,7 +5780,18 @@ If this update establishes a new reusable design rule or pattern, you may also i
 
     function toggleDesignLinkDefaults(checked) {
         designState.linkStyleDefaults = !!checked;
+        designState.linkStyleDefaultsExplicit = true;
         saveDesignPreferences();
+    }
+
+    function toggleDesignColorManualMode() {
+        designState.manualColorMode = !designState.manualColorMode;
+        renderDesignControls();
+    }
+
+    function toggleDesignFontManualMode() {
+        designState.manualFontMode = !designState.manualFontMode;
+        renderDesignControls();
     }
 
     function applySavedDesignToHtml(html) {
@@ -5886,10 +5965,19 @@ If this update establishes a new reusable design rule or pattern, you may also i
         setPair('main', designState.main);
         setPair('contrast', designState.contrast);
 
-        populateColorSchemeDropdown();
         renderColorSchemeGrid();
-        const presetEl = document.getElementById('design-palette-preset');
-        if (presetEl) presetEl.value = DESIGN_PRESETS[designState.preset] ? designState.preset : 'custom';
+        renderFontSchemeGrid();
+        renderDesignFontSpecimen();
+
+        const colorManualBtn = document.getElementById('design-color-manual-btn');
+        const colorManualSec = document.getElementById('design-color-manual-section');
+        if (colorManualBtn) colorManualBtn.classList.toggle('active', !!designState.manualColorMode);
+        if (colorManualSec) colorManualSec.classList.toggle('open', !!designState.manualColorMode);
+
+        const fontManualBtn = document.getElementById('design-font-manual-btn');
+        const fontManualSec = document.getElementById('design-font-manual-section');
+        if (fontManualBtn) fontManualBtn.classList.toggle('active', !!designState.manualFontMode);
+        if (fontManualSec) fontManualSec.classList.toggle('open', !!designState.manualFontMode);
 
         const ratioLbl = document.getElementById('design-ratio-label');
         if (ratioLbl) {
@@ -5897,9 +5985,6 @@ If this update establishes a new reusable design rule or pattern, you may also i
             ratioLbl.textContent = activeScheme ? activeScheme.title : 'Custom 60-30-10';
         }
         switchDesignTab(activeDesignTab);
-
-        const fontPresetEl = document.getElementById('design-font-preset');
-        if (fontPresetEl) fontPresetEl.value = designState.fontPreset || 'custom';
 
         const fDispEl = document.getElementById('design-font-display');
         const fBodyEl = document.getElementById('design-font-body');
@@ -6642,7 +6727,7 @@ input::placeholder, textarea::placeholder { color: var(--hd-muted-on-main); opac
                 broadcastChange(600);
             }
             const note = document.getElementById('design-status-note');
-            if (note) note.textContent = 'Design & fonts synced to HTML & ready for export ✓';
+            if (note) note.textContent = 'Design & fonts synced to HTML and ready for export.';
         };
 
         if (designCodeSyncTimer) clearTimeout(designCodeSyncTimer);
@@ -6695,22 +6780,124 @@ input::placeholder, textarea::placeholder { color: var(--hd-muted-on-main); opac
         renderColorSchemeGrid();
     }
 
-    function populateColorSchemeDropdown() {
-        const selectEl = document.getElementById('design-palette-preset');
-        if (!selectEl || selectEl.dataset.populated === '1') return;
-        selectEl.innerHTML = '<option value="custom">Custom Colors (Manual)</option>';
-        DESIGN_MOODS.filter(m => m.id !== 'all').forEach(mood => {
-            const grp = document.createElement('optgroup');
-            grp.label = mood.label;
-            DESIGN_SCHEME_CATALOG.filter(s => s.mood === mood.id).forEach(scheme => {
-                const opt = document.createElement('option');
-                opt.value = scheme.id;
-                opt.textContent = `${scheme.title} (${scheme.colors})`;
-                grp.appendChild(opt);
-            });
-            selectEl.appendChild(grp);
+    function setDesignFontMood(moodId) {
+        activeFontMood = moodId || 'all';
+        renderFontSchemeGrid();
+    }
+
+    function getHexContrastRatio(hexA, hexB) {
+        const l1 = getLuminance(hexA);
+        const l2 = getLuminance(hexB);
+        const bright = Math.max(l1, l2);
+        const dark = Math.min(l1, l2);
+        return (bright + 0.05) / (dark + 0.05);
+    }
+
+    function renderFontSchemeGrid() {
+        const pillsEl = document.getElementById('design-font-mood-pills');
+        const gridEl = document.getElementById('design-font-grid');
+        if (!pillsEl || !gridEl) return;
+
+        pillsEl.innerHTML = '';
+        DESIGN_MOODS.forEach(mood => {
+            const pill = document.createElement('button');
+            pill.type = 'button';
+            pill.className = 'design-mood-pill' + (activeFontMood === mood.id ? ' active' : '');
+            pill.textContent = mood.label;
+            pill.onclick = () => setDesignFontMood(mood.id);
+            pillsEl.appendChild(pill);
         });
-        selectEl.dataset.populated = '1';
+
+        const visibleFonts = activeFontMood === 'all'
+            ? FONT_SCHEME_CATALOG
+            : FONT_SCHEME_CATALOG.filter(f => f.mood === activeFontMood);
+
+        gridEl.innerHTML = '';
+        visibleFonts.forEach(scheme => {
+            const card = document.createElement('button');
+            card.type = 'button';
+            card.className = 'font-scheme-card' + (designState.fontPreset === scheme.id ? ' active' : '');
+            card.title = `${scheme.title}\nDisplay: ${scheme.display}\nBody: ${scheme.body}\nAccent: ${scheme.accent}`;
+            card.onclick = () => applyFontPreset(scheme.id);
+
+            const sample = document.createElement('div');
+            sample.className = 'font-scheme-sample';
+            sample.style.fontFamily = getFontCssStack(scheme.display, 'display');
+            sample.textContent = 'Aa Bb Studio';
+
+            const title = document.createElement('div');
+            title.className = 'font-scheme-title';
+            title.textContent = scheme.title;
+
+            const sub = document.createElement('div');
+            sub.className = 'font-scheme-sub';
+            sub.textContent = `${scheme.display} · ${scheme.body}`;
+
+            card.appendChild(sample);
+            card.appendChild(title);
+            card.appendChild(sub);
+            gridEl.appendChild(card);
+        });
+    }
+
+    function renderDesignFontSpecimen() {
+        const canvasEl = document.getElementById('design-font-specimen-canvas');
+        const surfaceEl = document.getElementById('design-font-specimen-surface');
+        const kickerEl = document.getElementById('design-specimen-kicker');
+        const titleEl = document.getElementById('design-specimen-title');
+        const headerEl = document.getElementById('design-specimen-header');
+        const subheaderEl = document.getElementById('design-specimen-subheader');
+        const bodyEl = document.getElementById('design-specimen-body');
+        const metaEl = document.getElementById('design-specimen-meta');
+        const pillEl = document.getElementById('design-specimen-pill');
+        const schemeLbl = document.getElementById('design-specimen-scheme-label');
+        if (!canvasEl || !surfaceEl) return;
+
+        const base = normalizeHex(designState.base, '#f8fafc');
+        const main = normalizeHex(designState.main, '#ffffff');
+        const contrast = normalizeHex(designState.contrast, '#4a7dff');
+        const inkOnMain = getReadableInk(main);
+        const mutedOnMain = getMutedInk(main);
+        const inkOnContrast = getReadableInk(contrast);
+        const isMainDark = getLuminance(main) <= 0.36;
+        const isBaseDark = getLuminance(base) <= 0.36;
+
+        const dispStack = getFontCssStack(designState.fontDisplay, 'display');
+        const bodyStack = getFontCssStack(designState.fontBody, 'body');
+        const accStack = getFontCssStack(designState.fontAccent, 'accent');
+
+        canvasEl.style.backgroundColor = base;
+        canvasEl.style.borderColor = isBaseDark ? 'rgba(255,255,255,0.16)' : 'rgba(15,23,42,0.14)';
+
+        surfaceEl.style.backgroundColor = main;
+        surfaceEl.style.color = inkOnMain;
+        surfaceEl.style.borderColor = isMainDark ? 'rgba(255,255,255,0.14)' : 'rgba(15,23,42,0.12)';
+
+        const kickerReadable = getHexContrastRatio(contrast, main) >= 2.6 ? contrast : inkOnMain;
+        if (kickerEl) {
+            kickerEl.style.fontFamily = accStack;
+            kickerEl.style.color = kickerReadable;
+        }
+        if (titleEl) titleEl.style.fontFamily = dispStack;
+        if (headerEl) headerEl.style.fontFamily = dispStack;
+        if (subheaderEl) {
+            subheaderEl.style.fontFamily = bodyStack;
+            subheaderEl.style.color = mutedOnMain;
+        }
+        if (bodyEl) bodyEl.style.fontFamily = bodyStack;
+        if (metaEl) {
+            metaEl.style.fontFamily = accStack;
+            metaEl.style.color = mutedOnMain;
+        }
+        if (pillEl) {
+            pillEl.style.backgroundColor = contrast;
+            pillEl.style.color = inkOnContrast;
+            pillEl.style.fontFamily = accStack;
+        }
+        if (schemeLbl) {
+            const activeScheme = DESIGN_SCHEME_CATALOG.find(s => s.id === designState.preset);
+            schemeLbl.textContent = activeScheme ? activeScheme.title : 'Custom 60-30-10';
+        }
     }
 
     function renderColorSchemeGrid() {
@@ -6867,11 +7054,11 @@ input::placeholder, textarea::placeholder { color: var(--hd-muted-on-main); opac
     let pendingTelemetryLoadHandler = null;
 
     const TELEMETRY_ROLES = {
-        style:    { id: 'style',    label: 'Style',    emoji: '🎨', color: '#ec4899' },
-        controls: { id: 'controls', label: 'Controls', emoji: '🎛️', color: '#38bdf8' },
-        layout:   { id: 'layout',   label: 'Layout',   emoji: '📐', color: '#a78bfa' },
-        media:    { id: 'media',    label: 'Media',    emoji: '🔊', color: '#10b981' },
-        logic:    { id: 'logic',    label: 'Logic',    emoji: '🧠', color: '#f59e0b' }
+        style:    { id: 'style',    label: 'Style',    color: '#ec4899' },
+        controls: { id: 'controls', label: 'Controls', color: '#38bdf8' },
+        layout:   { id: 'layout',   label: 'Layout',   color: '#a78bfa' },
+        media:    { id: 'media',    label: 'Media',    color: '#10b981' },
+        logic:    { id: 'logic',    label: 'Logic',    color: '#f59e0b' }
     };
 
     function clearPatchTelemetry(commitPending = false) {
@@ -7023,16 +7210,15 @@ input::placeholder, textarea::placeholder { color: var(--hd-muted-on-main); opac
     }
 
     function getStepDisplayLabel(step) {
-        if (step.kind === 'style-apply') return '🎨 Style';
-        if (step.kind === 'logic-pulse') return `${step.role.emoji} ${step.role.label}`;
+        if (step.kind === 'style-apply') return 'Style';
+        if (step.kind === 'logic-pulse') return step.role.label;
         const tag = (step.descriptor && step.descriptor.tag) || (step.newTag ? step.newTag.toUpperCase() : '');
         const tagMap = {
             H1: 'Heading', H2: 'Subheading', H3: 'Heading', H4: 'Heading',
             P: 'Text', BUTTON: 'Button', INPUT: 'Input', SELECT: 'Select',
             LI: 'Item', A: 'Link', LABEL: 'Label', TH: 'Header', TD: 'Cell', SPAN: 'Text'
         };
-        const shortName = tagMap[tag] || step.role.label;
-        return `${step.role.emoji} ${shortName}`;
+        return tagMap[tag] || step.role.label;
     }
 
     function buildPatchChoreography(operations, oldHtml, newHtml) {
@@ -7367,7 +7553,7 @@ input::placeholder, textarea::placeholder { color: var(--hd-muted-on-main); opac
         const elemLabel = elementCount > 0
             ? `${elementCount} ${elementCount === 1 ? 'element' : 'elements'} updated`
             : 'Editing...';
-        summary.innerHTML = `<span style="color:#10b981;">✓</span> <span id="telemetry-summary-text">${patchCount} ${patchCount === 1 ? 'patch' : 'patches'} • ${elemLabel}</span>`;
+        summary.innerHTML = `<span id="telemetry-summary-text">${patchCount} ${patchCount === 1 ? 'patch' : 'patches'} · ${elemLabel}</span>`;
         if (versionTitle && versionTitle !== 'Manual Upgrade') summary.title = versionTitle;
 
         const chipsWrap = document.createElement('div');
@@ -7375,7 +7561,7 @@ input::placeholder, textarea::placeholder { color: var(--hd-muted-on-main); opac
         roleSummaryList.forEach(group => {
             const chip = document.createElement('span');
             chip.className = 'telemetry-chip';
-            chip.innerHTML = `<span style="width:6px;height:6px;border-radius:50%;background:${group.role.color};display:inline-block;"></span><span>${group.role.emoji} ${group.role.label}</span><span style="color:#a1a1aa;">${group.count}</span>`;
+            chip.innerHTML = `<span style="width:6px;height:6px;border-radius:50%;background:${group.role.color};display:inline-block;"></span><span>${group.role.label}</span><span style="color:#a1a1aa;">${group.count}</span>`;
             chipsWrap.appendChild(chip);
         });
 
@@ -7548,7 +7734,7 @@ input::placeholder, textarea::placeholder { color: var(--hd-muted-on-main); opac
             }
 
             if (token !== telemetryRunToken) return;
-            if (badgeTextEl) badgeTextEl.textContent = `${getStepDisplayLabel(laneSteps[laneSteps.length - 1])} ✓`;
+            if (badgeTextEl) badgeTextEl.textContent = `${getStepDisplayLabel(laneSteps[laneSteps.length - 1])} · done`;
             await sleepTelemetry(850, token);
             if (token !== telemetryRunToken) return;
             cursorEl.style.opacity = '0';
@@ -9624,7 +9810,7 @@ fishMaterial.onBeforeCompile = (shader) => {
         if (skillsCurrentEditingFile && skillsRepo[skillsCurrentEditingFile]) {
             const isStarred = (skillsMeta.starred || []).includes(skillsCurrentEditingFile);
             const starBtn = document.getElementById('skills-editor-star-btn');
-            if (starBtn) starBtn.textContent = isStarred ? '⭐ Starred' : '☆ Star';
+            if (starBtn) starBtn.textContent = isStarred ? 'Starred' : 'Star';
         }
     }
 
@@ -9633,11 +9819,11 @@ fishMaterial.onBeforeCompile = (shader) => {
         if (!select) return;
         const prev = select.value;
         const cats = [...new Set(Object.keys(skillsRepo).map(fn => getSkillDetails(fn).category))].sort();
-        select.innerHTML = '<option value="">📂 All Categories</option>';
+        select.innerHTML = '<option value="">All Categories</option>';
         cats.forEach(c => {
             const opt = document.createElement('option');
             opt.value = c;
-            opt.textContent = `🏷 ${c}`;
+            opt.textContent = c;
             select.appendChild(opt);
         });
         if (cats.includes(prev)) select.value = prev;
@@ -9679,8 +9865,10 @@ fishMaterial.onBeforeCompile = (shader) => {
             const starBtn = document.createElement('button');
             starBtn.type = 'button';
             starBtn.className = 'skill-icon-btn';
-            starBtn.style.color = '#fbbf24';
-            starBtn.textContent = isStarred ? '⭐' : '☆';
+            starBtn.style.color = isStarred ? '#fbbf24' : '#64748b';
+            starBtn.innerHTML = isStarred
+                ? '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>'
+                : '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>';
             starBtn.title = 'Toggle repository default starred skill';
             starBtn.onclick = () => toggleSkillStar(fname);
 
@@ -9696,7 +9884,7 @@ fishMaterial.onBeforeCompile = (shader) => {
             const catSpan = document.createElement('span');
             catSpan.style.color = '#818cf8';
             catSpan.textContent = sdata.category;
-            sEl.appendChild(document.createTextNode(`${fname} • `));
+            sEl.appendChild(document.createTextNode(`${fname} · `));
             sEl.appendChild(catSpan);
 
             const dEl = document.createElement('div');
@@ -9711,7 +9899,7 @@ fishMaterial.onBeforeCompile = (shader) => {
             editBtn.type = 'button';
             editBtn.className = 'skill-icon-btn';
             editBtn.style.color = '#a78bfa';
-            editBtn.textContent = '📝';
+            editBtn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>';
             editBtn.title = 'Edit skill in Skill Editor';
             editBtn.onclick = () => openSkillInEditor(fname);
 
@@ -9719,7 +9907,7 @@ fishMaterial.onBeforeCompile = (shader) => {
             renBtn.type = 'button';
             renBtn.className = 'skill-icon-btn';
             renBtn.style.color = '#38bdf8';
-            renBtn.textContent = '✏️';
+            renBtn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
             renBtn.title = 'Rename skill';
             renBtn.onclick = () => renameSkillFile(fname);
 
@@ -9727,14 +9915,14 @@ fishMaterial.onBeforeCompile = (shader) => {
             delBtn.type = 'button';
             delBtn.className = 'skill-icon-btn danger';
             delBtn.style.color = '#f87171';
-            delBtn.textContent = '🗑️';
+            delBtn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>';
             delBtn.title = 'Delete skill';
             delBtn.onclick = () => deleteSkillFile(fname);
 
             const addBtn = document.createElement('button');
             addBtn.type = 'button';
             addBtn.className = 'skill-add-btn' + (isActive ? ' added' : '');
-            addBtn.textContent = isActive ? '✓ Added' : '+ Add';
+            addBtn.textContent = isActive ? 'Added' : '+ Add';
             addBtn.title = isActive ? 'Remove from active prompt' : 'Add to active prompt';
             addBtn.onclick = () => isActive ? removeSkillFromActive(fname) : addSkillToActive(fname);
 
@@ -9775,8 +9963,8 @@ fishMaterial.onBeforeCompile = (shader) => {
 
         const activeNames = getActiveSkillFilenames();
         const count = activeNames.length;
-        if (tabBtn) tabBtn.textContent = `🗂️ Active Cards (${count})`;
-        if (hdrTitle) hdrTitle.textContent = `🚀 Active Prompt Cards (${count} Sending)`;
+        if (tabBtn) tabBtn.textContent = `Active Cards (${count})`;
+        if (hdrTitle) hdrTitle.textContent = `Active Prompt Cards (${count} Sending)`;
 
         container.innerHTML = '';
         if (count === 0) {
@@ -9789,7 +9977,7 @@ fishMaterial.onBeforeCompile = (shader) => {
             restoreBtn.type = 'button';
             restoreBtn.className = 'skills-btn';
             restoreBtn.style.background = '#334155';
-            restoreBtn.textContent = '⭐ Restore Starred Defaults';
+            restoreBtn.textContent = 'Restore Starred Defaults';
             restoreBtn.onclick = () => resetActiveSkillsToStarred();
             empty.appendChild(msg);
             empty.appendChild(restoreBtn);
@@ -9808,9 +9996,6 @@ fishMaterial.onBeforeCompile = (shader) => {
             const head = document.createElement('div');
             head.className = 'active-skill-head';
 
-            const bolt = document.createElement('span');
-            bolt.textContent = '⚡';
-
             const title = document.createElement('div');
             title.className = 'active-skill-title';
             title.textContent = sdata.title;
@@ -9822,8 +10007,10 @@ fishMaterial.onBeforeCompile = (shader) => {
             const starBtn = document.createElement('button');
             starBtn.type = 'button';
             starBtn.className = 'skill-icon-btn';
-            starBtn.style.color = '#fbbf24';
-            starBtn.textContent = isStarred ? '⭐' : '☆';
+            starBtn.style.color = isStarred ? '#fbbf24' : '#64748b';
+            starBtn.innerHTML = isStarred
+                ? '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>'
+                : '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>';
             starBtn.title = 'Toggle repository default starred skill';
             starBtn.onclick = () => toggleSkillStar(fname);
 
@@ -9831,7 +10018,7 @@ fishMaterial.onBeforeCompile = (shader) => {
             renBtn.type = 'button';
             renBtn.className = 'skill-icon-btn';
             renBtn.style.color = '#38bdf8';
-            renBtn.textContent = '✏️';
+            renBtn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
             renBtn.title = 'Rename skill file';
             renBtn.onclick = () => renameSkillFile(fname);
 
@@ -9839,7 +10026,7 @@ fishMaterial.onBeforeCompile = (shader) => {
             delBtn.type = 'button';
             delBtn.className = 'skill-icon-btn danger';
             delBtn.style.color = '#f87171';
-            delBtn.textContent = '🗑️';
+            delBtn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>';
             delBtn.title = 'Delete skill file permanently from library';
             delBtn.onclick = () => deleteSkillFile(fname);
 
@@ -9851,7 +10038,6 @@ fishMaterial.onBeforeCompile = (shader) => {
             remBtn.title = 'Remove card from active prompt context';
             remBtn.onclick = () => removeSkillFromActive(fname);
 
-            head.appendChild(bolt);
             head.appendChild(title);
             head.appendChild(catBadge);
             head.appendChild(starBtn);
@@ -9861,7 +10047,7 @@ fishMaterial.onBeforeCompile = (shader) => {
 
             const fnLbl = document.createElement('div');
             fnLbl.className = 'active-skill-file';
-            fnLbl.textContent = `📄 ${fname}`;
+            fnLbl.textContent = fname;
 
             const descLbl = document.createElement('div');
             descLbl.className = 'active-skill-desc';
@@ -9878,16 +10064,16 @@ fishMaterial.onBeforeCompile = (shader) => {
             togglePreviewBtn.type = 'button';
             togglePreviewBtn.className = 'skill-link-btn';
             togglePreviewBtn.style.color = '#38bdf8';
-            togglePreviewBtn.textContent = isExpanded ? 'Hide Quick Edit 🔼' : '👁️ Quick Edit Rules';
+            togglePreviewBtn.textContent = isExpanded ? 'Hide Quick Edit' : 'Quick Edit Rules';
             togglePreviewBtn.onclick = () => {
                 if (skillsExpandedQuickEdit.has(fname)) {
                     skillsExpandedQuickEdit.delete(fname);
                     quickEditBox.classList.remove('open');
-                    togglePreviewBtn.textContent = '👁️ Quick Edit Rules';
+                    togglePreviewBtn.textContent = 'Quick Edit Rules';
                 } else {
                     skillsExpandedQuickEdit.add(fname);
                     quickEditBox.classList.add('open');
-                    togglePreviewBtn.textContent = 'Hide Quick Edit 🔼';
+                    togglePreviewBtn.textContent = 'Hide Quick Edit';
                 }
             };
 
@@ -9895,7 +10081,7 @@ fishMaterial.onBeforeCompile = (shader) => {
             openTabBtn.type = 'button';
             openTabBtn.className = 'skill-link-btn';
             openTabBtn.style.color = '#a78bfa';
-            openTabBtn.textContent = '📝 Open in Full Editor';
+            openTabBtn.textContent = 'Open in Full Editor';
             openTabBtn.onclick = () => openSkillInEditor(fname);
 
             linksRow.appendChild(togglePreviewBtn);
@@ -9926,12 +10112,12 @@ fishMaterial.onBeforeCompile = (shader) => {
             saveBtn.type = 'button';
             saveBtn.className = 'skills-btn';
             saveBtn.style.cssText = 'background:#059669; border-color:#10b981; height:24px; font-size:10px;';
-            saveBtn.textContent = '💾 Save Changes';
+            saveBtn.textContent = 'Save Changes';
             saveBtn.onclick = async () => {
                 await saveSkillContent(fname, qTextarea.value);
                 savedLbl.style.color = '#10b981';
-                savedLbl.textContent = 'Saved ✓';
-                setTimeout(() => { if (savedLbl.textContent === 'Saved ✓') savedLbl.textContent = ''; }, 1500);
+                savedLbl.textContent = 'Saved';
+                setTimeout(() => { if (savedLbl.textContent === 'Saved') savedLbl.textContent = ''; }, 1500);
             };
             saveBar.appendChild(savedLbl);
             saveBar.appendChild(saveBtn);
@@ -10047,7 +10233,7 @@ fishMaterial.onBeforeCompile = (shader) => {
         const starBtn = document.getElementById('skills-editor-star-btn');
         if (lbl) lbl.textContent = `Editing: ${fname}`;
         if (ed) ed.value = entry.content || '';
-        if (starBtn) starBtn.textContent = (skillsMeta.starred || []).includes(fname) ? '⭐ Starred' : '☆ Star';
+        if (starBtn) starBtn.textContent = (skillsMeta.starred || []).includes(fname) ? 'Starred' : 'Star';
         updateSkillEditorControlsState();
         switchSkillsHubTab('editor');
         setSkillsHubStatus(`Opened '${fname}' in Skill Editor.`);
@@ -10077,7 +10263,7 @@ fishMaterial.onBeforeCompile = (shader) => {
         await mirrorSkillsMetaToLocalIfConnected();
         updateActiveSkillsBadge();
         refreshSkillsHubUI();
-        setSkillsHubStatus(`Saved changes to '${fname}' ✓`);
+        setSkillsHubStatus(`Saved changes to '${fname}'`);
     }
 
     async function saveEditorSkill() {
@@ -10087,7 +10273,7 @@ fishMaterial.onBeforeCompile = (shader) => {
         await saveSkillContent(skillsCurrentEditingFile, ed.value);
         const lbl = document.getElementById('skills-editor-filename');
         if (lbl) {
-            lbl.textContent = `Editing: ${skillsCurrentEditingFile} (Saved ✓)`;
+            lbl.textContent = `Editing: ${skillsCurrentEditingFile} (Saved)`;
             const targetName = skillsCurrentEditingFile;
             setTimeout(() => {
                 if (skillsCurrentEditingFile === targetName && lbl) {
@@ -10129,7 +10315,7 @@ fishMaterial.onBeforeCompile = (shader) => {
         await mirrorSkillsMetaToLocalIfConnected();
         addSkillToActive(cname);
         openSkillInEditor(cname);
-        setSkillsHubStatus(`Created new skill '${cname}' ✨`);
+        setSkillsHubStatus(`Created new skill '${cname}'`);
     }
 
     async function renameSkillFile(oldName) {
@@ -10307,7 +10493,7 @@ fishMaterial.onBeforeCompile = (shader) => {
                 const mw = await mh.createWritable();
                 await mw.write(JSON.stringify({ starred: skillsMeta.starred || [], categories: skillsMeta.categories || {} }, null, 2));
                 await mw.close();
-                setSkillsHubStatus(`Exported ${Object.keys(skillsRepo).length} skills to ${localRootHandle.name}/skills/ ✓`);
+                setSkillsHubStatus(`Exported ${Object.keys(skillsRepo).length} skills to ${localRootHandle.name}/skills/`);
                 return;
             }
 
@@ -10339,7 +10525,7 @@ fishMaterial.onBeforeCompile = (shader) => {
             updateActiveSkillsBadge();
             refreshSkillsHubUI();
             if (interactive) {
-                setSkillsHubStatus(`Synced ${loadedCount} skill(s) from ${localRootHandle.name}/skills/ ✓`);
+                setSkillsHubStatus(`Synced ${loadedCount} skill(s) from ${localRootHandle.name}/skills/`);
             }
         } catch (err) {
             if (interactive) alert('Local /skills sync error: ' + err.message);
@@ -10369,7 +10555,7 @@ fishMaterial.onBeforeCompile = (shader) => {
         saveSkillsState();
         updateActiveSkillsBadge();
         refreshSkillsHubUI();
-        setSkillsHubStatus(`Imported ${imported} skill file(s) ✓`);
+        setSkillsHubStatus(`Imported ${imported} skill file(s)`);
         event.target.value = '';
     }
 
@@ -10395,7 +10581,7 @@ fishMaterial.onBeforeCompile = (shader) => {
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(a.href);
-        setSkillsHubStatus('Exported skills repository ZIP ✓');
+        setSkillsHubStatus('Exported skills repository ZIP');
     }
 
     function toggleSkillsSyncMenu(e) {
@@ -10502,12 +10688,12 @@ RULES:
             'Clipboard permission was blocked. Copy this prompt manually and paste it into your AI:'
         );
         if (copied) {
-            setSkillsHubStatus(`AI Sync prompt for ${scopeLabel} copied to clipboard! 📋`);
+            setSkillsHubStatus(`AI Sync prompt for ${scopeLabel} copied to clipboard!`);
             alert(
                 `Successfully copied AI Skills Architect prompt for ${scopeLabel} to clipboard!\n\n` +
                 `1. Paste this prompt into your LLM conversation (AI Studio, Claude, ChatGPT).\n` +
                 `2. When the LLM responds with a <skill_patch>, copy its response.\n` +
-                `3. Click '📥 Intake Patch' right here in the Skills Hub (or 'Upgrade' in the sidebar) to apply it!`
+                `3. Click 'Intake Patch' right here in the Skills Hub (or 'Upgrade' in the sidebar) to apply it!`
             );
         }
     }
@@ -10672,7 +10858,7 @@ RULES:
             const fm = parseSkillFrontmatter(c);
             skillsMeta.categories[mod.file] = fm.category || mod.category || skillsMeta.categories[mod.file] || 'General';
             await mirrorSkillFileToLocalIfConnected(mod.file, c);
-            logs.push(`✔ Updated '${mod.file}'`);
+            logs.push(`Updated '${mod.file}'`);
         }
 
         for (const cr of (patchData.creations || [])) {
@@ -10683,7 +10869,7 @@ RULES:
             skillsMeta.categories[cr.file] = fm.category || cr.category || 'General';
             if (!skillsMeta.starred.includes(cr.file)) skillsMeta.starred.push(cr.file);
             await mirrorSkillFileToLocalIfConnected(cr.file, c);
-            logs.push(`✨ Created '${cr.file}'`);
+            logs.push(`Created '${cr.file}'`);
         }
 
         for (const dl of (patchData.deletions || [])) {
@@ -10703,7 +10889,7 @@ RULES:
             delete skillsMeta.categories[dl.file];
             skillsMeta.starred = skillsMeta.starred.filter(s => s !== dl.file);
             await deleteLocalSkillFileIfConnected(dl.file);
-            logs.push(`🗑 Deleted '${dl.file}'`);
+            logs.push(`Deleted '${dl.file}'`);
         }
 
         // Sync active / streamlined context after patch
@@ -10740,7 +10926,7 @@ RULES:
                 box.style.cssText = 'background:rgba(16,185,129,0.12); border:1px solid #10b981; border-radius:6px; padding:8px 10px; font-size:12px;';
                 const head = document.createElement('div');
                 head.style.fontWeight = '700';
-                head.textContent = `✨ CREATE: ${c.file} [Category: ${c.category || 'General'}]`;
+                head.textContent = `CREATE: ${c.file} [Category: ${c.category || 'General'}]`;
                 const rsn = document.createElement('div');
                 rsn.style.cssText = 'color:#94a3b8; font-size:11px; margin-top:3px;';
                 rsn.textContent = `Reason: ${c.reason || 'Modular skill expansion'}`;
@@ -10754,7 +10940,7 @@ RULES:
                 box.style.cssText = 'background:rgba(239,68,68,0.12); border:1px solid #ef4444; border-radius:6px; padding:8px 10px; font-size:12px;';
                 const head = document.createElement('div');
                 head.style.fontWeight = '700';
-                head.textContent = `🗑 DELETE: ${d.file}`;
+                head.textContent = `DELETE: ${d.file}`;
                 const rsn = document.createElement('div');
                 rsn.style.cssText = 'color:#94a3b8; font-size:11px; margin-top:3px;';
                 rsn.textContent = `Reason: ${d.reason || 'Consolidation/Deprecation'}`;
@@ -10766,7 +10952,7 @@ RULES:
             if (note) {
                 if (modCount > 0) {
                     note.style.display = 'block';
-                    note.textContent = `ℹ Additionally, ${modCount} existing skill(s) will be modified via search-and-replace.`;
+                    note.textContent = `Note: Additionally, ${modCount} existing skill(s) will be modified via search-and-replace.`;
                 } else {
                     note.style.display = 'none';
                 }
@@ -10828,7 +11014,7 @@ RULES:
             }
         }
         const res = await executeSkillPatchPayload(parsed.data);
-        setSkillsHubStatus('Skills patch applied ✓');
+        setSkillsHubStatus('Skills patch applied');
         return { applied: true, message: res.logText };
     }
 
@@ -10846,14 +11032,14 @@ RULES:
         if (mode === 'copy-only') {
             titleEl.textContent = customTitle || 'Copy Ready';
             descEl.textContent = customDesc || 'Select all and copy this text manually:';
-            btn.textContent = 'Copy & Close 📋';
+            btn.textContent = 'Copy & Close';
             btn.onclick = async () => {
                 ta.select();
                 try { await navigator.clipboard.writeText(ta.value); } catch (e) { document.execCommand('copy'); }
                 closeSkillPasteModal();
             };
         } else if (mode === 'intake') {
-            titleEl.textContent = '📥 Intake <skill_patch>';
+            titleEl.textContent = 'Intake <skill_patch>';
             descEl.textContent = 'Paste the <skill_patch> XML (or JSON) response from your AI below:';
             btn.textContent = 'Apply Skill Patch';
             btn.onclick = async () => {
@@ -10864,7 +11050,7 @@ RULES:
                 if (res.applied) alert('Successfully updated skills:\n\n' + res.message);
             };
         } else if (mode === 'streamline') {
-            titleEl.textContent = '⚡ Streamline Skills';
+            titleEl.textContent = 'Streamline Skills';
             descEl.textContent = "Paste the AI's list of relevant skill filenames below:";
             btn.textContent = 'Streamline & Bundle';
             btn.onclick = async () => {
@@ -10908,7 +11094,7 @@ RULES:
             'Clipboard permission was blocked. Copy your active skills bundle below:'
         );
         if (copied) {
-            setSkillsHubStatus('Active skills bundle copied to clipboard! 📋');
+            setSkillsHubStatus('Active skills bundle copied to clipboard!');
             alert(`Copied ${activeNames.length} active skill(s) bundle to clipboard!`);
         }
     }
@@ -10993,7 +11179,7 @@ RULES:
                 restoreBtn.type = 'button';
                 restoreBtn.className = 'skills-btn';
                 restoreBtn.style.cssText = 'background:#0284c7; border-color:#0ea5e9; flex-shrink:0;';
-                restoreBtn.textContent = '↩ Restore';
+                restoreBtn.textContent = 'Restore';
                 restoreBtn.onclick = () => restoreSkillBackup(item.origIdx);
 
                 row.appendChild(info);
@@ -11041,7 +11227,7 @@ RULES:
         updateActiveSkillsBadge();
         refreshSkillsHubUI();
         closeSkillBackupsModal();
-        setSkillsHubStatus(`Restored '${fname}' from backup ✓`);
+        setSkillsHubStatus(`Restored '${fname}' from backup`);
     }
 
     async function offerSkills() {
@@ -11082,12 +11268,12 @@ RULES:
             'Clipboard permission was blocked. Copy the skills screening prompt below:'
         );
         if (copied) {
-            setSkillsHubStatus(`Offered ${allNames.length} skills to clipboard 📤`);
+            setSkillsHubStatus(`Offered ${allNames.length} skills to clipboard`);
             alert(
                 `Successfully copied all ${allNames.length} skills with screening instructions to your clipboard!\n\n` +
                 `1. Paste this into your LLM conversation.\n` +
                 `2. When the AI replies with the relevant filenames, copy that response.\n` +
-                `3. Click 'Streamline ⚡' to bundle only the relevant skills back into your clipboard.`
+                `3. Click 'Streamline' to bundle only the relevant skills back into your clipboard.`
             );
         }
     }
@@ -11162,7 +11348,7 @@ RULES:
             'Active skills updated! Copy the bundled skills below if needed:'
         );
         const listStr = sortedMatched.map(n => `• ${n}`).join('\n');
-        setSkillsHubStatus(`Streamlined ${sortedMatched.length} skill(s) ⚡`);
+        setSkillsHubStatus(`Streamlined ${sortedMatched.length} skill(s)`);
         if (copied) {
             alert(
                 `Successfully bundled ${sortedMatched.length} relevant skill(s) into clipboard and activated them for 'Get AI Context' & Gemini Upgrader:\n\n${listStr}`

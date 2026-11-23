@@ -40,11 +40,8 @@
         #app-sidebar.closed { transform: translateX(-100%); }
 
         /* Adjusted Styles for Sidebar Layout */
-        .header-left { display: flex; flex-direction: column; gap: 20px; width: 100%; align-items: flex-start; }
-        .app-title { margin-bottom: 10px; width: 100%; }
-        .tabs { display: flex; flex-direction: column; gap: 5px; width: 100%; }
-        .tabs .tab-button { width: 100%; text-align: left; padding: 12px 15px; border-bottom: none; border-left: 3px solid transparent; background: rgba(255,255,255,0.03); border-radius: 0 5px 5px 0; }
-        .tabs .tab-button.active { border-bottom: none; border-left: 3px solid var(--primary-color); background: rgba(255,255,255,0.1); }
+        .header-left { display: flex; flex-direction: column; gap: 10px; width: 100%; align-items: flex-start; }
+        .app-title { margin-bottom: 10px; width: 100%; font-family: 'Montserrat', sans-serif; font-weight: 700; color: #fff; line-height: 1.2; }
 
         .window-toggles { display: flex; flex-direction: column; gap: 10px; width: 100%; }
         .window-toggles .toggle-button { margin-left: 0; width: 100%; text-align: left; display: flex; justify-content: space-between; align-items: center; padding: 12px; }
@@ -62,15 +59,8 @@
         .import-mini-btn:active { transform: scale(0.95); }
         .import-mini-btn:focus-visible { outline: none; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.45); }
         .import-mini-btn.success { background: #28a745; border-color: #28a745; color: #ffffff; }
-        .header-left { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; width: 100%; }
-        .app-title { font-family: 'Montserrat', sans-serif; font-weight: 700; color: #fff; line-height: 1.2; }
         .app-title > div:first-child { font-size: 17px; margin-bottom: 4px; }
         .app-title .subtitle { font-size: 13px; font-weight: 400; opacity: 0.85; }
-        .tabs .tab-button {
-            font-size: 16px; padding: 10px 15px; cursor: pointer; border: none; background: transparent; color: var(--text-color);
-            opacity: 0.7; border-bottom: 2px solid transparent; transition: all 0.3s ease;
-        }
-        .tabs .tab-button:hover { opacity: 1; } .tabs .tab-button.active { opacity: 1; border-bottom: 2px solid var(--primary-color); }
         .window-toggles .toggle-button {
             font-size: 14px; padding: 8px 12px; cursor: pointer; border: 1px solid var(--border-color); background: rgba(255, 255, 255, 0.05);
             color: var(--text-color); border-radius: 5px; margin-left: 5px; transition: all 0.3s ease;
@@ -88,7 +78,6 @@
         }
         .panel.hidden { flex-basis: 0 !important; flex-grow: 0 !important; padding: 0; border: none; opacity: 0; margin: 0; }
 
-        #left-panel { display: none !important; }
         /* Slide-out Panel Styles */
         #middle-panel, #versions-panel, #credits-panel, #design-panel, #skills-panel {
             position: fixed; top: 0; right: 0; height: 100vh; width: 600px; max-width: 90vw;
@@ -523,22 +512,6 @@
         }
         .panel-header-actions .action-button { padding: 6px 12px; font-size: 13px; background-color: #007bff; }
 
-        #chat-history { flex-grow: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; min-height: 0; }
-        #chat-input-container { flex-shrink: 0; }
-
-        .message { padding: 10px 15px; border-radius: 12px; max-width: 90%; word-wrap: break-word; line-height: 1.5; }
-        .user-message { background-color: var(--primary-color); color: white; align-self: flex-end; border-bottom-right-radius: 2px; }
-        .ai-message { background-color: rgba(0, 0, 0, 0.25); color: var(--text-color); align-self: flex-start; border-bottom-left-radius: 2px; }
-
-        #chat-input-container { display: flex; padding: 15px; border-top: 1px solid var(--border-color); }
-        #chat-input { flex-grow: 1; padding: 10px; border: 1px solid var(--border-color); border-radius: 5px; background: rgba(0,0,0,0.2); color: var(--text-color); }
-
-        #send-button {
-            padding: 10px 20px; margin-left: 10px; border: none; background-color: var(--primary-color); color: white; border-radius: 5px; cursor: pointer;
-            position: relative; transition: background-color 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px;
-        }
-        #send-button.cancel { background-color: var(--danger-color); }
-        .loader { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-left-color: #fff; border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         #code-editor-container { flex-grow: 1; position: relative; }
@@ -552,36 +525,10 @@
 
         #live-preview { width: 100%; height: 100%; border: none; background: #fff; flex-grow: 1; }
 
-        #settings, #settings {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(10,10,20,0.95); backdrop-filter: blur(10px);
-            transition: opacity 0.5s ease-in-out, visibility 0.5s; z-index: 50;
-            display: flex; justify-content: center; align-items: center;
-            opacity: 0; visibility: hidden; pointer-events: none;
-        }
-        #settings.active { opacity: 1; visibility: visible; pointer-events: auto; }
-        .settings-item { margin-bottom: 20px; } label { display: block; margin-bottom: 8px; font-weight: 500; }
+        label { display: block; margin-bottom: 8px; font-weight: 500; }
         input, select { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 5px; box-sizing: border-box; background: rgba(0,0,0,0.2); color: var(--text-color); }
 
-        #app-settings-dropdown {
-            position: absolute; top: 60px; right: 10px; width: 300px;
-            background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 10px;
-            padding: 15px; z-index: 30; display: none;
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-        }
-        #materials-list { list-style: none; padding: 0; margin-top: 10px; font-size: 12px; max-height: 150px; overflow-y: auto; }
-        #materials-list li { display: flex; justify-content: space-between; align-items: center; padding: 5px; background: rgba(0,0,0,0.2); border-radius: 3px; margin-bottom: 5px; }
-        #materials-list .remove-file { cursor: pointer; color: #ff5555; }
-        .file-status { font-style: italic; opacity: 0.7; }
-        .ai-message .stream-char { display: inline-block; animation: fadeInUp 0.4s ease-out forwards; }
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .progress-wrapper { display: flex; flex-direction: column; align-items: stretch; gap: 6px; margin: 10px 0 5px 0; }
-        .progress-bar-container { background-color: rgba(0, 0, 0, 0.3); border-radius: 5px; overflow: hidden; }
-        .progress-bar { width: 0%; height: 12px; background-color: var(--primary-color); transition: width 0.5s ease-in-out; }
-        .ai-message .thinking-text { font-style: italic; opacity: 0.8; margin-bottom: 4px; font-size: 14px; display: block; }
-        .timer-display { font-size: 12px; font-family: 'SF Mono', 'Courier New', monospace; white-space: nowrap; color: var(--text-color); opacity: 0.85; align-self: flex-end; }
-
-        #versions-panel, #manual-panel { flex: 0 0 25%; }
+        #versions-panel { flex: 0 0 25%; }
         #versions-list-container { flex-grow: 1; overflow-y: auto; padding: 15px; display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 15px; align-content: start; position: relative; }
         .drag-over-container { background-color: rgba(74, 125, 255, 0.1); border: 2px dashed var(--primary-color); border-radius: 10px; }
         .asset-thumbnail { display: flex; flex-direction: column; align-items: center; padding: 10px; border-radius: 8px; background-color: rgba(255, 255, 255, 0.05); cursor: pointer; transition: all 0.2s; position: relative; user-select: none; text-align: center; border: 1px solid transparent; box-sizing: border-box; }
@@ -618,11 +565,27 @@
         input:checked + .slider { background-color: var(--primary-color); }
         input:checked + .slider:before { transform: translateX(14px); }
         .mini-loader { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.1); border-left-color: var(--primary-color); border-radius: 50%; animation: spin 1s linear infinite; display: none; }
-        #camera-btn { width: 22px; height: 22px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.3); background-color: rgba(0,0,0,0.3); color: white; cursor: pointer; padding: 3px; display: none; align-items: center; justify-content: center; transition: background 0.3s; }
-        #camera-btn:hover { background-color: var(--primary-color); border-color: var(--primary-color); }
         #pin-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.95); z-index: 10000; display: none; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(10px); } #pin-box { background: var(--panel-bg); padding: 30px; border-radius: 15px; border: 1px solid var(--primary-color); text-align: center; box-shadow: 0 0 30px rgba(74, 125, 255, 0.3); } #pin-title { margin: 0 0 20px 0; color: white; font-family: 'Montserrat', sans-serif; font-size: 18px; } #pin-display { background: rgba(255,255,255,0.1); color: var(--primary-color); font-size: 24px; padding: 10px; border-radius: 5px; margin-bottom: 20px; height: 30px; line-height: 30px; letter-spacing: 5px; font-family: monospace; } .pin-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; } .pin-btn { padding: 0; font-size: 18px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: white; border-radius: 50%; cursor: pointer; touch-action: manipulation; transition: all 0.2s; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; } .pin-btn:hover { background: var(--primary-color); border-color: var(--primary-color); } .pin-btn.action { border-radius: 8px; font-size: 14px; font-weight: bold; } #qr-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
-        #qr-reader { width: 300px; height: 300px; border: 2px solid var(--primary-color); border-radius: 10px; overflow: hidden; background: #000; box-shadow: 0 0 20px rgba(74, 125, 255, 0.5); } #sidebar-sync-status { width: 8px; height: 8px; border-radius: 50%; background-color: #555; display: inline-block; margin-left: 10px; box-shadow: 0 0 5px rgba(0,0,0,0.5); transition: background-color 0.3s ease, box-shadow 0.3s ease; }
+        #qr-reader { width: 300px; height: 300px; border: 2px solid var(--primary-color); border-radius: 10px; overflow: hidden; background: #000; box-shadow: 0 0 20px rgba(74, 125, 255, 0.5); } #sidebar-sync-status { width: 8px; height: 8px; border-radius: 50%; background-color: #555; display: inline-block; margin-left: 10px; box-shadow: 0 0 5px rgba(0,0,0,0.5); transition: background-color 0.3s ease, box-shadow 0.3s ease; cursor: pointer; }
         #qr-close-btn { margin-top: 20px; padding: 10px 20px; background: var(--danger-color); color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+
+        /* Non-blocking Studio Toast Notifications */
+        #hd-toast-stack {
+            position: fixed; top: 16px; right: 16px; z-index: 10080;
+            display: flex; flex-direction: column; gap: 8px; pointer-events: none; max-width: 340px;
+        }
+        .hd-toast {
+            pointer-events: auto; padding: 10px 14px; border-radius: 10px;
+            background: rgba(15, 23, 42, 0.94); color: #f8fafc;
+            border: 1px solid rgba(99, 102, 241, 0.45);
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            font-size: 12px; line-height: 1.4; display: flex; align-items: center; gap: 8px;
+            animation: hdToastIn 0.2s ease-out forwards;
+        }
+        .hd-toast.ok { border-color: rgba(16, 185, 129, 0.55); }
+        .hd-toast.warn { border-color: rgba(245, 158, 11, 0.55); }
+        @keyframes hdToastIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
 
         /* Multi-Mouse Patch Telemetry Overlay */
         #telemetry-overlay {
@@ -723,6 +686,7 @@
 </head>
 <body>
 <div id="background-animation"></div>
+<div id="hd-toast-stack" aria-live="polite"></div>
 <div id="telemetry-overlay" aria-hidden="true"></div>
 <div id="pin-overlay"><div id="pin-box"><h3 id="pin-title">Enter PIN</h3><div id="pin-display"></div><div class="pin-grid"><button class="pin-btn" onclick="handlePinInput('1')">1</button><button class="pin-btn" onclick="handlePinInput('2')">2</button><button class="pin-btn" onclick="handlePinInput('3')">3</button><button class="pin-btn" onclick="handlePinInput('4')">4</button><button class="pin-btn" onclick="handlePinInput('5')">5</button><button class="pin-btn" onclick="handlePinInput('6')">6</button><button class="pin-btn" onclick="handlePinInput('7')">7</button><button class="pin-btn" onclick="handlePinInput('8')">8</button><button class="pin-btn" onclick="handlePinInput('9')">9</button><button class="pin-btn action" style="color: #ff5555;" onclick="handlePinInput('C')">CLR</button><button class="pin-btn" onclick="handlePinInput('0')">0</button><button class="pin-btn action" style="color: #55ff55;" onclick="handlePinInput('OK')">OK</button></div><button style="margin-top: 15px; background: none; border: none; color: #777; font-size: 12px; cursor: pointer; text-decoration: underline;" onclick="closePinPad(false)">Cancel</button></div></div><div id="qr-overlay">
     <div style="color: white; margin-bottom: 15px; font-weight: bold; font-family: sans-serif;">Scan Gemini API Key QR</div>
@@ -744,10 +708,9 @@
 <div id="app-sidebar" class="closed">
     <div class="header-left">
         <div class="app-title">
-            <div style="display: flex; align-items: center;">红豆SG | HongDouSG <span id="sidebar-sync-status" title="Sync Status: Offline"></span></div>
+            <div style="display: flex; align-items: center;">红豆SG | HongDouSG <span id="sidebar-sync-status" title="Sync Status: Offline (Click to configure Firebase)" onclick="configureFirebasePrompt()"></span></div>
             <div class="subtitle">A Singaporean App Creator</div>
         </div>
-        <!-- Tabs Removed -->
         <div style="margin-top: 15px; display: flex; flex-direction: column; gap: 8px; width: 100%;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
                 <label id="upgrader-label" style="font-size: 11px; text-transform: uppercase; color: var(--text-color); opacity: 0.6; letter-spacing: 1px;">Gemini Upgrader</label>
@@ -826,7 +789,6 @@
         <button class="toggle-button" id="toggle-skills" onclick="togglePanel('skills-panel')">Skills</button>
         <button class="toggle-button" id="toggle-code" onclick="togglePanel('middle-panel')" data-translate-key="codeToggle">Code</button>
         <button class="toggle-button" id="toggle-credits" onclick="togglePanel('credits-panel')" data-translate-key="creditsTab">Credits</button>
-        <button id="toggle-manual" style="display: none;"></button>
     </div>
     <hr style="width: 100%; border: none; border-top: 1px solid var(--border-color); opacity: 0.5; margin: 15px 0;">
     <div style="display: flex; flex-direction: column; gap: 8px; width: 100%;">
@@ -845,44 +807,10 @@
 
 <div class="main-container">
     <div id="coder">
-        <div id="left-panel" class="panel">
-            <div class="panel-header">
-                <h3 data-translate-key="chatHeader">Chat with AI</h3>
-                <div>
-                    <button class="icon-button" title="App Creation Settings" onclick="toggleAppSettings()">&#9881;</button>
-                    <button class="icon-button" title="Clear Chat" onclick="clearChat()">Clear</button>
-                </div>
-            </div>
-            <div id="app-settings-dropdown">
-                <div class="settings-item">
-                    <label for="app-type" data-translate-key="appGoalLabel">App Creation Goal:</label>
-                    <select id="app-type">
-                        <option value="general" data-translate-key="goalGeneral">General Purpose</option>
-                        <option value="lesson-slides" data-translate-key="goalSlides">Lesson Slides</option>
-                        <option value="formal-test" data-translate-key="goalTest">Formal Test/Quiz</option>
-                        <option value="interactive-tool" data-translate-key="goalTool">Interactive Tool</option>
-                        <option value="portfolio" data-translate-key="goalPortfolio">Portfolio Page</option>
-                        <option value="3D-Quiz" data-translate-key="goal3D">3D Gamified Quiz</option>
-                        <option value="netlify-blob-backend" data-translate-key="goalNetlifyBlob">Netlify Blob Backend App</option>
-                    </select>
-                </div>
-                <div class="settings-item">
-                    <label for="materials-upload" data-translate-key="materialsLabel">Provide Materials (PDF, IMG, TXT):</label>
-                    <input type="file" id="materials-upload" multiple>
-                    <ul id="materials-list"></ul>
-                </div>
-            </div>
-            <div id="chat-history"></div>
-            <div id="chat-input-container">
-                <input type="text" id="chat-input" placeholder="e.g., 'Make the h1 tag red'" data-translate-key-placeholder="chatPlaceholder">
-                <button id="send-button" data-translate-key="sendButton">Send</button>
-            </div>
-        </div>
         <div id="middle-panel" class="panel"><div class="panel-header"><h3 data-translate-key="codeEditorHeader">Code Editor</h3><div style="display: flex; align-items: center; gap: 10px;"><button class="icon-button" onclick="togglePanel('middle-panel')" style="color: #ff5555; font-weight: bold;">✕</button></div></div><div id="code-editor-container"><textarea id="main-code" spellcheck="false"></textarea></div><div class="panel-footer"><button id="update-version-button" class="action-button" style="background-color: #28a745;">Update Version</button><button id="save-version-button" class="action-button" style="background-color: #007bff;">Save New</button><button id="reset-code-button" class="action-button" data-translate-key="resetButton">Reset</button><button id="copy-html-button" class="action-button" style="background-color: #6c757d;">Copy HTML</button><button id="download-button" class="action-button" data-translate-key="downloadHtmlButton">Download HTML</button></div></div>
         <div id="right-panel" class="panel">
             <iframe id="live-preview" sandbox="allow-scripts allow-same-origin allow-forms allow-modals allow-downloads allow-popups"></iframe>
         </div>
-        <div id="manual-panel" style="display: none;"></div>
         <div id="versions-panel" class="panel hidden">
             <button class="icon-button" onclick="togglePanel('versions-panel')" style="position: absolute; top: 15px; right: 15px; color: #ff5555; font-weight: bold; z-index: 10;">✕</button>
             <div class="panel-header" style="flex-wrap: wrap; gap: 8px; padding-right: 45px;">
@@ -917,57 +845,6 @@
             <div id="versions-list-container"></div>
         </div>
     </div>
-    <div id="settings" style="display: none !important;"><div class="panel" style="padding: 30px; width: 90%; max-width: 500px;"><h3 data-translate-key="settingsHeader">Settings</h3>
-
-        <div class="settings-item" id="gemini-key-container">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                <label for="api-key" style="margin: 0;" data-translate-key="geminiKeyLabel">Gemini API Key:</label>
-                <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer" style="color: var(--primary-color); font-size: 12px; text-decoration: none;" data-translate-key="getApiKeyLink">Get API Key</a>
-            </div>
-            <button id="btn-gemini-keys" class="action-button" style="width: 100%; background: linear-gradient(135deg, #7b61ff, #00d2ff); text-align: center; padding: 10px 5px; font-size: 12px; border: none; border-radius: 5px; color: white; cursor: pointer;">Manage Gemini API Keys</button>
-            <input type="password" id="api-key" style="display: none;">
-        </div>
-        <div class="settings-item" id="deepseek-key-container" style="display: none;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                <label for="deepseek-api-key" style="margin: 0;" data-translate-key="deepseekKeyLabel">DeepSeek API Key:</label>
-                <a href="https://platform.deepseek.com/api_keys" target="_blank" rel="noopener noreferrer" style="color: var(--primary-color); font-size: 12px; text-decoration: none;" data-translate-key="getApiKeyLink">Get API Key</a>
-            </div>
-            <input type="password" id="deepseek-api-key">
-        </div>
-
-        <div class="settings-item"><label for="ai-model" data-translate-key="aiModelLabel">AI Model:</label>
-            <select id="ai-model">
-                <option value="gemini-3.5-flash" selected>Gemini 3.5 Flash</option>
-                <option value="gemini-3-flash-preview">Gemini 3 Flash</option>
-                <option value="gemini-3-flash-preview">Gemini 3 Flash</option>
-                <option value="gemini-3-flash-preview">Latest Version of Gemini Flash 3</option>
-                <option value="gemini-3-flash-preview">Latest Version of Gemini Flash 3</option>
-                <option value="deepseek-coder">DeepSeek Coder V2</option>
-                <option value="deepseek-reasoner">DeepSeek Reasoner V3.1</option>
-            </select>
-        </div>
-
-        <div class="settings-item">
-            <label for="language-select" data-translate-key="languageLabel">Language:</label>
-            <select id="language-select">
-                <option value="en">English</option>
-                <option value="zh">中文 (Chinese)</option>
-                <option value="ms">Bahasa Melayu (Malay)</option>
-                <option value="ta">தமிழ் (Tamil)</option>
-            </select>
-        </div>
-
-        <div class="settings-item" style="border-top: 1px solid var(--border-color); padding-top: 15px; margin-top: 15px;">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <label style="color: #e67e22; margin:0;">Real-time Sync</label>
-                <span id="sync-status" style="font-size: 10px; padding: 2px 6px; border-radius: 4px; background: #333; color: #aaa;">Offline</span>
-            </div>
-            <div style="font-size: 11px; margin: 8px 0; opacity: 0.8; line-height: 1.4;">
-                Paste Firebase Config below. Changes will sync instantly to <strong>hongdou_live/{App Title}</strong>.
-            </div>
-            <textarea id="firebase-config" onchange="localStorage.setItem('firebaseConfig', this.value); startRealtimeSync();" placeholder="Paste const firebaseConfig = { ... } here" style="height: 130px; font-family: 'SF Mono', monospace; font-size: 11px; resize: vertical;"></textarea>
-        </div>
-        <div id="save-settings-container"><button id="save-settings" class="action-button" style="background-color: var(--primary-color);" data-translate-key="saveSettingsButton">Save Settings</button></div></div></div>
     <div id="credits-panel" class="panel hidden" style="padding: 0;">
         <div class="panel-header">
             <h3 data-translate-key="creditsTab">Credits</h3>
@@ -1409,8 +1286,11 @@
 
 <div id="gemini-keys-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10,10,20,0.95); backdrop-filter: blur(10px); z-index: 10000; justify-content: center; align-items: center;">
     <div class="panel" style="padding: 30px; width: 90%; max-width: 500px; display: flex; flex-direction: column; gap: 15px;">
-        <h3 style="margin: 0;">Gemini API Carousel</h3>
-        <p style="font-size: 12px; color: #a0a0a0; margin: 0;">Manage your Gemini API keys. The app will cycle through them automatically on rate limits.</p>
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+            <h3 style="margin: 0;">Gemini API Carousel</h3>
+            <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" style="color: #93c5fd; font-size: 12px; font-weight: 600; text-decoration: none;">Get Free API Key →</a>
+        </div>
+        <p style="font-size: 12px; color: #a0a0a0; margin: 0;">Manage your Gemini API keys. The app rotates keys automatically on rate limits and marks a specific key at 0 left only when Google reports daily quota exhaustion.</p>
         <div id="gemini-keys-container" style="max-height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px;"></div>
         <div style="display:flex; gap:10px; margin-bottom: 10px;">
             <button id="gemini-keys-add" class="action-button" style="flex: 1; background: #555;">+ Add Key</button>
@@ -1430,11 +1310,11 @@
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 <script>
-    let apiKey = ''; let deepseekApiKey = ''; let model = 'gemini-3.6-flash';
+    let apiKey = '';
 
     let pinState = { mode: 'check', input: '', temp: '' }; let remotePin = null;
 
-    const geminiModels =[
+    const geminiModels = [
         { id: 'gemini-4-hydrogen', name: 'Gemini 4 Hydrogen', limit: 20 },
         { id: 'gemini-3.8-flash', name: 'Gemini 3.8 Flash', limit: 20 },
         { id: 'gemini-3.6-flash', name: 'Gemini 3.6 Flash', limit: 20 },
@@ -1446,8 +1326,8 @@
     function getFlashThinkingConfig(modelId) {
         if (!modelId) return { thinkingLevel: 'high' };
         const mid = String(modelId).toLowerCase();
-        if (mid.includes('flash')) {
-            if (mid.includes('2.5')) return { thinkingBudget: 24576 };
+        if (mid.includes('2.5')) return { thinkingBudget: 24576 };
+        if (mid.includes('flash') || mid.includes('hydrogen')) {
             return { thinkingLevel: 'high' };
         }
         return null;
@@ -1465,11 +1345,42 @@
         return code.slice(0, half) + notice + code.slice(-half);
     }
 
+    function getGeminiKeyId(key) {
+        const k = String(key || '').trim();
+        if (!k) return 'default';
+        let h = 2166136261;
+        for (let i = 0; i < k.length; i++) {
+            h ^= k.charCodeAt(i);
+            h = Math.imul(h, 16777619);
+        }
+        return 'k_' + (h >>> 0).toString(36);
+    }
+
+    function getConfiguredGeminiKeys() {
+        const list = [];
+        if (typeof geminiKeys !== 'undefined' && Array.isArray(geminiKeys)) {
+            geminiKeys.forEach(item => {
+                const val = typeof item === 'string' ? item.trim() : String(item && item.key || '').trim();
+                if (val && !list.includes(val)) list.push(val);
+            });
+        }
+        if (list.length === 0 && apiKey && apiKey.trim()) {
+            list.push(apiKey.trim());
+        }
+        return list;
+    }
+
+    function getModelDef(modelId) {
+        return geminiModels.find(m => m.id === modelId) || { id: modelId, name: modelId, limit: 20 };
+    }
+
     function initGeminiUsage() {
         const today = new Date().toDateString();
         const storedDate = localStorage.getItem('geminiUsageDate');
         if (storedDate !== today) {
-            geminiModels.forEach(m => localStorage.setItem('gemini_usage_' + m.id, '0'));
+            Object.keys(localStorage).forEach(k => {
+                if (k.startsWith('gemini_usage_')) localStorage.removeItem(k);
+            });
             localStorage.setItem('geminiUsageDate', today);
         }
         const savedModel = localStorage.getItem('selectedGeminiModel');
@@ -1479,11 +1390,68 @@
         renderGeminiUsage();
     }
 
-    function getUsage(modelId) { return parseInt(localStorage.getItem('gemini_usage_' + modelId) || '0'); }
-    function incrementUsage(modelId) {
-        let usage = getUsage(modelId);
-        localStorage.setItem('gemini_usage_' + modelId, (usage + 1).toString());
+    function getKeyUsage(key, modelId) {
+        const storageKey = `gemini_usage_${getGeminiKeyId(key)}_${modelId}`;
+        return parseInt(localStorage.getItem(storageKey) || '0', 10) || 0;
+    }
+
+    function setKeyUsage(key, modelId, count) {
+        const storageKey = `gemini_usage_${getGeminiKeyId(key)}_${modelId}`;
+        localStorage.setItem(storageKey, String(Math.max(0, parseInt(count, 10) || 0)));
+    }
+
+    function getKeyRemaining(key, modelId) {
+        const limit = getModelDef(modelId).limit;
+        return Math.max(0, limit - getKeyUsage(key, modelId));
+    }
+
+    function getUsage(modelId) {
+        const keys = getConfiguredGeminiKeys();
+        if (keys.length === 0) return parseInt(localStorage.getItem('gemini_usage_' + modelId) || '0', 10) || 0;
+        return keys.reduce((sum, k) => sum + getKeyUsage(k, modelId), 0);
+    }
+
+    function getTotalRemaining(modelId) {
+        const keys = getConfiguredGeminiKeys();
+        const limit = getModelDef(modelId).limit;
+        if (keys.length === 0) return Math.max(0, limit - getUsage(modelId));
+        return keys.reduce((sum, k) => sum + getKeyRemaining(k, modelId), 0);
+    }
+
+    function incrementUsage(modelId, keyUsed = null) {
+        const active = keyUsed || (typeof getCurrentGeminiKey === 'function' ? getCurrentGeminiKey() : apiKey);
+        if (active) {
+            setKeyUsage(active, modelId, getKeyUsage(active, modelId) + 1);
+        } else {
+            const cur = parseInt(localStorage.getItem('gemini_usage_' + modelId) || '0', 10) || 0;
+            localStorage.setItem('gemini_usage_' + modelId, String(cur + 1));
+        }
         renderGeminiUsage();
+    }
+
+    function markKeyQuotaExhausted(key, modelId) {
+        if (!key) return;
+        const limit = getModelDef(modelId).limit;
+        const cur = getKeyUsage(key, modelId);
+        setKeyUsage(key, modelId, Math.max(cur, limit));
+        renderGeminiUsage();
+    }
+
+    async function inspectGeminiHttpError(response) {
+        if (!response) return { status: 0, message: 'Network connection failed', isDailyExhausted: false, isTransientRateLimit: true };
+        const status = response.status;
+        let rawText = '';
+        let parsed = null;
+        try {
+            rawText = await response.text();
+            parsed = JSON.parse(rawText);
+        } catch (e) {}
+        const msg = (parsed && parsed.error && parsed.error.message) ? parsed.error.message : (rawText || `HTTP ${status}`);
+        const detailsStr = parsed && parsed.error && parsed.error.details ? JSON.stringify(parsed.error.details) : '';
+        const combined = `${msg} ${detailsStr}`;
+        const isDailyExhausted = status === 429 && /per\s*day|requestsperday|requests_per_day|daily|limit:\s*0\b/i.test(combined);
+        const isTransientRateLimit = [429, 500, 502, 503, 504, 529].includes(status) && !isDailyExhausted;
+        return { status, message: msg, isDailyExhausted, isTransientRateLimit };
     }
 
     function toggleGeminiDropdown() {
@@ -1497,6 +1465,7 @@
         const dd = document.getElementById('gemini-usage-dropdown');
         if (dd) dd.style.display = 'none';
         renderGeminiUsage();
+        if (typeof broadcastPreferencesChange === 'function') broadcastPreferencesChange(300);
     }
 
     function renderGeminiUsage() {
@@ -1505,14 +1474,13 @@
         const dd = document.getElementById('gemini-usage-dropdown');
         if (dd) dd.innerHTML = '';
 
-        const localKeys = JSON.parse(localStorage.getItem('geminiKeys') || '[]');
-        const keyMultiplier = Math.max(1, localKeys.length);
+        const keys = getConfiguredGeminiKeys();
+        const keyMultiplier = Math.max(1, keys.length);
 
         geminiModels.forEach(model => {
             const effectiveLimit = model.limit * keyMultiplier;
-            const usage = getUsage(model.id);
-            const left = Math.max(0, effectiveLimit - usage);
-            const percentage = left / effectiveLimit;
+            const left = getTotalRemaining(model.id);
+            const percentage = effectiveLimit > 0 ? (left / effectiveLimit) : 0;
             const color = percentage > 0.25 ? '#369b18' : '#ff3b3b';
             const widthPct = Math.max(0, percentage * 100) + '%';
 
@@ -1643,7 +1611,7 @@
     function closePinPad(success) {
         document.getElementById('pin-overlay').style.display = 'none';
         if (success) document.getElementById('app-sidebar').classList.remove('closed');
-    } let language = 'en'; let chatHistoryLog = []; let currentRequestController = null; let progressSimulationTimeout = null; let countdownInterval = null;
+    } let language = 'en';
     let versionData = []; let currentlySelectedVersionId = null; let draggedItemId = null; let activeFolderId = null; let html5QrCode = null;
     let assetSourceMode = 'db'; // 'db' | 'local'
     let localRootHandle = null;
@@ -1659,14 +1627,7 @@
     async function getAssetData(id) { const db = await initDB(); return new Promise((resolve, reject) => { const tx = db.transaction(storeName, "readonly"); const req = tx.objectStore(storeName).get(id); req.onsuccess = () => resolve(req.result); req.onerror = () => reject(req.error); }); }
     async function deleteAssetData(id) { const db = await initDB(); return new Promise((resolve, reject) => { const tx = db.transaction(storeName, "readwrite"); tx.objectStore(storeName).delete(id); tx.oncomplete = resolve; tx.onerror = reject; }); }
 
-    class ApiError extends Error {
-        constructor(message, status) {
-            super(message);
-            this.name = 'ApiError';
-            this.status = status;
-        }
-    }
-    const appSettings = { type: 'general', materials: [] };
+
 
     const translations = {
         en: {
@@ -1768,741 +1729,22 @@
 
     const codeEditor = document.getElementById('main-code');
 
-    const springGlassCss = `
-    body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        line-height: 1.7; margin: 0; padding: 2rem; color: #2a2f4a;
-        background: linear-gradient(-45deg, #e0c3fc, #8ec5fc, #f0e68c, #98fb98);
-        background-size: 400% 400%; animation: springGradient 25s ease infinite; min-height: 100vh;
-    }
-    @keyframes springGradient { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-    .container {
-        max-width: 900px; margin: 0 auto; padding: 2.5rem; background: rgba(255, 255, 255, 0.45);
-        border-radius: 16px; box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
-        backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-    h1, h2, h3 { color: #1c2135; font-weight: 700; } h1 { font-size: 2.8rem; margin-bottom: 0.5rem; text-align: center; }
-    h2 { font-size: 2rem; border-bottom: 2px solid rgba(42, 47, 74, 0.1); padding-bottom: 0.5rem; margin-top: 2.5rem; }
-    button, .button {
-        display: inline-block; padding: 12px 24px; border: none; background-color: #5b75e4; color: white; border-radius: 8px;
-        cursor: pointer; font-size: 1rem; font-weight: 600; text-decoration: none; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(91, 117, 228, 0.3);
-    }
-    button:hover, .button:hover { background-color: #4a64d1; transform: translateY(-3px); box-shadow: 0 6px 20px rgba(91, 117, 228, 0.4); }
-    .quiz-question { margin: 1.5rem 0; padding: 1.5rem; background: rgba(255, 255, 255, 0.5); border-left: 5px solid #5b75e4; border-radius: 8px; }
-    .feedback { margin-top: 1rem; padding: 1rem; border-radius: 5px; font-weight: bold; display: none; }
-    .feedback.correct { background-color: rgba(40, 167, 69, 0.2); color: #155724; }
-    .feedback.incorrect { background-color: rgba(220, 53, 69, 0.2); color: #721c24; }
-    `;
-
-    const springGlassCssReference = `- Use \`<div class="container">\` for the main content wrapper.
-- Use \`<h1>\`, \`<h2>\` for titles.
-- Use \`<button class="button">\` for buttons.
-- Use \`<div class="quiz-question">\` for sections or individual questions.
-- Use \`<div class="feedback correct">\` and \`<div class="feedback incorrect">\` for feedback messages.
-- For custom elements (like word banks, drop zones), create simple, logical class names (e.g., 'word-bank', 'drop-zone') and ensure your generated \`<script>\` tag targets them correctly. Do not use inline styles.`;
-
-    const goalTemplates = {
-        'general': `<!DOCTYPE html>\n<html>\n<head>\n    <title>General Purpose</title>\n    <style>${springGlassCss}</style>\n</head>\n<body>\n    <div class="container">\n        <h1>General Purpose Hello World</h1>\n        <p>This is a starting point for a general-purpose application.</p>\n    </div>\n</body>\n</html>`,
-        'lesson-slides': `<!DOCTYPE html>
-<html>
-<head>
-<title>Lesson Slides on Sonata Form</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
-<style>
-    :root {
-        --slide-bg: rgba(255, 255, 255, 0.75);
-        --text-color: #2a2f4a;
-        --header-color: #1c2135;
-        --primary-color: #5b75e4;
-        --accent-color: rgba(91, 117, 228, 0.4);
-    }
-    body {
-        font-family: 'Roboto', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-        line-height: 1.7; margin: 0; color: var(--text-color);
-        background: linear-gradient(-45deg, #e0c3fc, #8ec5fc, #f0e68c, #98fb98);
-        background-size: 400% 400%; animation: springGradient 25s ease infinite;
-        display: flex; flex-direction: column; height: 100vh; padding: 2vh 2vw; box-sizing: border-box; gap: 1.5rem;
-        justify-content: center; align-items: center;
-    }
-    @keyframes springGradient { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-
-    #slide-window {
-        width: 100%;
-        max-width: 1200px;
-        aspect-ratio: 16 / 9;
-        border-radius: 16px;
-        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        padding: 4% 5%;
-        box-sizing: border-box;
-        display: flex; flex-direction: column; overflow: hidden;
-        position: relative;
-        isolation: isolate; /* Creates a new stacking context */
-    }
-    #slide-window::before {
-        content: '';
-        position: absolute;
-        top: 0; left: 0; right: 0; bottom: 0;
-        background: var(--slide-bg);
-        border-radius: 16px;
-        backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
-        z-index: -1; /* Sits behind content, but inside the slide-window */
-    }
-    #controls-panel {
-        width: 100%;
-        max-width: 1200px;
-        flex-shrink: 0;
-        display: flex; justify-content: space-between; align-items: center;
-    }
-    .slide-counter { font-family: 'Montserrat', sans-serif; font-weight: 700; color: rgba(255,255,255,0.8); text-shadow: 1px 1px 2px rgba(0,0,0,0.2); }
-    .slide { display: none; height: 100%; }
-    .slide.active { display: flex; flex-direction: column; animation: fadeIn 0.6s ease-out; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-
-    h2 {
-        font-family: 'Montserrat', sans-serif; color: var(--header-color);
-        font-size: clamp(2rem, 5vw, 3.5rem); margin-top: 0; margin-bottom: 1.5rem;
-        border-bottom: 3px solid var(--accent-color); padding-bottom: 0.5rem;
-    }
-    ul { list-style-type: '✔ '; padding-left: 2rem; }
-    li { padding-left: 0.8rem; margin-bottom: 0.75rem; }
-    table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
-    th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid rgba(42, 47, 74, 0.1); }
-    th { background-color: rgba(91, 117, 228, 0.1); font-weight: 500; }
-    .highlight { color: var(--primary-color); font-weight: 500; }
-
-    [contenteditable] { outline: 2px solid transparent; transition: all 0.2s; border-radius: 4px; padding: 2px 4px; }
-    [contenteditable]:hover { background-color: rgba(255, 255, 255, 0.8); box-shadow: 0 0 0 2px var(--primary-color); }
-    [contenteditable]:focus { background-color: white; outline: 2px solid var(--primary-color); box-shadow: 0 0 10px rgba(91, 117, 228, 0.3); }
-
-    button, .button {
-        display: inline-block; padding: 12px 24px; border: none; background-color: var(--primary-color); color: white; border-radius: 8px;
-        cursor: pointer; font-size: 1rem; font-weight: 600; text-decoration: none; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(91, 117, 228, 0.3);
-    }
-    button:hover, .button:hover { background-color: #4a64d1; transform: translateY(-3px); box-shadow: 0 6px 20px rgba(91, 117, 228, 0.4); }
-    button:disabled { background-color: #cccccc; cursor: not-allowed; transform: none; box-shadow: none; }
-</style>
-</head>
-<body>
-<div id="slide-window">
-    <div id="slides-container">
-        <div class="slide active">
-            <h2 contenteditable="true">1. Exposition: The Introduction</h2>
-            <ul contenteditable="true">
-                <li>Presents the main musical ideas, like characters in a story.</li>
-                <li><strong class="highlight">Theme 1:</strong> Stated in the home key (Tonic).</li>
-                <li><strong class="highlight">Transition:</strong> A musical bridge that modulates to a new key.</li>
-                <li><strong class="highlight">Theme 2:</strong> Presented in a contrasting key (e.g., Dominant or Relative Major).</li>
-            </ul>
-        </div>
-        <div class="slide">
-            <h2 contenteditable="true">2. Development: The Drama</h2>
-            <p contenteditable="true">This section creates tension and excitement. The composer creatively explores, fragments, and transforms the themes from the Exposition.</p>
-            <ul contenteditable="true">
-                <li>Themes are broken into smaller motifs.</li>
-                <li>Travels through many different keys, creating instability.</li>
-                <li>Can feature dramatic changes in texture, dynamics, and mood.</li>
-                <li>Its main goal is to build tension towards a resolution.</li>
-            </ul>
-        </div>
-        <div class="slide">
-            <h2 contenteditable="true">3. Recapitulation: The Return Home</h2>
-            <p contenteditable="true">The musical tension is resolved. The main themes return, bringing a sense of balance and closure.</p>
-            <table contenteditable="true">
-                <thead>
-                    <tr>
-                        <th>Section</th>
-                        <th>Exposition (Beginning)</th>
-                        <th class="highlight">Recapitulation (End)</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Theme 1</td>
-                        <td>Home Key (Tonic)</td>
-                        <td>Home Key (Tonic)</td>
-                    </tr>
-                    <tr>
-                        <td>Theme 2</td>
-                        <td>Contrasting Key</td>
-                        <td class="highlight">Home Key (Tonic)</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
-<div id="controls-panel">
-    <button id="download-pdf-btn" class="button">Download as PDF</button>
-    <div class="slide-counter" id="slide-counter">1 / 3</div>
-    <div>
-        <button onclick="changeSlide(-1)" class="button">Previous</button>
-        <button onclick="changeSlide(1)" class="button">Next</button>
-    </div>
-</div>
-
-<!-- Libraries loaded directly inside the template for the iframe -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"><\/script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"><\/script>
-<script>
-    let currentSlide = 0;
-    const slides = document.querySelectorAll('.slide');
-    const slideCounter = document.getElementById('slide-counter');
-
-    function updateCounter() {
-        if(slideCounter) {
-            slideCounter.textContent = \`\${currentSlide + 1} / \${slides.length}\`;
-        }
+    function showStudioToast(msg, tone = 'info', duration = 3400) {
+        const stack = document.getElementById('hd-toast-stack');
+        if (!stack) return;
+        const el = document.createElement('div');
+        el.className = `hd-toast ${tone === 'ok' ? 'ok' : (tone === 'warn' ? 'warn' : '')}`;
+        el.textContent = msg;
+        stack.appendChild(el);
+        setTimeout(() => {
+            el.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(-4px)';
+            setTimeout(() => el.remove(), 220);
+        }, duration);
     }
 
-    function showSlide(index) {
-        slides.forEach((slide, i) => {
-            slide.classList.toggle('active', i === index);
-        });
-        updateCounter();
-    }
 
-    function changeSlide(n) {
-        currentSlide = (currentSlide + n + slides.length) % slides.length;
-        showSlide(currentSlide);
-    }
-
-    async function downloadPdf() {
-        const btn = document.getElementById('download-pdf-btn');
-        const originalBtnText = btn.textContent;
-
-        if (typeof html2canvas === 'undefined' || typeof window.jspdf === 'undefined') {
-            alert('Required libraries (html2canvas or jsPDF) are not loaded. Please check your app setup.');
-            return;
-        }
-
-        btn.textContent = 'Processing... (0%)';
-        btn.disabled = true;
-
-        const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF({
-            orientation: 'landscape',
-            unit: 'px',
-            format: [1280, 720] // Standard 16:9 aspect ratio
-        });
-
-        const slideWindow = document.getElementById('slide-window');
-        const originalScrollPos = { x: window.scrollX, y: window.scrollY };
-
-        try {
-            for (let i = 0; i < slides.length; i++) {
-                showSlide(i);
-                btn.textContent = \`Processing... (\${Math.round(((i + 1) / slides.length) * 100)}%)\`;
-                await new Promise(resolve => setTimeout(resolve, 200)); // Allow slide to render
-
-                window.scrollTo(0, 0); // Ensure top-left is in view for accurate capture
-
-                const canvas = await html2canvas(slideWindow, {
-                    backgroundColor: null,
-                    scale: 2 // Higher scale for better quality
-                });
-
-                const imgData = canvas.toDataURL('image/png');
-                const pdfWidth = pdf.internal.pageSize.getWidth();
-                const pdfHeight = pdf.internal.pageSize.getHeight();
-
-                if (i > 0) {
-                    pdf.addPage([pdfWidth, pdfHeight], 'landscape');
-                }
-                pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-            }
-
-            pdf.save('lesson-slides.pdf');
-
-        } catch (error) {
-            console.error("Error creating PDF:", error);
-            alert("An error occurred while generating the PDF. Please try again.");
-        } finally {
-            btn.textContent = originalBtnText;
-            btn.disabled = false;
-            window.scrollTo(originalScrollPos.x, originalScrollPos.y);
-            showSlide(currentSlide); // Go back to the slide the user was on
-        }
-    }
-
-    document.getElementById('download-pdf-btn').addEventListener('click', downloadPdf);
-    showSlide(currentSlide);
-<\/script>
-</body>
-</html>`,
-        'formal-test': `<!DOCTYPE html>
-<html>
-<head>
-<title>Formal Test</title>
-<style>
-    body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        line-height: 1.7; margin: 0; padding: 2rem; color: #2a2f4a;
-        background: linear-gradient(-45deg, #e0c3fc, #8ec5fc, #f0e68c, #98fb98);
-        background-size: 400% 400%; animation: springGradient 25s ease infinite; min-height: 100vh;
-    }
-    @keyframes springGradient { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-    .container {
-        position: relative; z-index: 1;
-        max-width: 900px; margin: 0 auto; padding: 2.5rem; background: rgba(255, 255, 255, 0.45);
-        border-radius: 16px; box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
-        backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-    h1, h2, h3 { color: #1c2135; font-weight: 700; } h1 { font-size: 2.8rem; margin-bottom: 0.5rem; text-align: center; }
-    h2 { font-size: 2rem; border-bottom: 2px solid rgba(42, 47, 74, 0.1); padding-bottom: 0.5rem; margin-top: 2.5rem; }
-    button, .button {
-        display: inline-block; padding: 12px 24px; border: none; background-color: #5b75e4; color: white; border-radius: 8px;
-        cursor: pointer; font-size: 1rem; font-weight: 600; text-decoration: none; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(91, 117, 228, 0.3);
-    }
-    button:hover, .button:hover { background-color: #4a64d1; transform: translateY(-3px); box-shadow: 0 6px 20px rgba(91, 117, 228, 0.4); }
-    .quiz-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
-    .quiz-header h1 { margin: 0; text-align: left; font-size: 2.2rem; }
-    .quiz-nav { display: flex; justify-content: flex-start; gap: 10px; margin-bottom: 1.5rem; overflow-x: auto; padding-bottom: 10px; }
-    .nav-button { background-color: rgba(255, 255, 255, 0.6); color: #2a2f4a; border: 1px solid rgba(42, 47, 74, 0.2); }
-    .nav-button.active { background-color: #5b75e4; color: white; border-color: #5b75e4; transform: translateY(-3px); box-shadow: 0 6px 20px rgba(91, 117, 228, 0.4); }
-    .quiz-slider-wrapper { overflow: hidden; position: relative; width: 100%; }
-    .quiz-slider { display: flex; transition: transform 0.5s ease-in-out; width: 300%; }
-    .quiz-question-slide { flex: 0 0 33.333%; width: 33.333%; box-sizing: border-box; padding: 0 10px; }
-    .quiz-question { margin: 0; padding: 1.5rem; background: rgba(255, 255, 255, 0.5); border-left: 5px solid #5b75e4; border-radius: 8px; }
-    .quiz-question label { display: block; margin: 0.5rem 0; padding: 0.75rem; border-radius: 6px; cursor: pointer; transition: background-color 0.2s; }
-    .quiz-question label:hover { background-color: rgba(91, 117, 228, 0.1); }
-    #results-container { text-align: center; margin-top: 2rem; }
-    #results-container h2 { font-size: 2.5rem; }
-    .explanation { display: none; margin-top: 1rem; padding: 1rem; border-radius: 8px; font-size: 0.95rem; }
-    .feedback.correct { background-color: rgba(40, 167, 69, 0.2); color: #155724; border-left: 5px solid #28a745; }
-    .feedback.incorrect { background-color: rgba(220, 53, 69, 0.2); color: #721c24; border-left: 5px solid #dc3545; }
-    label.user-correct { background-color: rgba(40, 167, 69, 0.3); border: 1px solid #28a745; }
-    label.user-incorrect { background-color: rgba(220, 53, 69, 0.3); border: 1px solid #dc3545; }
-    label.actual-correct { border: 2px solid #28a745; }
-    .nav-button { padding: 8px 16px; font-size: 0.9rem; }
-    .nav-button.correct { background-color: #28a745; color: white; border-color: #28a745; }
-    .nav-button.incorrect { background-color: #dc3545; color: white; border-color: #dc3545; }
-    .quiz-pagination { display: flex; justify-content: flex-end; gap: 10px; margin-top: 1.5rem; }
-    button:disabled { background-color: #cccccc; cursor: not-allowed; transform: none; box-shadow: none; }
-    .word-bank {
-        display: flex; flex-wrap: wrap; gap: 10px; padding: 10px; background: rgba(0, 0, 0, 0.05); border-radius: 8px; margin-bottom: 1.5rem; justify-content: center;
-    }
-    .draggable-word {
-        padding: 8px 16px; background-color: #fff; border: 1px solid #ccc; border-radius: 6px; cursor: grab; user-select: none; transition: background-color 0.2s;
-    }
-    .draggable-word:active { cursor: grabbing; }
-    .drop-zone {
-        display: inline-block; min-width: 100px; min-height: 38px; padding: 8px; border: 2px dashed #5b75e4; border-radius: 6px; text-align: center;
-        vertical-align: middle; transition: all 0.2s;
-    }
-    .drop-zone.filled { border-style: solid; background-color: #e9ecef; }
-    .drag-over { background-color: rgba(91, 117, 228, 0.2); border-color: #4a64d1; }
-    .draggable-word.dragging { opacity: 0.5; }
-    .drop-zone.user-correct { border-color: #28a745; background-color: rgba(40, 167, 69, 0.2); color: #155724; }
-    .drop-zone.user-incorrect { border-color: #dc3545; background-color: rgba(220, 53, 69, 0.2); color: #721c24; }
-    .drop-zone .correct-answer-text { font-size: 0.8em; color: #155724; display: block; margin-top: 4px; }
-    .cloze-sentence { line-height: 2.5; }
-    </style>
-</head>
-<body>
-<div class="container">
-    <div class="quiz-header">
-        <h1>Physics Quiz</h1>
-        <button id="submit-btn" class="button">Submit Quiz</button>
-    </div>
-
-    <div class="quiz-nav" id="quiz-nav">
-        <button class="nav-button active" data-slide="0">Q1</button>
-        <button class="nav-button" data-slide="1">Q2</button>
-        <button class="nav-button" data-slide="2">Q3</button>
-    </div>
-
-    <form id="quiz-form">
-        <div class="quiz-slider-wrapper">
-            <div class="quiz-slider" id="quiz-slider">
-
-                <div class="quiz-question-slide">
-                    <div class="quiz-question">
-                        <p><strong>1. What is the standard unit of force in the International System of Units (SI)?</strong></p>
-                        <label><input type="radio" name="q1" value="a"> Watt</label>
-                        <label><input type="radio" name="q1" value="b"> Newton</label>
-                        <label><input type="radio" name="q1" value="c"> Joule</label>
-                        <div class="explanation feedback correct" id="explanation-q1">
-                            <strong>Correct!</strong> The Newton (N) is the SI unit of force, named after Sir Isaac Newton.
-                        </div>
-                    </div>
-                </div>
-
-                <div class="quiz-question-slide">
-                    <div class="quiz-question">
-                        <p><strong>2. Which of Newton's laws states that for every action, there is an equal and opposite reaction?</strong></p>
-                        <label><input type="radio" name="q2" value="a"> First Law of Motion</label>
-                        <label><input type="radio" name="q2" value="b"> Second Law of Motion</label>
-                        <label><input type="radio" name="q2" value="c"> Third Law of Motion</label>
-                        <div class="explanation feedback correct" id="explanation-q2">
-                            <strong>Correct!</strong> Newton's Third Law describes the nature of forces as interactions between two bodies.
-                        </div>
-                    </div>
-                </div>
-
-                <div class="quiz-question-slide" id="q3-slide">
-                    <div class="quiz-question">
-                        <p><strong>3. Complete the sentence by dragging the words into the blanks.</strong></p>
-                        <div id="q3-word-bank" class="word-bank">
-                            <span class="draggable-word" draggable="true">force</span>
-                            <span class="draggable-word" draggable="true">velocity</span>
-                            <span class="draggable-word" draggable="true">mass</span>
-                            <span class="draggable-word" draggable="true">acceleration</span>
-                            <span class="draggable-word" draggable="true">energy</span>
-                        </div>
-                        <p class="cloze-sentence">
-                            Newton's Second Law of Motion states that the
-                            <span class="drop-zone"></span>
-                            of an object is directly proportional to the net
-                            <span class="drop-zone"></span>
-                            applied to it and inversely proportional to its
-                            <span class="drop-zone"></span>.
-                        </p>
-                        <div class="explanation feedback correct" id="explanation-q3">
-                            <strong>Correct!</strong> The formula is F = ma, where force (F) equals mass (m) times acceleration (a). This means acceleration is proportional to force and inversely proportional to mass.
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-    </form>
-
-    <div class="quiz-pagination">
-        <button id="prev-btn" class="button">Previous Question</button>
-        <button id="next-btn" class="button">Next Question</button>
-    </div>
-
-    <div id="results-container" style="display:none;">
-        <h2 id="score-text"></h2>
-        <p>You can now review your answers. Use the navigation buttons above to revisit each question.</p>
-    </div>
-</div>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const slider = document.getElementById('quiz-slider');
-    const navButtons = document.querySelectorAll('.nav-button');
-    const submitBtn = document.getElementById('submit-btn');
-    const prevBtn = document.getElementById('prev-btn');
-    const nextBtn = document.getElementById('next-btn');
-    const form = document.getElementById('quiz-form');
-    const resultsContainer = document.getElementById('results-container');
-    const scoreText = document.getElementById('score-text');
-    const questionCount = 3;
-
-    let currentSlide = 0;
-    let isReviewMode = false;
-
-    const correctAnswers = {
-        q1: 'b',
-        q2: 'c',
-        q3: ['acceleration', 'force', 'mass']
-    };
-
-    function initializeDragAndDrop() {
-        const draggables = document.querySelectorAll('.draggable-word');
-        const dropZones = document.querySelectorAll('.drop-zone');
-        let draggedItem = null;
-        let touchClone = null;
-
-        function handleDrop(dropZone, word) {
-            if (isReviewMode) return;
-
-            // If another word is in the drop zone, return it to the bank
-            if (dropZone.children.length > 0) {
-                const existingWord = dropZone.children[0];
-                const wordBank = document.getElementById('q3-word-bank');
-                wordBank.appendChild(existingWord);
-                existingWord.classList.remove('in-slot');
-            }
-
-            // Place the new word in the zone
-            dropZone.innerHTML = '';
-            dropZone.appendChild(word);
-            word.classList.add('in-slot');
-            dropZone.classList.add('filled');
-        }
-
-        draggables.forEach(draggable => {
-            // MOUSE EVENTS
-            draggable.addEventListener('dragstart', (e) => {
-                if (isReviewMode) { e.preventDefault(); return; }
-                draggedItem = e.target;
-                setTimeout(() => e.target.classList.add('dragging'), 0);
-            });
-
-            draggable.addEventListener('dragend', () => {
-                if (draggedItem) draggedItem.classList.remove('dragging');
-            });
-
-            // TOUCH EVENTS
-            let lastTouchTarget = null;
-            draggable.addEventListener('touchstart', (e) => {
-                if (isReviewMode) { e.preventDefault(); return; }
-                draggedItem = e.target;
-
-                touchClone = draggedItem.cloneNode(true);
-                touchClone.style.position = 'absolute';
-                touchClone.style.zIndex = '1000';
-                touchClone.style.opacity = '1';
-                touchClone.style.pointerEvents = 'none';
-                document.body.appendChild(touchClone);
-                updateClonePosition(e.touches[0]);
-
-            }, { passive: false });
-
-            draggable.addEventListener('touchmove', (e) => {
-                if (!draggedItem || isReviewMode) return;
-                e.preventDefault();
-                updateClonePosition(e.touches[0]);
-
-                if (lastTouchTarget) lastTouchTarget.classList.remove('drag-over');
-                const targetElement = document.elementFromPoint(e.touches[0].clientX, e.touches[0].clientY);
-                if (targetElement && targetElement.classList.contains('drop-zone')) {
-                    targetElement.classList.add('drag-over');
-                    lastTouchTarget = targetElement;
-                } else {
-                    lastTouchTarget = null;
-                }
-            }, { passive: false });
-
-            draggable.addEventListener('touchend', (e) => {
-                if (!draggedItem || isReviewMode) return;
-                if (touchClone) {
-                    touchClone.remove();
-                    touchClone = null;
-                }
-                if (lastTouchTarget) {
-                    lastTouchTarget.classList.remove('drag-over');
-                    handleDrop(lastTouchTarget, draggedItem);
-                }
-                draggedItem = null;
-                lastTouchTarget = null;
-            });
-        });
-
-        function updateClonePosition(touch) {
-            if (touchClone) {
-                touchClone.style.left = \`\${touch.pageX - touchClone.offsetWidth / 2}px\`;
-                touchClone.style.top = \`\${touch.pageY - touchClone.offsetHeight / 2}px\`;
-            }
-        }
-
-        dropZones.forEach(zone => {
-            zone.addEventListener('dragover', (e) => {
-                if (isReviewMode) return;
-                e.preventDefault();
-                zone.classList.add('drag-over');
-            });
-
-            zone.addEventListener('dragleave', () => {
-                zone.classList.remove('drag-over');
-            });
-
-            zone.addEventListener('drop', (e) => {
-                e.preventDefault();
-                zone.classList.remove('drag-over');
-                if (draggedItem) {
-                    handleDrop(zone, draggedItem);
-                    draggedItem = null;
-                }
-            });
-        });
-    }
-
-    function updatePaginationButtons() {
-        prevBtn.disabled = currentSlide === 0;
-        nextBtn.disabled = currentSlide === questionCount - 1;
-    }
-
-    function goToSlide(slideIndex) {
-        currentSlide = slideIndex;
-        const percentage = slideIndex * -33.333;
-        slider.style.transform = \`translateX(\${percentage}%)\`;
-        navButtons.forEach((btn, index) => {
-            btn.classList.toggle('active', index === slideIndex);
-        });
-        updatePaginationButtons();
-    }
-
-    navButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            goToSlide(parseInt(button.dataset.slide));
-        });
-    });
-
-    prevBtn.addEventListener('click', () => {
-        if (currentSlide > 0) goToSlide(currentSlide - 1);
-    });
-
-    nextBtn.addEventListener('click', () => {
-        if (currentSlide < questionCount - 1) goToSlide(currentSlide + 1);
-    });
-
-    function handleSubmit() {
-        const formData = new FormData(form);
-        let score = 0;
-        const userAnswers = {};
-
-        for (let i = 1; i <= 2; i++) {
-            const questionName = \`q\${i}\`;
-            const userAnswer = formData.get(questionName);
-            userAnswers[questionName] = userAnswer;
-            if (userAnswer === correctAnswers[questionName]) score++;
-        }
-
-        const q3DropZones = document.querySelectorAll('#q3-slide .drop-zone');
-        const q3UserAnswers = Array.from(q3DropZones).map(zone => zone.children.length > 0 ? zone.children[0].textContent : null);
-        userAnswers['q3'] = q3UserAnswers;
-        if (JSON.stringify(q3UserAnswers) === JSON.stringify(correctAnswers.q3)) {
-            score++;
-        }
-
-        scoreText.textContent = \`Your Score: \${score} / \${questionCount}\`;
-        resultsContainer.style.display = 'block';
-        submitBtn.textContent = 'Retake Quiz';
-        isReviewMode = true;
-        enterReviewMode(userAnswers);
-    }
-
-    function resetQuiz() {
-        form.reset();
-        const inputs = form.querySelectorAll('input[type="radio"]');
-        inputs.forEach(input => {
-            input.disabled = false;
-            input.parentElement.classList.remove('user-correct', 'user-incorrect', 'actual-correct');
-        });
-
-        const wordBank = document.getElementById('q3-word-bank');
-        const dropZones = document.querySelectorAll('#q3-slide .drop-zone');
-        dropZones.forEach(zone => {
-            if (zone.children.length > 0) {
-                wordBank.appendChild(zone.children[0]);
-            }
-            zone.innerHTML = '';
-            zone.classList.remove('filled', 'user-correct', 'user-incorrect');
-        });
-        wordBank.querySelectorAll('.draggable-word').forEach(word => word.classList.remove('in-slot'));
-
-        navButtons.forEach(btn => btn.classList.remove('correct', 'incorrect'));
-        document.querySelectorAll('.explanation').forEach(el => el.style.display = 'none');
-        document.querySelectorAll('.feedback.incorrect').forEach(el => el.remove());
-
-        resultsContainer.style.display = 'none';
-        submitBtn.textContent = 'Submit Quiz';
-        isReviewMode = false;
-        goToSlide(0);
-    }
-
-    submitBtn.addEventListener('click', function(event) {
-        event.preventDefault();
-        if (isReviewMode) resetQuiz();
-        else handleSubmit();
-    });
-
-    function enterReviewMode(userAnswers) {
-        form.querySelectorAll('input[type="radio"]').forEach(input => input.disabled = true);
-
-        for (let i = 1; i <= 2; i++) {
-            const qName = \`q\${i}\`;
-            const isCorrect = userAnswers[qName] === correctAnswers[qName];
-            navButtons[i - 1].classList.add(isCorrect ? 'correct' : 'incorrect');
-            form.querySelectorAll(\`input[name="\${qName}"]\`).forEach(input => {
-                const label = input.parentElement;
-                if (input.value === correctAnswers[qName]) label.classList.add('actual-correct');
-                if (input.value === userAnswers[qName]) label.classList.add(isCorrect ? 'user-correct' : 'user-incorrect');
-            });
-            const explanationDiv = document.getElementById(\`explanation-\${qName}\`);
-            if (isCorrect) {
-                explanationDiv.style.display = 'block';
-            } else {
-                const wrongExplanation = explanationDiv.cloneNode(true);
-                wrongExplanation.classList.remove('correct');
-                wrongExplanation.classList.add('incorrect');
-                wrongExplanation.innerHTML = \`<strong>Incorrect.</strong> The correct answer is highlighted. \${explanationDiv.innerHTML.replace('<strong>Correct!</strong>', '')}\`;
-                if (!explanationDiv.parentNode.querySelector('.feedback.incorrect')) {
-                     explanationDiv.parentNode.appendChild(wrongExplanation);
-                     wrongExplanation.style.display = 'block';
-                }
-            }
-        }
-
-        const isQ3Correct = JSON.stringify(userAnswers.q3) === JSON.stringify(correctAnswers.q3);
-        navButtons[2].classList.add(isQ3Correct ? 'correct' : 'incorrect');
-        const q3DropZones = document.querySelectorAll('#q3-slide .drop-zone');
-        q3DropZones.forEach((zone, index) => {
-            const userWord = userAnswers.q3[index];
-            const correctWord = correctAnswers.q3[index];
-            if (userWord === correctWord) {
-                zone.classList.add('user-correct');
-            } else {
-                zone.classList.add('user-incorrect');
-                zone.innerHTML += \`<span class="correct-answer-text">Correct: \${correctWord}</span>\`;
-            }
-        });
-        const q3Explanation = document.getElementById('explanation-q3');
-        if (isQ3Correct) {
-            q3Explanation.style.display = 'block';
-        } else {
-            const wrongExplanation = q3Explanation.cloneNode(true);
-            wrongExplanation.classList.remove('correct');
-            wrongExplanation.classList.add('incorrect');
-            wrongExplanation.innerHTML = \`<strong>Incorrect.</strong> \${q3Explanation.innerHTML.replace('<strong>Correct!</strong>', '')}\`;
-            if (!q3Explanation.parentNode.querySelector('.feedback.incorrect')) {
-                q3Explanation.parentNode.appendChild(wrongExplanation);
-                wrongExplanation.style.display = 'block';
-            }
-        }
-    }
-
-    goToSlide(0);
-    initializeDragAndDrop();
-});
-<\/script>
-</body>
-</html>`,
-        'interactive-tool': `<!DOCTYPE html>\n<html>\n<head>\n    <title>Interactive Tool</title>\n    <style>${springGlassCss}</style>\n</head>\n<body>\n    <div class="container">\n        <h1>Interactive Tool Hello World</h1>\n        <p>Move the slider to change the value.</p>\n        <input type="range" min="1" max="100" value="50" id="myRange" style="width: 100%;">\n        <h2 style="text-align: center;">Value: <span id="sliderValue">50</span></h2>\n    </div>\n    <script>\n        const slider = document.getElementById('myRange');\n        const output = document.getElementById('sliderValue');\n        slider.oninput = function() { output.innerHTML = this.value; }\n    <\/script>\n</body>\n</html>`,
-        'portfolio': `<!DOCTYPE html>\n<html>\n<head>\n    <title>My Portfolio</title>\n    <style>${springGlassCss}</style>\n</head>\n<body>\n    <div class="container">\n        <h1>Portfolio Hello World</h1>\n        <h2>About Me</h2><p>Your introduction here.</p>\n        <h2>Projects</h2><p>Details about your projects.</p>\n        <h2>Contact</h2><p>How to reach you.</p>\n    </div>\n</body>\n</html>`,
-        '3D-Quiz': `<!DOCTYPE html>\n<html>\n<head>\n    <title>3D Gamified Quiz</title>\n    <style>\n        body { margin: 0; overflow: hidden; }\n        canvas { display: block; }\n        .container { display: none; }\n    </style>\n</head>\n<body>\n    <div class="container" style="position: absolute; top: 10px; left: 10px; z-index: 10; display: block;">\n        <h1>3D Quiz Hello World</h1>\n        <p>This is a basic Three.js scene. Use the AI to build the full game!</p>\n    </div>\n    <script type="importmap">\n    { "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } }\n    <\/script>\n    <script type="module">\n        import * as THREE from 'three';\n        const scene = new THREE.Scene();\n        const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );\n        const renderer = new THREE.WebGLRenderer({ antialias: true });\n        renderer.setSize( window.innerWidth, window.innerHeight );\n        document.body.appendChild( renderer.domElement );\n        const geometry = new THREE.BoxGeometry();\n        const material = new THREE.MeshNormalMaterial();\n        const cube = new THREE.Mesh( geometry, material );\n        scene.add( cube );\n        camera.position.z = 5;\n        function animate() {\n            requestAnimationFrame( animate );\n            cube.rotation.x += 0.01;\n            cube.rotation.y += 0.01;\n            renderer.render( scene, camera );\n        }\n        animate();\n    <\/script>\n</body>\n</html>`,
-        'netlify-blob-backend': `You are an "App Enhancer" AI. Your task is to add a Netlify Blob storage backend to the user's provided HTML code. You MUST return a single, raw JSON object without markdown fences. This JSON object must have three keys: "title", "explanation", and "files". The "files" key must contain an array of exactly four file objects. The four required file objects are:
-1. A file object with "name": "netlify.toml". Its "content" must be the standard Netlify config pointing to the functions directory.
-2. A file object with "name": "package.json". Its "content" must define the necessary dependencies, specifically "@netlify/blobs".
-3. A file object with "name": "netlify/functions/api.js". Its "content" must be a serverless function that handles GET and POST requests to retrieve and save data to a Netlify Blob store named 'my_store'. The function should read and write JSON data.
-4. A file object with "name": "index.html". Its "content" MUST be the user's original HTML, but with a new <script> tag added before the closing </body> tag. This script must contain example client-side JavaScript to demonstrate how to use fetch() to communicate with the new '/.netlify/functions/api' endpoints. It should include example functions for saving and loading data.`
-    };
-
-    function loadGoalTemplate() {
-        const goal = document.getElementById('app-type').value;
-        const content = goalTemplates[goal];
-
-        // Check if the content is an HTML template (starts with <!DOCTYPE)
-        if (content && content.trim().toLowerCase().startsWith('<!doctype')) {
-            if (confirm('This will replace the current code in the editor with a template. Are you sure?')) {
-                codeEditor.value = typeof applySavedDesignToHtml === 'function' ? applySavedDesignToHtml(content) : content;
-                designUndoCaptured = false;
-                currentlySelectedVersionId = null; // This is a new, unsaved starting point
-                activeFolderId = null;
-                updatePreview();
-                renderVersionsTree();
-            }
-        }
-    }
-
-    function openTab(evt, tabName) {
-        document.querySelectorAll(".tab-button").forEach(tb => tb.classList.remove('active'));
-        evt.currentTarget.classList.add('active');
-        const settingsPage = document.getElementById('settings');
-        const creditsPage = document.getElementById('credits');
-        settingsPage.classList.remove('active');
-        creditsPage.classList.remove('active');
-        if (tabName === 'settings') {
-            settingsPage.classList.add('active');
-        } else if (tabName === 'credits') {
-            creditsPage.classList.add('active');
-        }
-    }
 
     function togglePanel(panelId, skipDesignGuard = false) {
         const panel = document.getElementById(panelId);
@@ -2580,39 +1822,12 @@ document.addEventListener('DOMContentLoaded', function() {
         };
         window.open(map[select.value] || 'https://chatgpt.com', '_blank');
     }
-    function updateApiKeyVisibility() {
-        const selectedModel = document.getElementById('ai-model').value;
-        const isDeepSeek = selectedModel.startsWith('deepseek');
-        document.getElementById('gemini-key-container').style.display = isDeepSeek ? 'none' : 'block';
-        document.getElementById('deepseek-key-container').style.display = isDeepSeek ? 'block' : 'none';
-    }
-    function loadSettings() { const savedTitle = localStorage.getItem('hongdouAppTitle'); if(savedTitle) document.getElementById('app-title-input').value = savedTitle;
+    function initAppSettings() {
+        const savedTitle = localStorage.getItem('hongdouAppTitle');
+        if (savedTitle) document.getElementById('app-title-input').value = savedTitle;
         apiKey = localStorage.getItem('geminiApiKey') || '';
-        deepseekApiKey = localStorage.getItem('deepseekApiKey') || '';
-        model = localStorage.getItem('geminiModel') || 'gemini-3.5-flash';
         language = localStorage.getItem('appLanguage') || 'en';
-
-        document.getElementById('api-key').value = apiKey;
-        document.getElementById('deepseek-api-key').value = deepseekApiKey;
-        document.getElementById('ai-model').value = model;
-        document.getElementById('language-select').value = language;
         setLanguage(language);
-        updateApiKeyVisibility();
-        const savedFbConfig = localStorage.getItem('firebaseConfig');
-        if(savedFbConfig) document.getElementById('firebase-config').value = savedFbConfig;
-    }
-    function saveSettings() {
-        apiKey = document.getElementById('api-key').value;
-        deepseekApiKey = document.getElementById('deepseek-api-key').value;
-        model = document.getElementById('ai-model').value;
-        language = document.getElementById('language-select').value;
-        localStorage.setItem('geminiApiKey', apiKey);
-        localStorage.setItem('deepseekApiKey', deepseekApiKey);
-        localStorage.setItem('geminiModel', model);
-        localStorage.setItem('appLanguage', language);
-        localStorage.setItem('firebaseConfig', document.getElementById('firebase-config').value);
-        setLanguage(language);
-        alert('Settings saved!'); document.querySelector('.tab-button[onclick*="coder"]').click();
     }
 
     // --- Knowledgebase & Export Utilities ---
@@ -2778,7 +1993,6 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch (e) {
             console.warn("LocalStorage full, relying on Firebase.");
         }
-        // Unified broadcast prevents race conditions where versions update before active selection state
         broadcastChange(customDelay);
     }
     function loadVersionsFromStorage() {
@@ -3030,12 +2244,12 @@ document.addEventListener('DOMContentLoaded', function() {
             if (progressText) progressText.textContent = `${filesProcessed} / ${totalFiles}`;
         }
 
-        if (statusDetail) statusDetail.textContent = 'Syncing to Database...';
+        if (statusDetail) statusDetail.textContent = syncReference ? 'Syncing to Database...' : 'Saving Locally...';
         renderVersionsTree();
 
         try {
             localStorage.setItem('hongdouVersionData', JSON.stringify(versionData));
-            if (syncReference) {
+            if (syncReference && hasLoadedRemoteSync && isTeacherSessionAuthorized()) {
                 if (progressBar) progressBar.style.width = '85%';
                 await syncReference.update({
                     versions: versionData,
@@ -3045,6 +2259,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (progressBar) progressBar.style.width = '100%';
                 if (statusDetail) statusDetail.textContent = 'Upload Complete!';
                 await new Promise(r => setTimeout(r, 500));
+            } else {
+                if (progressBar) progressBar.style.width = '100%';
+                if (statusDetail) statusDetail.textContent = 'Saved Locally!';
+                await new Promise(r => setTimeout(r, 350));
             }
         } catch (e) {
             console.error("Sync failed:", e);
@@ -3449,261 +2667,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('live-preview').srcdoc = processedHtml;
     }
 
-    function stopProgressSimulation() {
-        if (progressSimulationTimeout) {
-            clearTimeout(progressSimulationTimeout);
-            progressSimulationTimeout = null;
-        }
-        if (countdownInterval) {
-            clearInterval(countdownInterval);
-            countdownInterval = null;
-        }
-    }
 
-         function formatTime(seconds) {
-        const mins = Math.floor(seconds / 60);
-        const secs = Math.floor(seconds % 60);
-        return `${mins}:${secs.toString().padStart(2, '0')}`;
-    }
-
-    function simulateProgress(progressBar, thinkingText, timerDisplay, targetDuration = 65, messages = []) {
-        stopProgressSimulation();
-        let currentProgress = 0;
-        const thinkingMessages = messages.length > 0 ? messages : [
-            "Analyzing request...", "Consulting materials...", "Formulating initial plan...",
-            "Generating core logic...", "Cross-referencing HTML structure...",
-            "Refining structural patches...", "Adding aesthetic touches...", "Finalizing output..."
-        ];
-        let messageIndex = 0;
-        const TARGET_DURATION_SECONDS = targetDuration;
-        let remainingTime = TARGET_DURATION_SECONDS + (Math.random() * (targetDuration * 0.1) - (targetDuration * 0.05)); // Fluctuate by +/- 5% of duration
-
-        thinkingText.textContent = thinkingMessages[messageIndex];
-        progressBar.style.width = '0%';
-        timerDisplay.textContent = 'Estimating...';
-
-        // This separate interval handles the smooth second-by-second countdown.
-        const startCountdown = () => {
-            countdownInterval = setInterval(() => {
-                if (remainingTime > 0) {
-                    remainingTime--;
-                    timerDisplay.textContent = `~${formatTime(remainingTime)} left`;
-                }
-            }, 1000);
-        };
-
-        // This loop handles progress bar jumps and occasional timer corrections.
-        const updateStep = () => {
-            if (currentProgress < 98) {
-                // Adjust jump size based on the target duration to keep the bar in sync with the timer
-                const speedFactor = 65 / Math.max(1, targetDuration); // Compare to the 65s baseline
-                const jump = (0.5 + (Math.random() * 3.5)) * speedFactor;
-                currentProgress = Math.min(98, currentProgress + jump);
-                progressBar.style.width = currentProgress + '%';
-
-                // Re-evaluation now happens much less frequently (approx. 1 in 10 updates).
-                if (Math.random() < 0.1) {
-                    const idealRemaining = TARGET_DURATION_SECONDS * (1 - (currentProgress / 98));
-                    const fluctuation = (Math.random() - 0.5) * (targetDuration * 0.25); // Fluctuate by +/- 12.5% of duration
-                    remainingTime = Math.max(2, idealRemaining + fluctuation);
-                    timerDisplay.textContent = `~${formatTime(remainingTime)} left`; // Update display immediately
-                }
-            }
-
-            const nextMessageThreshold = (messageIndex + 1) * (98 / thinkingMessages.length);
-            if (currentProgress >= nextMessageThreshold && messageIndex < thinkingMessages.length - 1) {
-                messageIndex++;
-                thinkingText.textContent = thinkingMessages[messageIndex];
-            }
-
-            const nextInterval = (targetDuration <= 20)
-                ? 200 + (Math.random() * 400)   // Fast interval for short durations (e.g., reply phase)
-                : 1200 + (Math.random() * 2200); // Slower interval for long durations (e.g., initial request)
-            progressSimulationTimeout = setTimeout(updateStep, nextInterval);
-        };
-
-        // Start the process
-        setTimeout(() => {
-            if (progressSimulationTimeout === null && countdownInterval === null) { // Check if it was cancelled during estimation
-                startCountdown();
-                updateStep();
-            }
-        }, 1500); // Shorter "Estimating..." period
-    }
-
-           async function handleSendClick() {
-        if (currentRequestController) {
-            currentRequestController.abort();
-            console.log("Request cancelled by user.");
-            return;
-        }
-
-        const chatInput = document.getElementById('chat-input');
-        const userMessage = chatInput.value.trim();
-        if (!userMessage && appSettings.materials.length === 0) return;
-
-        const selectedModel = document.getElementById('ai-model').value;
-        const isDeepSeek = selectedModel.startsWith('deepseek');
-        const appGoal = document.getElementById('app-type').value;
-
-        if (isDeepSeek && !deepseekApiKey) {
-            alert('Please enter your DeepSeek API Key in the Settings tab.');
-            document.querySelector('.tab-button[onclick*="settings"]').click();
-            return;
-        }
-        if (!isDeepSeek && (typeof getCurrentGeminiKey === 'function' ? !getCurrentGeminiKey() : !apiKey)) {
-            alert('Please add a Gemini API Key in the API Carousel.');
-            document.querySelector('.tab-button[onclick*="settings"]').click();
-            return;
-        }
-
-        const effectiveMessage = userMessage || `Based on the provided file(s), please fulfill the selected "App Creation Goal".`;
-        appendMessage(effectiveMessage, 'user');
-        chatInput.value = '';
-        chatHistoryLog.push({ role: 'user', content: effectiveMessage });
-
-        const sendButton = document.getElementById('send-button');
-        sendButton.classList.add('cancel');
-        sendButton.innerHTML = `<div class="loader"></div><span>Cancel</span>`;
-        currentRequestController = new AbortController();
-
-        let streamingMessageDiv = null;
-
-        while (true) {
-            const originalCode = codeEditor.value;
-            try {
-                if (streamingMessageDiv) streamingMessageDiv.remove();
-                streamingMessageDiv = appendMessage('', 'model', true);
-                streamingMessageDiv.innerHTML = `<span class="thinking-text">Initializing...</span><div class="progress-wrapper"><div class="progress-bar-container"><div class="progress-bar"></div></div><span class="timer-display"></span></div>`;
-                const progressBar = streamingMessageDiv.querySelector('.progress-bar');
-                const thinkingText = streamingMessageDiv.querySelector('.thinking-text');
-                const timerDisplay = streamingMessageDiv.querySelector('.timer-display');
-
-                const initialDuration = selectedModel === 'gemini-3-flash-preview' ? 35 : 65;
-                simulateProgress(progressBar, thinkingText, timerDisplay, initialDuration);
-
-                const strippedOriginal = typeof removeDesignStyleFromHtml === 'function' ? removeDesignStyleFromHtml(originalCode) : originalCode;
-                const isInitialCode = strippedOriginal.trim() === initialCode.trim();
-
-                let systemPrompt = '';
-                let userPromptContent = '';
-
-                const formattedHistory = chatHistoryLog.slice(0, -1).map(turn => `${turn.role === 'user' ? 'Previous User' : 'Your Previous Response'}: ${turn.content}`).join('\n\n');
-                const historyContext = formattedHistory ? `**Conversation History:**\n${formattedHistory}\n\n---\n\n**Current Task:**\n` : '';
-                const languageNames = { en: 'English', zh: 'Chinese', ms: 'Malay', ta: 'Tamil' };
-                const languageInstruction = `IMPORTANT: Your "explanation" text MUST be in ${languageNames[language] || 'English'}.`;
-
-                const skillsContextStr = typeof getActiveSkillsPromptBlock === 'function' ? getActiveSkillsPromptBlock() : '';
-                const contextPromptAdd = getGlobalProjectContextStr() + '\n\n' + getDesignSystemPromptNote() + (skillsContextStr ? '\n\n' + skillsContextStr : '');
-                const kbData = await getKnowledgebaseContentParts(isDeepSeek);
-
-                if (appGoal === 'netlify-blob-backend') {
-                    const goalInstruction = goalTemplates[appGoal];
-                    systemPrompt = `${goalInstruction} ${languageInstruction}`;
-                    userPromptContent = `${historyContext}**User Request:** "${effectiveMessage}"${contextPromptAdd}\n\n**Original User HTML to Enhance:**\n\`\`\`html\n${originalCode}\n\`\`\`\nNow, generate the JSON response containing the four enhanced files.`;
-                } else if (isInitialCode) {
-                    systemPrompt = `You are a "Builder" AI. Your ONLY function is to return a valid JSON object that builds a complete, functional HTML page from scratch. The JSON object MUST have three keys: "title" (a 3-5 word summary), "explanation" (a string explaining your work), and "htmlBodyContent" (a string with inner HTML for the body). Your response MUST be a single, raw JSON object without markdown fences. The "htmlBodyContent" must start with \`<div class="container">\` and use the provided "SpringGlass" CSS classes. If project assets are provided, incorporate them into the design using their local filenames (e.g. src="image.jpg"). ${languageInstruction}`;
-                    userPromptContent = `${historyContext}**User Request:** "${effectiveMessage}"${contextPromptAdd}\n\n${kbData.extraText}\n\n**SpringGlass CSS Class Reference:**\n\`\`\`\n${springGlassCssReference}\n\`\`\`\nNow, generate the JSON response.`;
-                } else {
-                    systemPrompt = `You are a "Patcher" AI. Your ONLY function is to return a valid JSON object that modifies existing HTML. The JSON object MUST have three keys: "title" (a 3-5 word summary), "explanation" (a string explaining changes), and "patches" (an array of {search, replace} objects). Your response MUST be a single, raw JSON object without markdown fences. "search" must be a verbatim match from the current HTML. All new HTML must use "SpringGlass" CSS classes. If assets are listed in the Project context, use their local filenames (e.g. src="image.jpg"). ${languageInstruction}`;
-                    userPromptContent = `${historyContext}**User Request:** "${effectiveMessage}"${contextPromptAdd}\n\n**Current HTML:** \`\`\`html\n${originalCode}\n\`\`\`\n\n${kbData.extraText}\n\n**SpringGlass CSS Class Reference:**\n\`\`\`\n${springGlassCssReference}\n\`\`\`\nNow, generate the JSON response.`;
-                }
-
-                // --- API Call Logic (remains the same) ---
-                let response;
-                if (isDeepSeek) {
-                    const messages = [{ "role": "system", "content": systemPrompt }, { "role": "user", "content": userPromptContent }];
-                    response = await fetch(`https://api.deepseek.com/chat/completions`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${deepseekApiKey}` }, body: JSON.stringify({ model: selectedModel, messages: messages, stream: true, response_format: { type: "json_object" } }), signal: currentRequestController.signal });
-                } else {
-                    const textPrompt = `${systemPrompt}\n\n${userPromptContent}`;
-                    const contentParts = [{ "text": textPrompt }, ...kbData.parts];
-                    appSettings.materials.forEach(material => { if (material.base64Data) { contentParts.push({ "inlineData": { "mimeType": material.mimeType, "data": material.base64Data } }); } });
-                    response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${selectedModel}:streamGenerateContent?key=${apiKey}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: contentParts }], generationConfig: { responseMimeType: "application/json" }, safetySettings: [ { "category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE" }, { "category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE" }, { "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE" }, { "category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE" } ] }), signal: currentRequestController.signal });
-                }
-                if (!response.ok) { let errorText = `API request failed: ${response.status}`; try { const errorJson = await response.json(); if(errorJson.error && errorJson.error.message) { errorText = errorJson.error.message; } } catch(e){} throw new ApiError(errorText, response.status); }
-
-                // --- Stream Parsing Logic (remains the same) ---
-                const reader = response.body.getReader(); const decoder = new TextDecoder(); let rawStreamText = '';
-                while (true) { const { value, done } = await reader.read(); if (done) break; rawStreamText += decoder.decode(value, { stream: true }); }
-                stopProgressSimulation();
-                let combinedText = '';
-                if (isDeepSeek) { const lines = rawStreamText.split('\n').filter(line => line.startsWith('data: ')); for (const line of lines) { const jsonStr = line.substring(6); if (jsonStr === '[DONE]') break; try { const chunk = JSON.parse(jsonStr); combinedText += chunk.choices[0]?.delta?.content || ''; } catch (e) { console.warn('Skipping malformed stream chunk:', jsonStr); } } } else { try { const responseArray = JSON.parse(rawStreamText); combinedText = responseArray.map(chunk => chunk.candidates?.[0]?.content?.parts?.[0]?.text || '').join(''); } catch (e) { throw new Error(`The API stream was malformed or blocked.`); } }
-                if (!combinedText) { throw new Error(`The AI response was empty after parsing the stream.`); }
-
-                // --- Response Processing Logic (UPDATED) ---
-                let aiResponseJson;
-                try { aiResponseJson = JSON.parse(combinedText); } catch (parseError) { throw new Error(`AI returned invalid JSON. Content: "${combinedText.substring(0, 200)}..."`); }
-
-                const explanation = aiResponseJson.explanation || "Request processed.";
-                const title = aiResponseJson.title || explanation.substring(0, 40) + '...';
-
-                if (appGoal === 'netlify-blob-backend') {
-                    if (!aiResponseJson.files || !Array.isArray(aiResponseJson.files) || aiResponseJson.files.length === 0) throw new Error("Architect response missing 'files' array.");
-                    streamingMessageDiv.textContent = `[Architect] ${explanation} Your ZIP file is now downloading.`;
-                    chatHistoryLog.push({ role: 'model', content: explanation });
-                    createAndDownloadMultiFileZip(aiResponseJson.files, title);
-                } else {
-                    const modePrefix = isInitialCode ? '[Builder]' : '[Patcher]';
-                    streamingMessageDiv.textContent = `${modePrefix} ${explanation}`;
-                    chatHistoryLog.push({ role: 'model', content: explanation });
-                    let finalCode = '';
-                    if (isInitialCode) {
-                        if (!aiResponseJson.htmlBodyContent || typeof aiResponseJson.htmlBodyContent !== 'string') throw new Error("Builder response missing 'htmlBodyContent'.");
-                        finalCode = `<!DOCTYPE html>\n<html>\n<head>\n    <title>${document.getElementById('app-title-input').value.trim() || 'My Page'}</title>\n    <style>${springGlassCss}</style>\n</head>\n<body>\n${aiResponseJson.htmlBodyContent}\n</body>\n</html>`;
-                        if (typeof applySavedDesignToHtml === 'function') {
-                            finalCode = applySavedDesignToHtml(finalCode);
-                        }
-                    } else {
-                        if (!aiResponseJson.patches || !Array.isArray(aiResponseJson.patches)) throw new Error("Patcher response missing 'patches' array.");
-                        let tempCode = originalCode;
-                        for (const patch of aiResponseJson.patches) {
-                            if (typeof patch.search !== 'string' || typeof patch.replace !== 'string') throw new Error('Invalid patch format.');
-                            if (!tempCode.includes(patch.search)) throw new Error(`A patch failed: 'search' block not found. Search term: "${patch.search.substring(0, 50)}..."`);
-                            tempCode = tempCode.replace(patch.search, patch.replace);
-                        }
-                        finalCode = tempCode;
-                    }
-                    codeEditor.value = finalCode;
-                    if (!isInitialCode && telemetryEnabled && Array.isArray(aiResponseJson.patches) && typeof playPatchTelemetry === 'function') {
-                        await createNewVersion(finalCode, title, isInitialCode, true);
-                        playPatchTelemetry(aiResponseJson.patches, title, originalCode, finalCode);
-                    } else {
-                        await createNewVersion(finalCode, title, isInitialCode, false);
-                        updatePreview();
-                    }
-                }
-                break; // Success!
-
-            } catch (error) { // --- Error Handling Logic (remains the same) ---
-                if (error.name === 'AbortError') { stopProgressSimulation(); if (streamingMessageDiv) streamingMessageDiv.textContent = 'Request cancelled.'; break; }
-                codeEditor.value = originalCode;
-                if (error.message.startsWith('AI returned invalid JSON')) {
-                    console.warn(`Invalid JSON response. Retrying... Error:`, error.message);
-                    const retryMessage = `AI response was malformed. Retrying automatically...`;
-                    if (streamingMessageDiv) { streamingMessageDiv.innerHTML = `<span class="thinking-text">${retryMessage}</span><div class="progress-wrapper"><div class="progress-bar-container"><div class="progress-bar"></div></div><span class="timer-display"></span></div>`; }
-                    await new Promise(resolve => setTimeout(resolve, 5000));
-                    continue;
-                }
-                stopProgressSimulation(); console.error(`Request failed with a non-retriable error:`, error);
-                const finalMessage = `Sorry, an error occurred: ${error.message}`;
-                if (streamingMessageDiv) streamingMessageDiv.textContent = finalMessage; else appendMessage(finalMessage, 'model');
-                break;
-            }
-        }
-
-        sendButton.classList.remove('cancel');
-        sendButton.innerHTML = `Send`;
-        currentRequestController = null;
-    }
-
-    function appendMessage(message, sender, returnElement = false) {
-        const chatHistoryDiv = document.getElementById('chat-history'); const messageDiv = document.createElement('div');
-        messageDiv.className = `message ${sender === 'user' ? 'user-message' : 'ai-message'}`;
-        messageDiv.textContent = message; chatHistoryDiv.appendChild(messageDiv); chatHistoryDiv.scrollTop = chatHistoryDiv.scrollHeight;
-        if (returnElement) return messageDiv;
-    }
-
-    function clearChat() { if (confirm("Clear the chat history?")) { document.getElementById('chat-history').innerHTML = ''; chatHistoryLog = []; } }
     function resetCode() {
         if (confirm("Reset the code to its original state? This will clear the editor but not delete any saved versions.")) {
             codeEditor.value = typeof applySavedDesignToHtml === 'function' ? applySavedDesignToHtml(initialCode) : initialCode;
@@ -3719,56 +2683,7 @@ document.addEventListener('DOMContentLoaded', function() {
         a.href = URL.createObjectURL(blob); a.download = 'index.html';
         document.body.appendChild(a); a.click(); document.body.removeChild(a);
     }
-    function toggleAppSettings() { document.getElementById('app-settings-dropdown').style.display = document.getElementById('app-settings-dropdown').style.display === 'block' ? 'none' : 'block'; }
 
-    // Close App Settings dropdown when clicking outside
-    document.addEventListener('click', function(event) {
-        const settingsDropdown = document.getElementById('app-settings-dropdown');
-        const settingsButton = document.querySelector('.icon-button[title="App Creation Settings"]');
-        if (settingsDropdown.style.display === 'block' && !settingsDropdown.contains(event.target) && !settingsButton.contains(event.target)) {
-            settingsDropdown.style.display = 'none';
-        }
-    });
-
-    function handleFileSelection(event) {
-        const files = event.target.files; if (!files.length) return;
-        const MAX_FILE_SIZE_BYTES = 20 * 1024 * 1024; // 20 MB limit
-
-        for (const file of files) {
-            const materialId = `file-${Date.now()}-${Math.random()}`;
-
-            if (file.size > MAX_FILE_SIZE_BYTES) {
-                const material = { id: materialId, name: file.name, mimeType: file.type, status: 'File too large (Max 20MB)' };
-                appSettings.materials.push(material);
-                renderMaterialsList();
-                alert(`File "${file.name}" is too large. The maximum file size is 20MB.`);
-                continue; // Skip to the next file
-            }
-
-            const material = { id: materialId, name: file.name, mimeType: file.type, status: 'Reading...' };
-            appSettings.materials.push(material); renderMaterialsList();
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const base64String = e.target.result.split(',')[1];
-                material.base64Data = base64String; material.status = 'Ready';
-                renderMaterialsList();
-            };
-            reader.onerror = (err) => { console.error("FileReader error:", err); material.status = 'Error reading file'; renderMaterialsList(); };
-            reader.readAsDataURL(file);
-        }
-    }
-
-    function renderMaterialsList() {
-        const list = document.getElementById('materials-list'); list.innerHTML = '';
-        appSettings.materials.forEach((material, index) => {
-            const li = document.createElement('li');
-            const fileName = document.createElement('span'); fileName.textContent = material.name;
-            const fileStatus = document.createElement('span'); fileStatus.className = 'file-status'; fileStatus.textContent = ` (${material.status})`;
-            const removeSpan = document.createElement('span'); removeSpan.className = 'remove-file'; removeSpan.innerHTML = ' &times;';
-            removeSpan.onclick = () => { appSettings.materials.splice(index, 1); renderMaterialsList(); };
-            li.appendChild(fileName); li.appendChild(fileStatus); li.appendChild(removeSpan); list.appendChild(li);
-        });
-    }
 
     document.addEventListener('DOMContentLoaded', () => {
         const versionsPanel = document.getElementById('versions-panel');
@@ -3813,7 +2728,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }, true);
         initGeminiUsage();
-        loadSettings();
+        initAppSettings();
         startRealtimeSync(); // Auto-start if config exists
         hydrateDesignPreferencesSync();
         loadVersionsFromStorage();
@@ -3846,8 +2761,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         updatePreview();
 
-        // Event listener for goal templates
-        document.getElementById('app-type').addEventListener('change', loadGoalTemplate);
+
 
         // Set initial panel visibility
         const savedCodeState = localStorage.getItem('hongdouCodePanelState');
@@ -3877,45 +2791,15 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    function createAndDownloadMultiFileZip(files, appTitle) {
-        if (typeof JSZip === 'undefined') {
-            alert('JSZip library not loaded. Please check your internet connection.');
-            return;
-        }
-        const safeTitle = appTitle.replace(/[^a-z0-9]/gi, '-').toLowerCase() || 'my-netlify-app';
-        const zip = new JSZip();
 
-        // The root folder for the project inside the zip
-        const folder = zip.folder(safeTitle);
 
-        files.forEach(file => {
-            // file.name includes the path, e.g., "netlify/functions/api.js"
-            folder.file(file.name, file.content);
-        });
-
-        zip.generateAsync({type:"blob"}).then(function(content) {
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(content);
-            a.download = safeTitle + '.zip';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(a.href);
-        }).catch(err => console.error("Error creating zip file:", err));
-    }
-
-    document.getElementById('mini-api-key').addEventListener('input', function(e) { const val = e.target.value.trim(); localStorage.setItem('geminiApiKey', val); apiKey = val; document.getElementById('api-key').value = val; });
-    document.getElementById('manual-input').addEventListener('input', broadcastChange);
+    document.getElementById('mini-api-key').addEventListener('input', function(e) { const val = e.target.value.trim(); localStorage.setItem('geminiApiKey', val); apiKey = val; });
     document.getElementById('manual-input').addEventListener('keydown', function(e) {
         if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
             e.preventDefault();
             document.getElementById('manual-upgrade-btn').click();
         }
     });
-    document.getElementById('ai-model').addEventListener('change', updateApiKeyVisibility);
-    document.getElementById('save-settings').addEventListener('click', saveSettings);
-    document.getElementById('send-button').addEventListener('click', handleSendClick);
-    document.getElementById('chat-input').addEventListener('keypress', e => e.key === 'Enter' && handleSendClick());
     document.getElementById('new-folder-button').addEventListener('click', () => createNewFolder());
     async function downloadAppAsZip() {
         if (typeof JSZip === 'undefined') {
@@ -4019,64 +2903,14 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     document.getElementById('reset-code-button-preview').addEventListener('click', resetCode);
-    document.getElementById('materials-upload').addEventListener('change', handleFileSelection);
     codeEditor.addEventListener('input', (e) => { updatePreview(); broadcastChange(); });
-    // Update title sync path when title changes
-    document.getElementById('app-title-input').addEventListener('input', (e) => localStorage.setItem('hongdouAppTitle', e.target.value)); document.getElementById('app-title-input').addEventListener('change', startRealtimeSync);
-
-    // Draggable Panel Logic (Fixed Robust Version)
-    function makeElementDraggable(panelId) {
-        const panel = document.getElementById(panelId);
-        const header = document.getElementById(panelId + "-header");
-        if (!panel || !header) return;
-
-        function startDrag(e) {
-            // Allow interaction with controls inside the header
-            if (['INPUT', 'BUTTON', 'SELECT', 'A'].includes(e.target.tagName)) return;
-
-            // Get mouse/touch coordinates
-            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-
-            // Get panel current position
-            const rect = panel.getBoundingClientRect();
-
-            // Calculate the distance between the mouse click and the panel's top-left corner
-            const shiftX = clientX - rect.left;
-            const shiftY = clientY - rect.top;
-
-            function moveAt(pageX, pageY) {
-                // Set new position based on mouse position minus the initial shift
-                panel.style.left = (pageX - shiftX) + 'px';
-                panel.style.top = (pageY - shiftY) + 'px';
-                panel.style.margin = '0'; // Ensure margins don't mess up positioning
-            }
-
-            function onMove(event) {
-                event.preventDefault(); // Prevent text selection/scrolling
-                const moveX = event.touches ? event.touches[0].clientX : event.clientX;
-                const moveY = event.touches ? event.touches[0].clientY : event.clientY;
-                moveAt(moveX, moveY);
-            }
-
-            function onEnd() {
-                document.removeEventListener('mousemove', onMove);
-                document.removeEventListener('mouseup', onEnd);
-                document.removeEventListener('touchmove', onMove);
-                document.removeEventListener('touchend', onEnd);
-            }
-
-            // Add listeners to document to handle dragging outside the element
-            document.addEventListener('mousemove', onMove);
-            document.addEventListener('mouseup', onEnd);
-            document.addEventListener('touchmove', onMove, { passive: false });
-            document.addEventListener('touchend', onEnd);
-        }
-
-        header.addEventListener('mousedown', startDrag);
-        header.addEventListener('touchstart', startDrag, { passive: false });
-    }
-    // makeElementDraggable("middle-panel"); // Feature disabled
+    document.getElementById('manual-input').addEventListener('input', broadcastChange);
+    // Update title sync path & global lastAppTitle preference when title changes
+    document.getElementById('app-title-input').addEventListener('input', (e) => localStorage.setItem('hongdouAppTitle', e.target.value));
+    document.getElementById('app-title-input').addEventListener('change', () => {
+        if (typeof broadcastPreferencesChange === 'function') broadcastPreferencesChange(200);
+        startRealtimeSync();
+    });
 
     // --- Realtime Firebase Sync ---
     let firebaseApp = null;
@@ -4087,7 +2921,7 @@ document.addEventListener('DOMContentLoaded', function() {
             delete activeSubscriptions[subPath];
         });
     }
-    // Bridge Listener: Allow Mini-Apps to use the connection
+    // Bridge Listener: Allow Mini-Apps to use the Realtime Database connection
     window.addEventListener('message', async (e) => {
         if (!e.data || !['SAVE_DATA', 'LOAD_DATA', 'SUBSCRIBE_DATA', 'UNSUBSCRIBE_DATA'].includes(e.data.action)) return;
         const safeKey = String(e.data.key || '').replace(/[.#$\[\]]/g, '_').trim();
@@ -4135,34 +2969,133 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     });
+
     let firebaseDb = null;
     let syncReference = null;
     let skillsSyncReference = null;
+    let prefsSyncReference = null;
     let isReceivingUpdate = false;
     let isReceivingSkillsUpdate = false;
+    let isReceivingPrefsUpdate = false;
     let hasLoadedRemoteSync = false;
+    let hasLoadedGlobalSkills = false;
+    let hasLoadedGlobalPrefs = false;
     let broadcastTimeout = null;
     let skillsBroadcastTimeout = null;
+    let prefsBroadcastTimeout = null;
+    let currentSyncedSafeTitle = null;
+
     function isTeacherSessionAuthorized() {
         return !remotePin || localStorage.getItem('savedAdminPin') === remotePin;
     }
 
     function setSyncStatus(msg, color) {
-        // Update Settings Panel Label
-        const el = document.getElementById('sync-status');
-        if(el) { el.textContent = msg; el.style.background = color; el.style.color = '#fff'; }
-
-        // Update Sidebar Indicator Dot
         const dot = document.getElementById('sidebar-sync-status');
-        if(dot) {
+        if (dot) {
             dot.style.backgroundColor = color;
-            dot.title = "Sync Status: " + msg;
-            if(msg === 'Syncing...') dot.style.boxShadow = '0 0 8px ' + color;
-            else dot.style.boxShadow = 'none';
+            dot.title = "Sync Status: " + msg + " (Click to configure Firebase)";
+            if (msg === 'Syncing...') dot.style.boxShadow = '0 0 8px ' + color;
+            else dot.style.boxShadow = '0 0 5px rgba(0,0,0,0.5)';
         }
     }
 
+    function configureFirebasePrompt() {
+        const cur = localStorage.getItem('firebaseConfig') || '';
+        const val = prompt('Paste Firebase Config object ({ apiKey: "...", databaseURL: "...", ... }) or leave empty to clear local override:', cur);
+        if (val === null) return;
+        const trimmed = val.trim();
+        if (trimmed) localStorage.setItem('firebaseConfig', trimmed);
+        else localStorage.removeItem('firebaseConfig');
+        startRealtimeSync();
+    }
+
+    function bindProjectSyncRef(safeTitle) {
+        if (!firebaseDb || !safeTitle) return;
+        if (syncReference && currentSyncedSafeTitle === safeTitle) return;
+        if (syncReference) syncReference.off();
+        hasLoadedRemoteSync = false;
+        remotePin = null;
+        currentSyncedSafeTitle = safeTitle;
+        syncReference = firebaseDb.ref('hongdou_live/' + safeTitle);
+
+        const flushDeferredGlobalSyncs = () => {
+            if (!isTeacherSessionAuthorized()) return;
+            if (window._pendingGlobalSkillsUpload && hasLoadedGlobalSkills) {
+                window._pendingGlobalSkillsUpload = false;
+                broadcastSkillsChange(100);
+            }
+            if (window._pendingGlobalPrefsUpload && hasLoadedGlobalPrefs) {
+                window._pendingGlobalPrefsUpload = false;
+                broadcastPreferencesChange(150);
+            }
+        };
+
+        syncReference.on('value', (snapshot) => {
+            hasLoadedRemoteSync = true;
+            const data = snapshot.val();
+            if (!data) {
+                remotePin = null;
+                flushDeferredGlobalSyncs();
+                return;
+            }
+
+            isReceivingUpdate = true;
+
+            if (data.adminPin) { remotePin = data.adminPin; } else { remotePin = null; }
+
+            // 1. Sync Versions (skip when Local Folder mode is active)
+            if (assetSourceMode !== 'local' && data.versions) {
+                const normalize = (arr) => {
+                    if (!arr) return [];
+                    const items = Array.isArray(arr) ? arr : Object.values(arr);
+                    return items.map(item => {
+                        if (item && item.children) item.children = normalize(item.children);
+                        return item;
+                    }).filter(Boolean);
+                };
+                const normalizedVersions = normalize(data.versions);
+                if (JSON.stringify(versionData) !== JSON.stringify(normalizedVersions) || currentlySelectedVersionId !== data.activeVersion) {
+                    versionData = normalizedVersions;
+                    ensureKnowledgebaseFolder(true);
+                    currentlySelectedVersionId = data.activeVersion;
+                    try { localStorage.setItem('hongdouVersionData', JSON.stringify(versionData)); } catch (e) {}
+                    if (currentlySelectedVersionId) localStorage.setItem('hongdouLastActiveVersion', currentlySelectedVersionId);
+                    renderVersionsTree();
+                }
+            }
+
+            // 2. Sync Metadata (Manual Input only — never sync API keys)
+            if (data.manualInput !== undefined && document.activeElement !== document.getElementById('manual-input')) {
+                document.getElementById('manual-input').value = data.manualInput;
+            }
+
+            // 3. Sync HTML (Only if NOT typing and NOT in Local Folder mode)
+            if (assetSourceMode !== 'local' && document.activeElement !== codeEditor) {
+                if (data.html && data.html !== codeEditor.value) {
+                    codeEditor.value = data.html;
+                    updatePreview();
+                }
+            }
+
+            // 4. One-time legacy per-app skills migration if global node is empty and user has no local edits
+            if (!window._globalSkillsNodeHasData && data.skillsJson && typeof skillsMeta !== 'undefined' && !skillsMeta.hasLocalUserChanges && typeof applyRemoteSkillsPayload === 'function') {
+                applyRemoteSkillsPayload({
+                    skillsJson: data.skillsJson,
+                    skillsMetaJson: data.skillsMetaJson || '',
+                    updatedAt: data.timestamp || 1
+                });
+            }
+
+            isReceivingUpdate = false;
+            flushDeferredGlobalSyncs();
+        });
+    }
+
     async function startRealtimeSync() {
+        if (typeof firebase === 'undefined') {
+            setSyncStatus('SDK Offline', '#dc3545');
+            return;
+        }
         let config;
         try {
             const params = new URLSearchParams(window.location.search);
@@ -4178,8 +3111,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         } catch (e) {
-            const configStr = document.getElementById('firebase-config').value.trim();
-            if (!configStr) { setSyncStatus('No Config', '#333'); return; }
+            const fbInput = document.getElementById('firebase-config');
+            const configStr = ((fbInput ? fbInput.value : '') || localStorage.getItem('firebaseConfig') || '').trim();
+            if (!configStr) { setSyncStatus('No Config', '#555'); return; }
             let cleanConfig = configStr;
             if (cleanConfig.includes('=')) cleanConfig = cleanConfig.substring(cleanConfig.indexOf('=') + 1).trim();
             if (cleanConfig.endsWith(';')) cleanConfig = cleanConfig.slice(0, -1);
@@ -4191,18 +3125,21 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         try {
-            if (!config.databaseURL) throw new Error("Missing databaseURL");
+            if (!config || !config.databaseURL) throw new Error("Missing databaseURL");
 
             clearBridgeSubscriptions();
             if (syncReference) syncReference.off();
             if (skillsSyncReference) skillsSyncReference.off();
+            if (prefsSyncReference) prefsSyncReference.off();
             hasLoadedRemoteSync = false;
+            hasLoadedGlobalSkills = false;
+            hasLoadedGlobalPrefs = false;
+            currentSyncedSafeTitle = null;
 
             if (firebase.apps.length) await firebase.app().delete();
             firebaseApp = firebase.initializeApp(config);
             firebaseDb = firebase.database();
 
-            // Establish connection path based on Title (supports ?app= query param for student links)
             const titleEl = document.getElementById('app-title-input');
             const urlAppParam = new URLSearchParams(window.location.search).get('app');
             if (urlAppParam && !titleEl.value.trim()) {
@@ -4210,13 +3147,15 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             const appTitle = titleEl.value.trim() || 'untitled-project';
             const safeTitle = appTitle.replace(/[^a-zA-Z0-9]/g, '_');
-            syncReference = firebaseDb.ref('hongdou_live/' + safeTitle);
+
             skillsSyncReference = firebaseDb.ref('hongdou_global/skills');
+            prefsSyncReference = firebaseDb.ref('hongdou_global/preferences');
 
             setSyncStatus('Connected', '#28a745');
 
             window._globalSkillsNodeHasData = false;
             skillsSyncReference.on('value', (snap) => {
+                hasLoadedGlobalSkills = true;
                 const remoteData = snap.val();
                 window._globalSkillsNodeHasData = Boolean(remoteData && remoteData.skillsJson);
                 if (typeof applyRemoteSkillsPayload === 'function') {
@@ -4224,62 +3163,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
 
-            // LISTENER: Receive updates from server
-            syncReference.on('value', (snapshot) => {
-                hasLoadedRemoteSync = true;
-                const data = snapshot.val();
-                if (!data) {
-                    remotePin = null;
-                    return;
-                }
-
-                isReceivingUpdate = true;
-
-                if (data.adminPin) { remotePin = data.adminPin; } else { remotePin = null; }
-
-                // 1. Sync Versions (skip when Local Folder mode is active)
-                if (assetSourceMode !== 'local' && data.versions) {
-                     const normalize = (arr) => {
-                        if (!arr) return [];
-                        const items = Array.isArray(arr) ? arr : Object.values(arr);
-                        return items.map(item => {
-                            if (item && item.children) item.children = normalize(item.children);
-                            return item;
-                        }).filter(Boolean);
-                     };
-                     const normalizedVersions = normalize(data.versions);
-                     if (JSON.stringify(versionData) !== JSON.stringify(normalizedVersions) || currentlySelectedVersionId !== data.activeVersion) {
-                         versionData = normalizedVersions;
-                         ensureKnowledgebaseFolder(true);
-                         currentlySelectedVersionId = data.activeVersion;
-                         renderVersionsTree();
-                     }
-                }
-
-                // 2. Sync Metadata (Manual Input only — never sync API keys)
-                if (data.manualInput !== undefined && document.activeElement !== document.getElementById('manual-input')) {
-                    document.getElementById('manual-input').value = data.manualInput;
-                }
-
-                // 3. Sync HTML (Only if NOT typing and NOT in Local Folder mode)
-                if (assetSourceMode !== 'local' && document.activeElement !== codeEditor) {
-                    if (data.html && data.html !== codeEditor.value) {
-                        codeEditor.value = data.html;
-                        updatePreview();
-                    }
-                }
-
-                // 4. One-time legacy per-app skills migration if global node is empty and user has no local edits
-                if (!window._globalSkillsNodeHasData && data.skillsJson && typeof skillsMeta !== 'undefined' && !skillsMeta.hasLocalUserChanges && typeof applyRemoteSkillsPayload === 'function') {
-                    applyRemoteSkillsPayload({
-                        skillsJson: data.skillsJson,
-                        skillsMetaJson: data.skillsMetaJson || '',
-                        updatedAt: data.timestamp || 1
-                    });
-                }
-
-                isReceivingUpdate = false;
+            prefsSyncReference.on('value', (snap) => {
+                hasLoadedGlobalPrefs = true;
+                applyRemotePreferencesPayload(snap.val());
             });
+
+            bindProjectSyncRef(safeTitle);
 
         } catch (e) {
             console.error(e);
@@ -4318,15 +3207,26 @@ document.addEventListener('DOMContentLoaded', function() {
 
             isReceivingSkillsUpdate = true;
             let skillsChanged = false;
-            if (remoteSkills && typeof remoteSkills === 'object' && Object.keys(remoteSkills).length > 0 && JSON.stringify(skillsRepo) !== JSON.stringify(remoteSkills)) {
-                skillsRepo = remoteSkills;
-                skillsChanged = true;
+            if (remoteSkills && typeof remoteSkills === 'object' && Object.keys(remoteSkills).length > 0) {
+                if (typeof PERSONAL_SKILL_FILE !== 'undefined' && !remoteSkills[PERSONAL_SKILL_FILE] && typeof USER_PREFERENCES_STARTER_MD !== 'undefined') {
+                    remoteSkills[PERSONAL_SKILL_FILE] = {
+                        filename: PERSONAL_SKILL_FILE,
+                        content: USER_PREFERENCES_STARTER_MD.trim() + '\n',
+                        updatedAt: remoteTime || Date.now()
+                    };
+                }
+                if (JSON.stringify(skillsRepo) !== JSON.stringify(remoteSkills)) {
+                    skillsRepo = remoteSkills;
+                    skillsChanged = true;
+                }
             }
             if (remoteMeta && typeof remoteMeta === 'object' && JSON.stringify(skillsMeta) !== JSON.stringify(remoteMeta)) {
                 skillsMeta = { ...skillsMeta, ...remoteMeta };
                 skillsChanged = true;
             }
-            if (remoteTime && !skillsMeta.repoUpdatedAt) skillsMeta.repoUpdatedAt = remoteTime;
+            if (remoteTime) {
+                skillsMeta.repoUpdatedAt = Math.max(Number(skillsMeta.repoUpdatedAt || 0), remoteTime);
+            }
             skillsMeta.hasLocalUserChanges = true;
             if (skillsChanged) {
                 if (typeof saveSkillsState === 'function') saveSkillsState(true, true, true);
@@ -4341,10 +3241,18 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function broadcastSkillsChange(delay = 500) {
-        if (!skillsSyncReference || isReceivingSkillsUpdate || typeof skillsRepo === 'undefined' || !hasLoadedRemoteSync || !isTeacherSessionAuthorized()) return;
+        if (isReceivingSkillsUpdate || typeof skillsRepo === 'undefined') return;
+        if (!skillsSyncReference || !hasLoadedRemoteSync || !hasLoadedGlobalSkills) {
+            if (skillsSyncReference && hasLoadedGlobalSkills && !hasLoadedRemoteSync) {
+                window._pendingGlobalSkillsUpload = true;
+            }
+            return;
+        }
+        if (!isTeacherSessionAuthorized()) return;
+        window._pendingGlobalSkillsUpload = false;
         if (skillsBroadcastTimeout) clearTimeout(skillsBroadcastTimeout);
         skillsBroadcastTimeout = setTimeout(() => {
-            if (!hasLoadedRemoteSync || !isTeacherSessionAuthorized()) return;
+            if (!hasLoadedRemoteSync || !hasLoadedGlobalSkills || !isTeacherSessionAuthorized()) return;
             const now = (typeof skillsMeta !== 'undefined' && skillsMeta.repoUpdatedAt) ? skillsMeta.repoUpdatedAt : Date.now();
             const payload = {
                 skillsJson: JSON.stringify(skillsRepo),
@@ -4353,6 +3261,142 @@ document.addEventListener('DOMContentLoaded', function() {
             };
             skillsSyncReference.set(payload).catch(err => {
                 console.warn('Global skills sync warning:', err);
+            });
+        }, delay);
+    }
+
+    function buildLocalPreferencesSnapshot() {
+        let designPrefs = null;
+        try {
+            const raw = localStorage.getItem('hongdouDesignState');
+            if (raw) designPrefs = JSON.parse(raw);
+        } catch (e) {}
+        if (!designPrefs && typeof designState === 'object') {
+            designPrefs = {
+                preset: designState.preset,
+                base: designState.base,
+                main: designState.main,
+                contrast: designState.contrast,
+                fontPreset: designState.fontPreset,
+                fontDisplay: designState.fontDisplay,
+                fontBody: designState.fontBody,
+                fontAccent: designState.fontAccent,
+                aesthetic: designState.aesthetic,
+                autoInk: designState.autoInk,
+                applyToNewApps: designState.applyToNewApps,
+                linkStyleDefaults: designState.linkStyleDefaults,
+                linkStyleDefaultsExplicit: designState.linkStyleDefaultsExplicit,
+                isCustomized: designState.isCustomized
+            };
+        }
+        return {
+            designPrefsJson: designPrefs ? JSON.stringify(designPrefs) : '',
+            selectedGeminiModel: selectedGeminiModel || 'gemini-3.6-flash',
+            upgraderAiMode: Boolean(document.getElementById('upgrader-mode-toggle')?.checked),
+            appLanguage: language || 'en',
+            lastAppTitle: (document.getElementById('app-title-input')?.value || '').trim(),
+            updatedAt: Number(localStorage.getItem('hongdouPrefsUpdatedAt') || Date.now())
+        };
+    }
+
+    function applyRemotePreferencesPayload(remotePrefs) {
+        if (!remotePrefs || typeof remotePrefs !== 'object') {
+            const localHasPrefs = Number(localStorage.getItem('hongdouPrefsUpdatedAt') || 0) > 0 || (typeof designState === 'object' && designState.isCustomized);
+            if (localHasPrefs && hasLoadedGlobalPrefs) {
+                if (hasLoadedRemoteSync && isTeacherSessionAuthorized()) {
+                    broadcastPreferencesChange(150);
+                } else if (!hasLoadedRemoteSync) {
+                    window._pendingGlobalPrefsUpload = true;
+                }
+            }
+            return;
+        }
+        const remoteTime = Number(remotePrefs.updatedAt || 0);
+        const localTime = Number(localStorage.getItem('hongdouPrefsUpdatedAt') || 0);
+        if (localTime > remoteTime && hasLoadedGlobalPrefs) {
+            if (hasLoadedRemoteSync && isTeacherSessionAuthorized()) {
+                broadcastPreferencesChange(150);
+            } else if (!hasLoadedRemoteSync) {
+                window._pendingGlobalPrefsUpload = true;
+            }
+            return;
+        }
+
+        isReceivingPrefsUpdate = true;
+        try {
+            if (remotePrefs.designPrefsJson) {
+                const parsedDesign = JSON.parse(remotePrefs.designPrefsJson);
+                if (parsedDesign && typeof applySavedDesignStateObj === 'function') {
+                    applySavedDesignStateObj(parsedDesign);
+                    try { localStorage.setItem('hongdouDesignState', JSON.stringify(parsedDesign)); } catch (e) {}
+                    if (typeof saveAssetData === 'function') {
+                        saveAssetData('hongdou_design_preferences', parsedDesign).catch(() => {});
+                    }
+                    if (typeof designHasUnsavedChanges === 'undefined' || !designHasUnsavedChanges) {
+                        if (typeof renderDesignControls === 'function') renderDesignControls();
+                        if (designState.applyToNewApps && designState.isCustomized && typeof removeDesignStyleFromHtml === 'function') {
+                            const stripped = removeDesignStyleFromHtml(codeEditor.value).trim();
+                            if (stripped === initialCode.trim() && !/<style\s+id=["']hongdou-design-system["']/i.test(codeEditor.value)) {
+                                codeEditor.value = applySavedDesignToHtml(codeEditor.value);
+                                updatePreview();
+                            }
+                        }
+                    }
+                }
+            }
+            if (remotePrefs.selectedGeminiModel && geminiModels.find(m => m.id === remotePrefs.selectedGeminiModel) && selectedGeminiModel !== remotePrefs.selectedGeminiModel) {
+                selectedGeminiModel = remotePrefs.selectedGeminiModel;
+                localStorage.setItem('selectedGeminiModel', selectedGeminiModel);
+                renderGeminiUsage();
+            }
+            if (typeof remotePrefs.upgraderAiMode === 'boolean') {
+                const tog = document.getElementById('upgrader-mode-toggle');
+                if (tog && tog.checked !== remotePrefs.upgraderAiMode) {
+                    tog.checked = remotePrefs.upgraderAiMode;
+                    toggleUpgraderMode();
+                }
+            }
+            if (remotePrefs.appLanguage && remotePrefs.appLanguage !== language) {
+                localStorage.setItem('appLanguage', remotePrefs.appLanguage);
+                setLanguage(remotePrefs.appLanguage);
+            }
+            const urlAppParam = new URLSearchParams(window.location.search).get('app');
+            const titleEl = document.getElementById('app-title-input');
+            if (!urlAppParam && remotePrefs.lastAppTitle && titleEl && !titleEl.value.trim() && document.activeElement !== titleEl) {
+                titleEl.value = remotePrefs.lastAppTitle;
+                localStorage.setItem('hongdouAppTitle', remotePrefs.lastAppTitle);
+                const newSafeTitle = remotePrefs.lastAppTitle.replace(/[^a-zA-Z0-9]/g, '_');
+                if (newSafeTitle && newSafeTitle !== currentSyncedSafeTitle) {
+                    bindProjectSyncRef(newSafeTitle);
+                }
+            }
+            if (remoteTime) localStorage.setItem('hongdouPrefsUpdatedAt', String(remoteTime));
+        } catch (err) {
+            console.warn('Global preferences sync parse warning:', err);
+        } finally {
+            isReceivingPrefsUpdate = false;
+        }
+    }
+
+    function broadcastPreferencesChange(delay = 350) {
+        if (isReceivingPrefsUpdate) return;
+        const now = Date.now();
+        localStorage.setItem('hongdouPrefsUpdatedAt', String(now));
+        if (!prefsSyncReference || !hasLoadedRemoteSync || !hasLoadedGlobalPrefs) {
+            if (prefsSyncReference && hasLoadedGlobalPrefs && !hasLoadedRemoteSync) {
+                window._pendingGlobalPrefsUpload = true;
+            }
+            return;
+        }
+        if (!isTeacherSessionAuthorized()) return;
+        window._pendingGlobalPrefsUpload = false;
+        if (prefsBroadcastTimeout) clearTimeout(prefsBroadcastTimeout);
+        prefsBroadcastTimeout = setTimeout(() => {
+            if (!hasLoadedRemoteSync || !hasLoadedGlobalPrefs || !isTeacherSessionAuthorized()) return;
+            const payload = buildLocalPreferencesSnapshot();
+            payload.updatedAt = now;
+            prefsSyncReference.set(payload).catch(err => {
+                console.warn('Global preferences sync warning:', err);
             });
         }, delay);
     }
@@ -4380,7 +3424,6 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }, delay);
     }
-    // Fixed: Removed listener for missing 'panel-opacity-slider' to prevent script crash.
 
     let previousManualCodeState = null;
 
@@ -4399,48 +3442,69 @@ document.addEventListener('DOMContentLoaded', function() {
         let rawInput = hasExternal ? externalInput.trim() : inputEl.value.trim();
 
         const hasPatchTags = (t) => /<patch[\s>]/i.test(t);
+        const hasSelectTags = (t) => /<skills_select[\s>]/i.test(t);
         const hasSkillTags = (t) => typeof hasSkillPatchMarkers === 'function' && hasSkillPatchMarkers(t);
         const hasJsonCodePatch = (t) => /"patches"\s*:/.test(t) && t.includes('{') && t.includes('}');
 
         // 1. Auto-check clipboard only for manual clicks when textarea lacks patch/skill tags
-        if (!hasExternal && (!rawInput || (!hasPatchTags(rawInput) && !hasSkillTags(rawInput) && !hasJsonCodePatch(rawInput)))) {
+        if (!hasExternal && (!rawInput || (!hasPatchTags(rawInput) && !hasSkillTags(rawInput) && !hasSelectTags(rawInput) && !hasJsonCodePatch(rawInput)))) {
             try {
                 inputEl.focus();
                 const clip = await navigator.clipboard.readText();
-                if (clip && (hasPatchTags(clip) || hasSkillTags(clip) || hasJsonCodePatch(clip))) {
+                if (clip && (hasPatchTags(clip) || hasSkillTags(clip) || hasSelectTags(clip) || hasJsonCodePatch(clip))) {
                     rawInput = clip.trim();
                 }
             } catch(e) {}
         }
 
         if (!rawInput) {
-            alert('Please paste XML patch or <skill_patch> blocks in the box or copy them to your clipboard.');
+            alert('Please paste XML patch, <skills_select>, or <skill_patch> blocks in the box or copy them to your clipboard.');
             return false;
         }
 
+        const stripSkillsSelect = (t) => t.replace(/<skills_select[^>]*>[\s\S]*?<\/skills_select>/gi, '');
         const patchesWrapperBlocks = rawInput.match(/<patches[^>]*>[\s\S]*?<\/patches>/gi);
         const codeCandidate = patchesWrapperBlocks
             ? patchesWrapperBlocks.join('\n')
-            : rawInput.replace(/<skill_patch[^>]*>[\s\S]*?<\/skill_patch>/gi, '');
-        const skillCandidate = patchesWrapperBlocks
-            ? rawInput.replace(/<patches[^>]*>[\s\S]*?<\/patches>/gi, '')
-            : (typeof stripCodePatchesForSkillCheck === 'function' ? stripCodePatchesForSkillCheck(rawInput) : rawInput);
+            : stripSkillsSelect(rawInput).replace(/<skill_patch[^>]*>[\s\S]*?<\/skill_patch>/gi, '');
+        const skillCandidate = stripSkillsSelect(
+            patchesWrapperBlocks
+                ? rawInput.replace(/<patches[^>]*>[\s\S]*?<\/patches>/gi, '')
+                : (typeof stripCodePatchesForSkillCheck === 'function' ? stripCodePatchesForSkillCheck(rawInput) : rawInput)
+        );
 
         const containsCodePatch = hasPatchTags(codeCandidate) || hasJsonCodePatch(codeCandidate);
+        const containsSkillSelect = hasSelectTags(rawInput);
         const containsSkillPatch = hasSkillTags(skillCandidate);
 
-        if (!containsCodePatch && containsSkillPatch && typeof applySkillPatchText === 'function') {
-            const skillRes = await applySkillPatchText(skillCandidate, true);
-            if (skillRes.applied) {
+        if (!containsCodePatch && (containsSkillSelect || containsSkillPatch)) {
+            let appliedAnything = false;
+            const notices = [];
+            if (containsSkillSelect && typeof applySkillsSelectFromText === 'function') {
+                const selRes = applySkillsSelectFromText(rawInput);
+                if (selRes.applied) {
+                    appliedAnything = true;
+                    notices.push(`Streamlined ${selRes.names.length} skill(s): ${selRes.names.join(', ')}`);
+                }
+            }
+            if (containsSkillPatch && typeof applySkillPatchText === 'function') {
+                const hasExplicitSkillXml = /<skill_patch[\s>]/i.test(skillCandidate);
+                const skillRes = await applySkillPatchText(skillCandidate, true, !hasExplicitSkillXml);
+                if (skillRes.applied) {
+                    appliedAnything = true;
+                    notices.push(skillRes.message);
+                }
+            }
+            if (appliedAnything) {
                 inputEl.value = '';
                 broadcastChange(200);
-                alert(`Skills Evolved!\n\n${skillRes.message}`);
+                if (!hasExternal) alert(`Skills Updated!\n\n${notices.join('\n\n')}`);
             }
-            return !!skillRes.applied;
+            return appliedAnything;
         }
 
-        if (!containsCodePatch && !containsSkillPatch) {
-            alert('No valid XML patch, <skill_patch>, or JSON patches found.');
+        if (!containsCodePatch && !containsSkillPatch && !containsSkillSelect) {
+            alert('No valid XML patch, <skills_select>, <skill_patch>, or JSON patches found.');
             return false;
         }
 
@@ -4523,12 +3587,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 return false;
             }
 
-            // 3.5 Apply <skill_patch> if bundled alongside code patches
+            // 3.5 Apply <skills_select> & <skill_patch> if bundled alongside code patches
             let skillAppliedMsg = '';
+            if (containsSkillSelect && typeof applySkillsSelectFromText === 'function') {
+                const selRes = applySkillsSelectFromText(rawInput);
+                if (selRes.applied) {
+                    skillAppliedMsg += `Streamlined (${selRes.names.length}): ${selRes.names.join(', ')}`;
+                    if (typeof showStudioToast === 'function') {
+                        showStudioToast(`Skills streamlined (${selRes.names.length} active)`, 'ok');
+                    }
+                }
+            }
             if (containsSkillPatch && typeof applySkillPatchText === 'function') {
                 const hasExplicitSkillXml = /<skill_patch[\s>]/i.test(skillCandidate);
                 const skillRes = await applySkillPatchText(skillCandidate, true, !hasExplicitSkillXml);
-                if (skillRes.applied) skillAppliedMsg = skillRes.message;
+                if (skillRes.applied) {
+                    skillAppliedMsg += (skillAppliedMsg ? '\n' : '') + skillRes.message;
+                }
             }
 
             // 4. Atomic Write
@@ -4664,6 +3739,7 @@ This app runs in an iframe sandbox. DO NOT initialize Firebase or use localStora
 - SAVE: window.parent.postMessage({ action: 'SAVE_DATA', key: 'score', value: 100 }, '*');
 - LOAD: window.parent.postMessage({ action: 'LOAD_DATA', key: 'score', reqId: 'r1' }, '*');
 - SUBSCRIBE: window.parent.postMessage({ action: 'SUBSCRIBE_DATA', key: 'score' }, '*');
+- UNSUBSCRIBE: window.parent.postMessage({ action: 'UNSUBSCRIBE_DATA', key: 'score' }, '*');
 - LISTENER: window.addEventListener('message', (e) => {
     if(e.data.action === 'DATA_LOADED') console.log('Loaded:', e.data.value);
     if(e.data.action === 'DATA_UPDATED') { /* update UI */ }
@@ -4675,10 +3751,11 @@ Use standard localStorage or IndexedDB for persistence. Do NOT initialize Fireba
         })();
 
         const skillsBlock = typeof getActiveSkillsPromptBlock === 'function' ? getActiveSkillsPromptBlock() : '';
+        const catalogBlock = typeof getSkillCatalogPromptBlock === 'function' ? getSkillCatalogPromptBlock() : '';
         const CD_S = '<!' + '[CDATA[';
         const CD_E = ']' + ']' + '>';
         const cdataPrompt = `Update this single-file web application.
-${skillsBlock}
+${skillsBlock}${catalogBlock}
 USER REQUEST:
 ${userReq}
 
@@ -4729,14 +3806,20 @@ ARCHITECTURE & IMPLEMENTATION INSTRUCTIONS:
    - Never use ellipses (...), comments as placeholders, or partial truncations inside the patch.
    - Include 2-3 lines of unchanged surrounding anchor context before and after the edit to guarantee uniqueness.
 
-7. OPTIONAL SKILLS EVOLUTION:
-   If this update establishes a new reusable design rule, architecture pattern, or user preference, you may ALSO include a <skill_patch> block in the same response:
+7. SKILLS STREAMLINING & PERSONAL PREFERENCE LEARNING:
+   - If any inactive skills in the catalog above are directly relevant to this project (or if this is the first turn), include <skills_select> inside your SAME single \`\`\`xml fence to activate the ideal set for future turns:
+\`\`\`xml
+<skills_select>
+  <skill>relevant_skill.md</skill>
+</skills_select>
+\`\`\`
+   - Whenever the user states a durable cross-project preference (UI look, layout, classroom/student context, accessibility, or coding rule), automatically update \`user_preferences.md\` via <skill_patch action="modify">. Merge or replace outdated bullets, keep it <= 35 concise bullets, and NEVER store one-off project content:
 \`\`\`xml
 <skill_patch>
-  <file name="skill_name.md" action="modify|create|delete" category="Category">
+  <file name="user_preferences.md" action="modify" category="Personal">
     <operation>
-      <search>${CD_S}exact original skill text${CD_E}</search>
-      <replace>${CD_S}updated skill text${CD_E}</replace>
+      <search>${CD_S}exact original text in user_preferences.md${CD_E}</search>
+      <replace>${CD_S}merged updated preference text${CD_E}</replace>
     </operation>
   </file>
 </skill_patch>
@@ -4785,53 +3868,45 @@ ${getDesignSystemPromptNote()}
         isUpgraderAiMode = toggle.checked;
 
         const contextBtn = document.getElementById('download-context-btn');
-        const externalBtn = document.getElementById('ai-tool-btn');
         const apiKeyInput = document.getElementById('mini-api-key');
-        const select = document.getElementById('ai-tool-select');
-        const cameraBtn = document.getElementById('camera-btn');
         const bridgeToggleContainer = document.getElementById('bridge-toggle-container');
         const inputArea = document.getElementById('manual-input');
         const loader = document.getElementById('mini-loader');
-
         const aiToolGroup = document.getElementById('ai-tool-group');
+
         if (isUpgraderAiMode) {
             const label = document.getElementById('upgrader-label');
-            if(label) label.textContent = "Gemini Upgrader";
+            if (label) label.textContent = "Gemini Upgrader";
             inputArea.placeholder = "Describe the change you want (e.g., 'Make the background blue')...";
-            contextBtn.textContent = "Get API Key";
+            contextBtn.textContent = "Optimize Skills";
+            contextBtn.title = "Send codebase + entire skills library to Gemini to streamline active skills & capture preferences";
             contextBtn.style.backgroundColor = "#8e44ad";
-            contextBtn.onclick = () => window.open('https://aistudio.google.com/app/apikey', '_blank');
+            contextBtn.onclick = optimizeSkillsWithAi;
 
             if (aiToolGroup) aiToolGroup.style.display = 'none';
             apiKeyInput.style.display = 'none';
             document.getElementById('btn-mini-gemini-keys').style.display = 'block';
-
-            // Hide select, show camera
-            loader.style.display = 'none'; // Ensure loader is hidden initially
-            if (cameraBtn) cameraBtn.style.display = 'none';
             if (bridgeToggleContainer) bridgeToggleContainer.style.display = 'flex';
+            loader.style.display = 'none';
 
             const usageTracker = document.getElementById('gemini-usage-tracker');
             if (usageTracker) usageTracker.style.display = 'block';
             const skillsToolbar = document.getElementById('skills-toolbar-widget');
             if (skillsToolbar) skillsToolbar.style.display = 'none';
 
-            if(apiKey && !apiKeyInput.value) apiKeyInput.value = apiKey;
-
+            if (apiKey && !apiKeyInput.value) apiKeyInput.value = apiKey;
         } else {
             const label = document.getElementById('upgrader-label');
-            if(label) label.textContent = "Manual Upgrader";
+            if (label) label.textContent = "Manual Upgrader";
             inputArea.placeholder = "1. Type instruction here.\n2. Click 'Get AI Context'.\n3. Copy AI Response (XML/CDATA).\n4. Click 'Upgrade'.";
             contextBtn.textContent = "Get AI Context";
+            contextBtn.title = "Copy XML/CDATA prompt with active skills & skill descriptions catalog";
             contextBtn.style.backgroundColor = "var(--spotlight-1)";
             contextBtn.onclick = downloadAiContext;
 
             if (aiToolGroup) aiToolGroup.style.display = 'flex';
             apiKeyInput.style.display = 'none';
             document.getElementById('btn-mini-gemini-keys').style.display = 'none';
-
-            // Show select, hide camera
-            if (cameraBtn) cameraBtn.style.display = 'none';
             if (bridgeToggleContainer) bridgeToggleContainer.style.display = 'flex';
             loader.style.display = 'none';
 
@@ -4840,6 +3915,10 @@ ${getDesignSystemPromptNote()}
             const skillsToolbar = document.getElementById('skills-toolbar-widget');
             if (skillsToolbar) skillsToolbar.style.display = 'flex';
         }
+        if (typeof broadcastPreferencesChange === 'function' && window._upgraderModeBooted) {
+            broadcastPreferencesChange(300);
+        }
+        window._upgraderModeBooted = true;
     }
 
     function openQrScanner() {
@@ -4872,7 +3951,6 @@ ${getDesignSystemPromptNote()}
             // Save it immediately
             localStorage.setItem('geminiApiKey', decodedText);
             apiKey = decodedText;
-            document.getElementById('api-key').value = decodedText;
 
             if (typeof geminiKeys !== 'undefined') {
                 geminiKeys.push({ nickname: 'Scanned Key', key: decodedText });
@@ -4896,50 +3974,56 @@ ${getDesignSystemPromptNote()}
     async function runMiniAiUpgrade() {
         const instruction = document.getElementById('manual-input').value.trim();
         const currentCode = codeEditor.value;
-        let activeKey = typeof getCurrentGeminiKey === 'function' ? getCurrentGeminiKey() : apiKey;
+        let activeKey = typeof pickBestStartingKey === 'function'
+            ? pickBestStartingKey(selectedGeminiModel)
+            : (typeof getCurrentGeminiKey === 'function' ? getCurrentGeminiKey() : apiKey);
 
-        if (!activeKey) { alert("Please add a Gemini API Key in the API Carousel."); return; }
+        if (!activeKey) { alert("Please add a Gemini API Key in Manage Keys."); return; }
         if (!instruction) { alert("Please enter an instruction."); return; }
 
-        const usage = getUsage(selectedGeminiModel);
-        const modelDef = geminiModels.find(m => m.id === selectedGeminiModel);
-        const localKeys = JSON.parse(localStorage.getItem('geminiKeys') || '[]');
-        const keyMultiplier = Math.max(1, localKeys.length);
-        const effectiveLimit = modelDef.limit * keyMultiplier;
-
-        if (usage >= effectiveLimit) {
-            alert(modelDef.name + " limit reached for today! Please select another model.");
-            return;
-        }
-
         const upgradeBtn = document.getElementById('manual-upgrade-btn');
-        const cameraBtn = document.getElementById('camera-btn');
         const bridgeToggleContainer = document.getElementById('bridge-toggle-container');
-        const select = document.getElementById('ai-tool-select');
         const loader = document.getElementById('mini-loader');
 
-        // Start Loading State
+        // Start Loading State (Quota gate is non-blocking; Google is the source of truth)
         upgradeBtn.disabled = true;
         upgradeBtn.textContent = "Thinking...";
 
-        if (isUpgraderAiMode) {
-            if (cameraBtn) cameraBtn.style.display = 'none';
-            if (bridgeToggleContainer) bridgeToggleContainer.style.display = 'none';
-            loader.style.display = 'block';
-        } else {
+        if (!isUpgraderAiMode) {
             const aiToolGroup = document.getElementById('ai-tool-group');
             if (aiToolGroup) aiToolGroup.style.display = 'none';
-            if (bridgeToggleContainer) bridgeToggleContainer.style.display = 'none';
-            loader.style.display = 'block';
         }
+        if (bridgeToggleContainer) bridgeToggleContainer.style.display = 'none';
+        loader.style.display = 'block';
 
         try {
+            if (typeof skillsMeta !== 'undefined' && !skillsMeta.activeInitialized && typeof autoScreenSkillsWithLite === 'function') {
+                upgradeBtn.textContent = "Screening skills...";
+                await autoScreenSkillsWithLite(instruction, currentCode);
+                upgradeBtn.textContent = "Thinking...";
+            }
             const kbData = await getKnowledgebaseContentParts(false);
             const skillsBlock = typeof getActiveSkillsPromptBlock === 'function' ? getActiveSkillsPromptBlock() : '';
+            const catalogBlock = typeof getSkillCatalogPromptBlock === 'function' ? getSkillCatalogPromptBlock() : '';
             const CD_S = '<!' + '[CDATA[';
             const CD_E = ']' + ']' + '>';
+            const bridgeToggle = document.getElementById('firebase-bridge-toggle');
+            const bridgeInfo = (bridgeToggle && bridgeToggle.checked)
+                ? `DATA STORAGE BRIDGE (Realtime Database & Multi-User Sync):
+This app runs in an iframe sandbox. DO NOT initialize Firebase or use localStorage for shared state. Use the built-in Parent Bridge:
+- SAVE: window.parent.postMessage({ action: 'SAVE_DATA', key: 'score', value: 100 }, '*');
+- LOAD: window.parent.postMessage({ action: 'LOAD_DATA', key: 'score', reqId: 'r1' }, '*');
+- SUBSCRIBE: window.parent.postMessage({ action: 'SUBSCRIBE_DATA', key: 'score' }, '*');
+- UNSUBSCRIBE: window.parent.postMessage({ action: 'UNSUBSCRIBE_DATA', key: 'score' }, '*');
+- LISTENER: window.addEventListener('message', (e) => {
+    if(e.data.action === 'DATA_LOADED') console.log('Loaded:', e.data.value);
+    if(e.data.action === 'DATA_UPDATED') { /* update UI */ }
+  });`
+                : `DATA STORAGE:
+Use standard localStorage or IndexedDB for persistence. Do NOT initialize Firebase or use postMessage bridges.`;
+
             const aiPatcherPrompt = `Update this single-file HTML application.
-${skillsBlock}
+${skillsBlock}${catalogBlock}
 USER REQUEST:
 ${instruction}
 
@@ -4950,6 +4034,7 @@ ${currentCode}
 
 ${getGlobalProjectContextStr()}
 ${getDesignSystemPromptNote()}
+${bridgeInfo}
 ${kbData.extraText}
 
 OUTPUT FORMAT:
@@ -4968,14 +4053,15 @@ RULES:
 - Use raw code inside CDATA without escaping quotes or backslashes.
 - Never use ellipses (...) or truncated code.
 
-OPTIONAL SKILLS EVOLUTION:
-If this update establishes a new reusable design rule or pattern, you may also include a <skill_patch> block:
+SKILLS STREAMLINING & PERSONAL PREFERENCE LEARNING:
+- If any inactive skills in the catalog are needed for this task, include <skills_select><skill>filename.md</skill></skills_select> inside the SAME single \`\`\`xml fence to activate them.
+- Whenever the user reveals a durable cross-project preference (design taste, layout, classroom/device context, accessibility, or coding rule), automatically update \`user_preferences.md\` via <skill_patch action="modify">. Merge or replace outdated bullets, stay <= 35 concise bullets, and NEVER store one-off project topics:
 \`\`\`xml
 <skill_patch>
-  <file name="skill_name.md" action="modify|create|delete" category="Category">
+  <file name="user_preferences.md" action="modify" category="Personal">
     <operation>
-      <search>${CD_S}exact original skill text${CD_E}</search>
-      <replace>${CD_S}updated skill text${CD_E}</replace>
+      <search>${CD_S}exact original text in user_preferences.md${CD_E}</search>
+      <replace>${CD_S}merged updated preference text${CD_E}</replace>
     </operation>
   </file>
 </skill_patch>
@@ -4990,7 +4076,9 @@ If this update establishes a new reusable design rule or pattern, you may also i
             if (thinkingCfg) genConfig.thinkingConfig = thinkingCfg;
 
             let response;
-            let maxAttempts = (typeof geminiKeys !== 'undefined' && geminiKeys.length > 0) ? geminiKeys.length * 2 : 2;
+            let lastErrorMessage = '';
+            const configuredKeys = getConfiguredGeminiKeys();
+            const maxAttempts = configuredKeys.length > 0 ? Math.max(2, configuredKeys.length * 2) : 2;
             for (let attempt = 0; attempt < maxAttempts; attempt++) {
                 upgradeBtn.textContent = `Connecting (${attempt + 1}/${maxAttempts})...`;
                 try {
@@ -5010,21 +4098,34 @@ If this update establishes a new reusable design rule or pattern, you may also i
                     });
                 } catch (netErr) {
                     console.warn("Network error on attempt " + (attempt + 1), netErr);
+                    response = null;
+                    lastErrorMessage = netErr.message || 'Network error';
                 }
 
                 if (response && response.ok) break;
 
-                const status = response ? response.status : 0;
-                if ([429, 500, 502, 503, 504, 529].includes(status) || !response) {
-                    if (typeof rotateGeminiKey === 'function') {
-                        rotateGeminiKey();
+                const errInfo = await inspectGeminiHttpError(response);
+                lastErrorMessage = errInfo.message || lastErrorMessage;
+
+                if (errInfo.isDailyExhausted) {
+                    markKeyQuotaExhausted(activeKey, selectedGeminiModel);
+                    if (configuredKeys.length > 1) {
+                        const prevKey = activeKey;
+                        rotateGeminiKey(selectedGeminiModel);
+                        activeKey = getCurrentGeminiKey();
+                        if (activeKey && activeKey !== prevKey) continue;
+                    }
+                    break;
+                } else if (errInfo.isTransientRateLimit) {
+                    if (configuredKeys.length > 1) {
+                        rotateGeminiKey(selectedGeminiModel);
                         activeKey = getCurrentGeminiKey();
                     }
                     await new Promise(r => setTimeout(r, 2000));
                     continue;
-                } else if ([400, 403].includes(status)) {
-                    if (typeof geminiKeys !== 'undefined' && geminiKeys.length > 1 && typeof rotateGeminiKey === 'function') {
-                        rotateGeminiKey();
+                } else if ([400, 403].includes(errInfo.status)) {
+                    if (configuredKeys.length > 1) {
+                        rotateGeminiKey(selectedGeminiModel);
                         activeKey = getCurrentGeminiKey();
                         continue;
                     }
@@ -5032,8 +4133,8 @@ If this update establishes a new reusable design rule or pattern, you may also i
                 }
                 break;
             }
-            if (!response || !response.ok) throw new Error("API Error: " + (response ? response.status : "Connection failed"));
-            incrementUsage(selectedGeminiModel);
+            if (!response || !response.ok) throw new Error(lastErrorMessage || ("API Error: " + (response ? response.status : "Connection failed")));
+            incrementUsage(selectedGeminiModel, activeKey);
             const data = await response.json();
             const candidate = data.candidates?.[0];
             if (!candidate) throw new Error("No completion candidate returned by Gemini.");
@@ -5053,18 +4154,217 @@ If this update establishes a new reusable design rule or pattern, you may also i
             upgradeBtn.textContent = "Upgrade";
             loader.style.display = 'none';
 
-            if (isUpgraderAiMode) {
-                 if (document.getElementById('camera-btn')) document.getElementById('camera-btn').style.display = 'none';
-                 if (document.getElementById('bridge-toggle-container')) document.getElementById('bridge-toggle-container').style.display = 'flex';
-            } else {
+            if (!isUpgraderAiMode) {
                  const aiToolGroup = document.getElementById('ai-tool-group');
                  if (aiToolGroup) aiToolGroup.style.display = 'flex';
-                 if (document.getElementById('bridge-toggle-container')) document.getElementById('bridge-toggle-container').style.display = 'flex';
             }
+            if (bridgeToggleContainer) bridgeToggleContainer.style.display = 'flex';
         }
     }
 
-    document.getElementById('manual-undo-btn').addEventListener('click', function() { if(confirm("Are you sure you want to undo the last upgrade?")) undoManualUpgrade(); });
+    async function callGeminiWithKeyRetry(modelId, contentParts, genConfig, statusCb = null) {
+        let activeKey = typeof pickBestStartingKey === 'function'
+            ? pickBestStartingKey(modelId)
+            : (typeof getCurrentGeminiKey === 'function' ? getCurrentGeminiKey() : apiKey);
+        if (!activeKey) throw new Error('Please add a Gemini API Key in Manage Keys.');
+
+        let response = null;
+        let lastErrorMessage = '';
+        const configuredKeys = getConfiguredGeminiKeys();
+        const maxAttempts = configuredKeys.length > 0 ? Math.max(2, configuredKeys.length * 2) : 2;
+
+        for (let attempt = 0; attempt < maxAttempts; attempt++) {
+            if (typeof statusCb === 'function') statusCb(attempt + 1, maxAttempts);
+            try {
+                response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelId}:generateContent?key=${activeKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: contentParts }],
+                        safetySettings: [
+                            { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
+                            { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
+                            { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
+                            { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" }
+                        ],
+                        generationConfig: genConfig
+                    })
+                });
+            } catch (netErr) {
+                response = null;
+                lastErrorMessage = netErr.message || 'Network error';
+            }
+            if (response && response.ok) break;
+
+            const errInfo = await inspectGeminiHttpError(response);
+            lastErrorMessage = errInfo.message || lastErrorMessage;
+
+            if (errInfo.isDailyExhausted) {
+                markKeyQuotaExhausted(activeKey, modelId);
+                if (configuredKeys.length > 1) {
+                    const prevKey = activeKey;
+                    rotateGeminiKey(modelId);
+                    activeKey = getCurrentGeminiKey();
+                    if (activeKey && activeKey !== prevKey) continue;
+                }
+                break;
+            } else if (errInfo.isTransientRateLimit) {
+                if (configuredKeys.length > 1) {
+                    rotateGeminiKey(modelId);
+                    activeKey = getCurrentGeminiKey();
+                }
+                await new Promise(r => setTimeout(r, 1500));
+                continue;
+            } else if ([400, 403].includes(errInfo.status)) {
+                if (configuredKeys.length > 1) {
+                    rotateGeminiKey(modelId);
+                    activeKey = getCurrentGeminiKey();
+                    continue;
+                }
+                break;
+            }
+            break;
+        }
+        if (!response || !response.ok) throw new Error(lastErrorMessage || ('API Error: ' + (response ? response.status : 'Connection failed')));
+        incrementUsage(modelId, activeKey);
+        const data = await response.json();
+        const rawText = data.candidates?.[0]?.content?.parts?.filter(p => !p.thought).map(p => p.text || '').join('').trim();
+        if (!rawText) throw new Error('Empty response from Gemini.');
+        return rawText;
+    }
+
+    async function autoScreenSkillsWithLite(instruction, currentCode) {
+        try {
+            if (typeof getAllSkillsCatalogLines !== 'function') return;
+            const catalogLines = getAllSkillsCatalogLines();
+            if (!catalogLines) return;
+            const titleM = (currentCode || '').match(/<title[^>]*>([\s\S]*?)<\/title>/i);
+            const appTitle = (document.getElementById('app-title-input')?.value || (titleM ? titleM[1] : '') || 'Single-file HTML app').trim();
+            const codePreview = budgetCodePreview(currentCode || '', 4000);
+            const screenPrompt = `Select the minimal set of relevant skill filenames for this app task.
+App Title: ${appTitle}
+User Request: ${instruction}
+Code Preview:
+\`\`\`html
+${codePreview}
+\`\`\`
+
+AVAILABLE SKILLS CATALOG:
+${catalogLines}
+
+Return ONLY an XML block with the relevant skill filenames (always include user_preferences.md if listed):
+\`\`\`xml
+<skills_select>
+  <skill>filename.md</skill>
+</skills_select>
+\`\`\``;
+            const raw = await callGeminiWithKeyRetry('gemini-3.5-flash-lite', [{ text: screenPrompt }], {
+                maxOutputTokens: 16384,
+                thinkingConfig: { thinkingLevel: 'minimal' }
+            });
+            if (typeof applySkillsSelectFromText === 'function') {
+                const res = applySkillsSelectFromText(raw);
+                if (res.applied && typeof showStudioToast === 'function') {
+                    showStudioToast(`Auto-selected ${res.names.length} project skill(s)`, 'ok');
+                }
+            }
+        } catch (err) {
+            console.warn('Turn-1 skill auto-screening skipped:', err.message);
+        }
+    }
+
+    async function optimizeSkillsWithAi() {
+        const currentCode = codeEditor ? codeEditor.value : '';
+        const instruction = document.getElementById('manual-input') ? document.getElementById('manual-input').value.trim() : '';
+        const btn = document.getElementById('download-context-btn');
+        const loader = document.getElementById('mini-loader');
+        const allNames = typeof skillsRepo === 'object' ? Object.keys(skillsRepo).sort() : [];
+        if (allNames.length === 0) { alert('No skills found in library.'); return; }
+
+        const activeKey = typeof pickBestStartingKey === 'function' ? pickBestStartingKey(selectedGeminiModel) : apiKey;
+        if (!activeKey) { alert('Please add a Gemini API Key in Manage Keys first.'); return; }
+
+        if (btn) { btn.disabled = true; btn.textContent = 'Optimizing...'; }
+        if (loader) loader.style.display = 'block';
+
+        try {
+            const fullRepoDump = allNames.map(fn => `=== SKILL: ${fn} ===\n${(skillsRepo[fn].content || '').trim()}\n=== END SKILL: ${fn} ===`).join('\n\n');
+            const CD_S = '<!' + '[CDATA[';
+            const CD_E = ']' + ']' + '>';
+            const optPrompt = `You are a Skills Curator & User Preference Architect.
+Analyze the current application codebase, user note, and the full Skills Repository below.
+
+1. Select ONLY the skills directly relevant to building/maintaining THIS codebase (keep it focused and lean).
+2. If the codebase or user note reveals any durable, cross-project user design/workflow preferences not yet recorded in \`user_preferences.md\`, update \`user_preferences.md\` via <skill_patch action="modify"> (merge cleanly, <= 35 concise bullets, NO one-off project content).
+
+USER NOTE: ${instruction || '(Optimize skills for this codebase)'}
+
+CURRENT CODEBASE:
+\`\`\`html
+${budgetCodePreview(currentCode, 35000)}
+\`\`\`
+
+FULL SKILLS REPOSITORY:
+${fullRepoDump}
+
+OUTPUT FORMAT (ONE single \`\`\`xml fence):
+\`\`\`xml
+<skills_select>
+  <skill>relevant_skill.md</skill>
+</skills_select>
+<!-- Optional if durable preferences found: -->
+<skill_patch>
+  <file name="user_preferences.md" action="modify" category="Personal">
+    <operation>
+      <search>${CD_S}exact original lines in user_preferences.md${CD_E}</search>
+      <replace>${CD_S}updated lines${CD_E}</replace>
+    </operation>
+  </file>
+</skill_patch>
+\`\`\``;
+
+            const genConfig = { maxOutputTokens: 65536 };
+            const thinkingCfg = getFlashThinkingConfig(selectedGeminiModel);
+            if (thinkingCfg) genConfig.thinkingConfig = thinkingCfg;
+
+            const raw = await callGeminiWithKeyRetry(selectedGeminiModel, [{ text: optPrompt }], genConfig);
+            const notices = [];
+
+            if (typeof applySkillsSelectFromText === 'function') {
+                const selRes = applySkillsSelectFromText(raw);
+                if (selRes.applied) {
+                    notices.push(`Active skills (${selRes.names.length}): ${selRes.names.join(', ')}`);
+                }
+            }
+            if (typeof hasSkillPatchMarkers === 'function' && hasSkillPatchMarkers(raw) && typeof applySkillPatchText === 'function') {
+                const hasExplicitXml = /<skill_patch[\s>]/i.test(raw);
+                const patchRes = await applySkillPatchText(raw, true, !hasExplicitXml);
+                if (patchRes.applied) {
+                    notices.push(`Preferences updated:\n${patchRes.message}`);
+                }
+            }
+
+            if (notices.length > 0) {
+                if (typeof showStudioToast === 'function') showStudioToast('Skills optimized for this project', 'ok');
+                alert(`Skills Optimized!\n\n${notices.join('\n\n')}`);
+            } else {
+                alert('AI reviewed your repository and made no changes.');
+            }
+        } catch (err) {
+            console.error(err);
+            alert('Skill Optimization Failed: ' + err.message);
+        } finally {
+            if (btn) {
+                btn.disabled = false;
+                btn.textContent = isUpgraderAiMode ? 'Optimize Skills' : 'Get AI Context';
+            }
+            if (loader) loader.style.display = 'none';
+        }
+    }
+
+    document.getElementById('manual-undo-btn').addEventListener('click', function() {
+        if (confirm("Are you sure you want to undo the last upgrade?")) undoManualUpgrade();
+    });
     document.getElementById('manual-upgrade-btn').addEventListener('click', function() {
         if (isUpgraderAiMode) {
             runMiniAiUpgrade();
@@ -5106,11 +4406,6 @@ If this update establishes a new reusable design rule or pattern, you may also i
         document.getElementById('gemini-keys-container').appendChild(row);
     }
 
-    document.getElementById('btn-gemini-keys')?.addEventListener('click', () => {
-        renderKeys();
-        document.getElementById('gemini-keys-modal').style.display = 'flex';
-    });
-
     document.getElementById('btn-mini-gemini-keys')?.addEventListener('click', () => {
         renderKeys();
         document.getElementById('gemini-keys-modal').style.display = 'flex';
@@ -5135,11 +4430,9 @@ If this update establishes a new reusable design rule or pattern, you may also i
         localStorage.setItem('geminiKeys', JSON.stringify(geminiKeys));
         localStorage.setItem('geminiKeyIndex', '0');
         currentKeyIndex = 0;
-        if(geminiKeys.length > 0) {
+        if (geminiKeys.length > 0) {
             apiKey = geminiKeys[0].key;
             localStorage.setItem('geminiApiKey', apiKey);
-            const mainKeyEl = document.getElementById('api-key');
-            if(mainKeyEl) mainKeyEl.value = apiKey;
         }
         renderGeminiUsage();
         document.getElementById('gemini-keys-modal').style.display = 'none';
@@ -5186,9 +4479,35 @@ If this update establishes a new reusable design rule or pattern, you may also i
         return geminiKeys[currentKeyIndex].key || geminiKeys[currentKeyIndex];
     }
 
-    function rotateGeminiKey() {
+    function pickBestStartingKey(modelId = selectedGeminiModel) {
+        if (geminiKeys.length === 0) return apiKey;
+        if (currentKeyIndex >= geminiKeys.length) currentKeyIndex = 0;
+        const curKey = geminiKeys[currentKeyIndex].key || geminiKeys[currentKeyIndex];
+        if (getKeyRemaining(curKey, modelId) > 0) return curKey;
+        for (let offset = 1; offset < geminiKeys.length; offset++) {
+            const idx = (currentKeyIndex + offset) % geminiKeys.length;
+            const cand = geminiKeys[idx].key || geminiKeys[idx];
+            if (getKeyRemaining(cand, modelId) > 0) {
+                currentKeyIndex = idx;
+                localStorage.setItem('geminiKeyIndex', currentKeyIndex);
+                return cand;
+            }
+        }
+        return curKey;
+    }
+
+    function rotateGeminiKey(modelId = selectedGeminiModel) {
         if (geminiKeys.length > 1) {
-            currentKeyIndex = (currentKeyIndex + 1) % geminiKeys.length;
+            let nextIdx = (currentKeyIndex + 1) % geminiKeys.length;
+            for (let offset = 1; offset < geminiKeys.length; offset++) {
+                const candIdx = (currentKeyIndex + offset) % geminiKeys.length;
+                const candKey = geminiKeys[candIdx].key || geminiKeys[candIdx];
+                if (getKeyRemaining(candKey, modelId) > 0) {
+                    nextIdx = candIdx;
+                    break;
+                }
+            }
+            currentKeyIndex = nextIdx;
             localStorage.setItem('geminiKeyIndex', currentKeyIndex);
             console.log("Rotated to key index: " + currentKeyIndex);
         }
@@ -6134,6 +5453,7 @@ If this update establishes a new reusable design rule or pattern, you may also i
         };
         try { localStorage.setItem(DESIGN_PREFS_LS_KEY, JSON.stringify(snapshot)); } catch (e) {}
         saveAssetData(DESIGN_PREFS_DB_KEY, snapshot).catch(err => console.warn('IndexedDB design save warning:', err));
+        if (typeof broadcastPreferencesChange === 'function') broadcastPreferencesChange(250);
     }
 
     function toggleDesignApplyNewApps(checked) {
@@ -7386,6 +6706,7 @@ a { color: var(--hd-contrast); }
             broadcastChange(100);
         }
 
+        const wasCleared = designDraftCleared;
         designDraftCleared = false;
         designHasUnsavedChanges = false;
         designBaselineSnapshot = getDesignStyleSnapshot();
@@ -7400,7 +6721,7 @@ a { color: var(--hd-contrast); }
         }
         const note = document.getElementById('design-status-note');
         if (note) {
-            note.textContent = designDraftCleared
+            note.textContent = wasCleared
                 ? 'Style cleared and pushed live to students.'
                 : 'Design saved and pushed live to students.';
         }
@@ -8536,7 +7857,32 @@ Audit every drafted skill against this checklist:
 - **Token-Efficient Formatting:** Uses markdown tables, bullet lists, and code diffs rather than verbose narrative paragraphs.
 - **Modular Reference:** Large asset lists, color registries, or heavy palettes are delegated to secondary reference files.`;
 
+    const PERSONAL_SKILL_FILE = 'user_preferences.md';
+
+    const USER_PREFERENCES_STARTER_MD = `---
+name: user-preferences
+category: Personal
+description: Always-active personal profile storing durable user design preferences, classroom context, accessibility habits, and cross-project app-building rules. Automatically updated as the user reveals preferences.
+---
+
+# User Personal Preferences & Context
+
+## Core Philosophy / Non-Negotiables
+- ALWAYS treat rules in this file as persistent user preferences across all projects.
+- NEVER store single-project topics, temporary bug fixes, or one-off quiz questions here; store ONLY durable, reusable preferences.
+- ALWAYS merge or replace outdated rules cleanly rather than appending duplicates (keep <= 35 bullet rules total).
+
+## Identity & Audience Context
+- (Auto-learned as you share your role, audience, or target devices)
+
+## Design, UI & Workflow Preferences
+- (Auto-learned as you specify layout, visual, or interaction preferences)
+
+## Coding & Architecture Conventions
+- (Auto-learned as you state preferred patterns or things to avoid)`;
+
     const STARTER_SKILLS = {
+        'user_preferences.md': USER_PREFERENCES_STARTER_MD,
         'skill_creator_and_optimizer.md': SKILL_CREATOR_OPTIMIZER_MD,
         'single_file_architecture.md': `---
 name: single-file-architecture
@@ -10149,12 +9495,14 @@ fishMaterial.onBeforeCompile = (shader) => {
     let skillsRepo = {};
     let skillsMeta = {
         starred: [
+            'user_preferences.md',
             'skill_creator_and_optimizer.md',
             'editorial_ui_and_ux_laws.md',
             'classroom_accessibility_udl.md',
             'single_file_architecture.md'
         ],
         categories: {
+            'user_preferences.md': 'Personal',
             'skill_creator_and_optimizer.md': 'Meta-Skill',
             'single_file_architecture.md': 'Architecture',
             'classroom_accessibility_udl.md': 'Pedagogy',
@@ -10277,6 +9625,7 @@ fishMaterial.onBeforeCompile = (shader) => {
             skillsMeta.categories[fname] = fm.category || 'General';
         });
         skillsMeta.starred = [
+            'user_preferences.md',
             'skill_creator_and_optimizer.md',
             'editorial_ui_and_ux_laws.md',
             'classroom_accessibility_udl.md',
@@ -10327,11 +9676,24 @@ fishMaterial.onBeforeCompile = (shader) => {
         if (!skillsMeta.categories) skillsMeta.categories = {};
         if (!skillsMeta.hasLocalUserChanges) {
             skillsMeta.starred = [
+                'user_preferences.md',
                 'skill_creator_and_optimizer.md',
                 'editorial_ui_and_ux_laws.md',
                 'classroom_accessibility_udl.md',
                 'single_file_architecture.md'
             ];
+        }
+        if (!skillsRepo[PERSONAL_SKILL_FILE]) {
+            skillsRepo[PERSONAL_SKILL_FILE] = {
+                filename: PERSONAL_SKILL_FILE,
+                content: USER_PREFERENCES_STARTER_MD.trim() + '\n',
+                updatedAt: Date.now()
+            };
+            skillsMeta.categories[PERSONAL_SKILL_FILE] = 'Personal';
+        }
+        if (!Array.isArray(skillsMeta.starred)) skillsMeta.starred = [];
+        if (!skillsMeta.starred.includes(PERSONAL_SKILL_FILE)) {
+            skillsMeta.starred.unshift(PERSONAL_SKILL_FILE);
         }
         if (skillsRepo['welcome_guide.md'] && /Evan's Skills Repository/i.test(skillsRepo['welcome_guide.md'].content || '')) {
             skillsRepo['welcome_guide.md'].content = STARTER_SKILLS['welcome_guide.md'].trim() + '\n';
@@ -10393,21 +9755,31 @@ fishMaterial.onBeforeCompile = (shader) => {
         }
     }
 
+    function withPinnedPersonalSkill(list) {
+        const out = [...new Set(list)].filter(n => skillsRepo[n]);
+        if (skillsRepo[PERSONAL_SKILL_FILE] && !out.includes(PERSONAL_SKILL_FILE)) {
+            out.unshift(PERSONAL_SKILL_FILE);
+        }
+        return out;
+    }
+
     function getActiveSkillsInfo() {
         const allNames = Object.keys(skillsRepo);
         if (skillsMeta.streamlinedContent && skillsMeta.streamlinedContent.trim()) {
             const matches = [...skillsMeta.streamlinedContent.matchAll(/=== SKILL:\s*(.*?)\s*===/g)].map(m => m[1].trim());
-            const unique = [...new Set(matches)].filter(n => allNames.includes(n));
-            return { names: unique, isStreamlined: true, content: skillsMeta.streamlinedContent };
+            const unique = withPinnedPersonalSkill(matches.filter(n => allNames.includes(n)));
+            return { names: unique, isStreamlined: true, content: buildSkillsBundleText(unique) };
         }
         if (skillsMeta.activeInitialized) {
-            const validActive = (skillsMeta.active || []).filter(n => allNames.includes(n));
+            const validActive = withPinnedPersonalSkill((skillsMeta.active || []).filter(n => allNames.includes(n)));
             return { names: validActive, isStreamlined: validActive.length > 0, content: buildSkillsBundleText(validActive) };
         }
         const starred = Array.isArray(skillsMeta.starred) ? skillsMeta.starred : [];
-        const defaults = allNames
-            .filter(n => starred.includes(n) || n === 'skill_creator_and_optimizer.md')
-            .sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
+        const defaults = withPinnedPersonalSkill(
+            allNames
+                .filter(n => starred.includes(n) || n === 'skill_creator_and_optimizer.md' || n === PERSONAL_SKILL_FILE)
+                .sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()))
+        );
         return { names: defaults, isStreamlined: false, content: buildSkillsBundleText(defaults) };
     }
 
@@ -10416,12 +9788,62 @@ fishMaterial.onBeforeCompile = (shader) => {
     }
 
     function setActiveSkillFilenames(list, markStreamlined = true) {
-        const valid = [...new Set(list)].filter(n => skillsRepo[n]);
+        const valid = withPinnedPersonalSkill(list);
         skillsMeta.active = valid;
         skillsMeta.activeInitialized = markStreamlined;
         skillsMeta.streamlinedContent = markStreamlined ? buildSkillsBundleText(valid) : '';
         saveSkillsState();
         updateActiveSkillsBadge();
+    }
+
+    function getAllSkillsCatalogLines(excludeSet = null) {
+        return Object.keys(skillsRepo)
+            .filter(fn => !excludeSet || !excludeSet.has(fn))
+            .sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()))
+            .map(fn => {
+                const d = getSkillDetails(fn);
+                return `- ${fn} [${d.category}]: ${d.description}`;
+            })
+            .join('\n');
+    }
+
+    function getSkillCatalogPromptBlock() {
+        const activeSet = new Set(getActiveSkillFilenames());
+        const lines = getAllSkillsCatalogLines(activeSet);
+        if (!lines) return '';
+        return `\nAVAILABLE INACTIVE SKILLS CATALOG (Descriptions only — load via <skills_select> if relevant):\n${lines}\n`;
+    }
+
+    function applySkillsSelectFromText(rawText) {
+        if (!rawText) return { applied: false, names: [] };
+        const m = rawText.match(/<skills_select[^>]*>([\s\S]*?)<\/skills_select>/i);
+        if (!m) return { applied: false, names: [] };
+        const inner = m[1];
+        const allNames = Object.keys(skillsRepo);
+        const lookup = {};
+        allNames.forEach(fn => {
+            lookup[fn.toLowerCase()] = fn;
+            lookup[fn.replace(/\.md$/i, '').toLowerCase()] = fn;
+            const fm = parseSkillFrontmatter(skillsRepo[fn].content || '');
+            if (fm.name) lookup[fm.name.toLowerCase()] = fn;
+        });
+
+        const picks = [];
+        for (const sm of inner.matchAll(/<skill[^>]*>([\s\S]*?)<\/skill>/gi)) {
+            const raw = sm[1].trim().toLowerCase();
+            if (lookup[raw]) picks.push(lookup[raw]);
+        }
+        if (picks.length === 0) {
+            inner.split(/\r?\n/).forEach(line => {
+                const cleaned = line.replace(/^[\s*\-•\d.]+/, '').trim().replace(/^[`'"]+|[`'"]+$/g, '').toLowerCase();
+                if (lookup[cleaned]) picks.push(lookup[cleaned]);
+            });
+        }
+        if (picks.length === 0) return { applied: false, names: [] };
+        const finalNames = withPinnedPersonalSkill(picks);
+        setActiveSkillFilenames(finalNames, true);
+        refreshSkillsHubUI();
+        return { applied: true, names: finalNames };
     }
 
     function buildSkillsBundleText(filenames) {
@@ -10859,6 +10281,11 @@ fishMaterial.onBeforeCompile = (shader) => {
     }
 
     function removeSkillFromActive(fname) {
+        if (fname === PERSONAL_SKILL_FILE) {
+            setSkillsHubStatus(`'${PERSONAL_SKILL_FILE}' is pinned as Always Active across projects.`);
+            if (typeof showStudioToast === 'function') showStudioToast('user_preferences.md is Always Active (editable in Skill Editor).', 'info');
+            return;
+        }
         const current = getActiveSkillFilenames().filter(n => n !== fname);
         setActiveSkillFilenames(current, true);
         refreshSkillsHubUI();
@@ -11058,6 +10485,10 @@ fishMaterial.onBeforeCompile = (shader) => {
 
     async function deleteSkillFile(fname) {
         if (!skillsRepo[fname]) return;
+        if (fname === PERSONAL_SKILL_FILE) {
+            alert(`'${PERSONAL_SKILL_FILE}' is your pinned Personal Skill. Open it in the Skill Editor to edit or clear its preferences.`);
+            return;
+        }
         if (!confirm(`Delete skill '${fname}' permanently from your repository?`)) return;
 
         await saveSkillBackupSnapshot(fname, skillsRepo[fname].content, 'delete');
@@ -11598,6 +11029,12 @@ RULES:
         await mirrorSkillsMetaToLocalIfConnected();
         updateActiveSkillsBadge();
         refreshSkillsHubUI();
+
+        const updatedPersonal = (patchData.modifications || []).some(m => m.file === PERSONAL_SKILL_FILE)
+            || (patchData.creations || []).some(c => c.file === PERSONAL_SKILL_FILE);
+        if (updatedPersonal && typeof showStudioToast === 'function') {
+            showStudioToast('Personal preference learned & saved to user_preferences.md', 'ok');
+        }
         return { ok: true, logText: logs.join('\n') };
     }
 
@@ -11696,8 +11133,9 @@ RULES:
         if (!creations.length && !deletions.length && !modifications.length) {
             return { applied: false, message: 'No operations found.' };
         }
-        if (creations.length > 0 || deletions.length > 0) {
-            const approved = await openStructuralDecisionModal(creations, deletions, modifications.length);
+        const nonPersonalCreations = creations.filter(c => c.file !== PERSONAL_SKILL_FILE);
+        if (nonPersonalCreations.length > 0 || deletions.length > 0) {
+            const approved = await openStructuralDecisionModal(nonPersonalCreations, deletions, modifications.length);
             if (!approved) {
                 setSkillsHubStatus('Structural skill patch rejected by user.');
                 return { applied: false, message: 'Cancelled' };
